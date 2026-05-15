@@ -1,8 +1,58 @@
 // frontend/src/pages/Home.jsx
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { searchEvents, toUtcStart, toUtcEnd, addFavorite } from "../lib/api";
 import EventCard from "../components/EventCard";
+import {
+  SearchIcon,
+  PinIcon,
+  MusicIcon,
+  HeartIcon,
+  SparkIcon,
+  GlobeIcon,
+  TicketIcon,
+  ArrowRightIcon,
+  RefreshIcon,
+  CalendarIcon,
+} from "../components/Icons";
+
+const HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=800&q=80",
+];
+
+const FEATURES = [
+  {
+    icon: <PinIcon size={22} />,
+    title: "Concerti nella tua città",
+    text: "Filtra per città e scopri in pochi secondi tutti gli show vicino a te.",
+  },
+  {
+    icon: <MusicIcon size={22} />,
+    title: "Artisti, date e venue",
+    text: "Cerca per artista o genere e trova date, orari e location aggiornati.",
+  },
+  {
+    icon: <HeartIcon size={22} />,
+    title: "Salva i tuoi preferiti",
+    text: "Crea la tua lista personale e tieni d'occhio gli eventi che non vuoi perdere.",
+  },
+  {
+    icon: <SparkIcon size={22} />,
+    title: "Esperienza personalizzata",
+    text: "Un'interfaccia veloce e pulita, pensata per chi ama la musica live.",
+  },
+];
+
+// "YYYY-MM-DD" in orario locale (niente shift da UTC)
+function formatDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
 export default function Home() {
   const [form, setForm] = useState({
@@ -14,22 +64,21 @@ export default function Home() {
     page: 0,
   });
 
-  const [data, setData] = useState({ events: [], totalPages: 1, page: 0 });
+  const [data, setData] = useState({
+    events: [],
+    totalPages: 1,
+    page: 0,
+    totalElements: 0,
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
-  const [quickRange, setQuickRange] = useState(null); // "today" | "week" | "month" | null
+  const [quickRange, setQuickRange] = useState(null);
 
   function update(p) {
     setForm((f) => ({ ...f, ...p }));
   }
 
-  // helper per formattare una Date in "YYYY-MM-DD"
-  function formatDate(d) {
-    return d.toISOString().slice(0, 10);
-  }
-
-  // pulsanti rapidi per il periodo
   function applyQuickRange(id) {
     const now = new Date();
     let startDate = null;
@@ -39,8 +88,7 @@ export default function Home() {
       startDate = now;
       endDate = now;
     } else if (id === "week") {
-      // lunedì → domenica della settimana corrente
-      const day = now.getDay(); // 0..6 (dom=0)
+      const day = now.getDay();
       const diffToMonday = (day + 6) % 7;
       const monday = new Date(now);
       monday.setDate(now.getDate() - diffToMonday);
@@ -49,10 +97,8 @@ export default function Home() {
       startDate = monday;
       endDate = sunday;
     } else if (id === "month") {
-      const first = new Date(now.getFullYear(), now.getMonth(), 1);
-      const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      startDate = first;
-      endDate = last;
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     }
 
     if (!startDate || !endDate) return;
@@ -66,20 +112,13 @@ export default function Home() {
     }));
   }
 
-  // 🔄 azzera completamente il filtro date e rilancia la ricerca
   function clearDates() {
     setQuickRange(null);
-    const cleared = {
-      ...form,
-      start: "",
-      end: "",
-      page: 0,
-    };
+    const cleared = { ...form, start: "", end: "", page: 0 };
     setForm(cleared);
-    runSearch(0, cleared); // uso il form "pulito" per la chiamata
+    runSearch(0, cleared);
   }
 
-  // page = pagina, overrideForm = form opzionale (per casi come clearDates)
   async function runSearch(page = 0, overrideForm) {
     setLoading(true);
     setError("");
@@ -97,7 +136,6 @@ export default function Home() {
         end: toUtcEnd(usedForm.end),
       });
 
-      // deduplica eventi con stesso id
       const seen = new Set();
       const uniqueEvents = [];
       for (const ev of res.events || []) {
@@ -107,15 +145,13 @@ export default function Home() {
         }
       }
 
-      setData({
-        ...res,
-        events: uniqueEvents,
-      });
-
+      setData({ ...res, events: uniqueEvents });
       setForm((f) => ({ ...f, page: res.page ?? page }));
     } catch (e) {
       console.error(e);
-      setError("Nessun risultato o errore di rete.");
+      setError(
+        "Non siamo riusciti a caricare gli eventi in questo momento. Riprova tra poco."
+      );
     } finally {
       setLoading(false);
     }
@@ -126,13 +162,19 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  function scrollToSearch() {
+    document
+      .getElementById("ricerca")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   async function handleAddFavorite(ev) {
     setError("");
     setInfo("");
 
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Devi effettuare il login per salvare i preferiti.");
+      setError("Accedi al tuo account per salvare gli eventi tra i preferiti.");
       return;
     }
 
@@ -146,176 +188,353 @@ export default function Home() {
         city: ev.city,
         url: ev.url,
       });
-      setInfo("Evento aggiunto ai preferiti.");
+      setInfo(`"${ev.name}" è stato aggiunto ai tuoi preferiti.`);
     } catch (e) {
       console.error(e);
-      setError(e.message || "Errore nel salvataggio del preferito.");
+      setError(e.message || "Non è stato possibile salvare il preferito.");
     }
   }
 
+  const hasResults = data.events?.length > 0;
+
   return (
-    <div className="container py-5 app-container">
-      <form
-        className="filters row g-3 align-items-end"
-        onSubmit={(e) => {
-          e.preventDefault();
-          runSearch(0);
-        }}
-      >
-        {/* Città */}
-        <div className="col-12 col-md-3">
-          <label className="form-label">Città</label>
-          <input
-            className="form-control"
-            value={form.city}
-            onChange={(e) => update({ city: e.target.value })}
-          />
-        </div>
+    <>
+      {/* ===== HERO ===== */}
+      <section className="hero">
+        <div className="hero__glow" />
+        <div className="wrap hero__inner">
+          <div>
+            <span className="eyebrow">
+              <SparkIcon size={14} /> Eventi live · powered by Ticketmaster
+            </span>
 
-        {/* Artista / Genere */}
-        <div className="col-12 col-md-3">
-          <label className="form-label">Artista/Genere</label>
-          <input
-            className="form-control"
-            value={form.keyword}
-            onChange={(e) => update({ keyword: e.target.value })}
-          />
-        </div>
+            <h1 className="hero__title">
+              Vivi la musica.
+              <br />
+              <span className="grad">Trova il tuo prossimo concerto.</span>
+            </h1>
 
-        {/* Quando: pulsanti rapidi + range date */}
-        <div className="col-12 col-md-4">
-          <label className="form-label">Quando</label>
+            <p className="hero__sub">
+              ConcertHub raccoglie concerti ed eventi live in tutta Italia.
+              Cerca per città, artista o data, scopri venue e prezzi, e salva
+              gli show che non vuoi perdere.
+            </p>
 
-          {/* Pulsanti rapidi */}
-          <div className="quick-range-row mb-2">
-            <button
-              type="button"
-              className={
-                "quick-range-pill" + (quickRange === "today" ? " active" : "")
-              }
-              onClick={() => applyQuickRange("today")}
-            >
-              Oggi
-            </button>
-            <button
-              type="button"
-              className={
-                "quick-range-pill" + (quickRange === "week" ? " active" : "")
-              }
-              onClick={() => applyQuickRange("week")}
-            >
-              Questa settimana
-            </button>
-            <button
-              type="button"
-              className={
-                "quick-range-pill" + (quickRange === "month" ? " active" : "")
-              }
-              onClick={() => applyQuickRange("month")}
-            >
-              Questo mese
-            </button>
-
-            {/* reset date minimal */}
-            <button
-              type="button"
-              className="quick-reset-icon"
-              onClick={clearDates}
-              title="Reset periodo"
-            >
-              🔁
-            </button>
-          </div>
-
-          {/* Duo Dal / Al */}
-          <div className="d-flex justify-content-between small mb-1">
-            <span className="date-label">Dal</span>
-            <span className="date-label">Al</span>
-          </div>
-
-          <div className="row g-2">
-            <div className="col-6">
-              <input
-                type="date"
-                className="form-control date-field"
-                value={form.start}
-                onChange={(e) => {
-                  setQuickRange(null);
-                  update({ start: e.target.value });
-                }}
-              />
+            <div className="hero__actions">
+              <button
+                type="button"
+                className="btn btn--primary"
+                onClick={scrollToSearch}
+              >
+                <SearchIcon size={18} />
+                Cerca eventi
+              </button>
+              <Link to="/favorites" className="btn btn--ghost">
+                <HeartIcon size={18} />I miei preferiti
+              </Link>
             </div>
-            <div className="col-6">
-              <input
-                type="date"
-                className="form-control date-field"
-                value={form.end}
-                onChange={(e) => {
-                  setQuickRange(null);
-                  update({ end: e.target.value });
-                }}
-              />
+
+            <div className="hero__stats">
+              <div className="hero__stat">
+                <div className="n">1000+</div>
+                <div className="l">Eventi in catalogo</div>
+              </div>
+              <div className="hero__stat">
+                <div className="n">90+</div>
+                <div className="l">Città coperte</div>
+              </div>
+              <div className="hero__stat">
+                <div className="n">Live</div>
+                <div className="l">Dati sempre aggiornati</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="hero__art" aria-hidden="true">
+            <div className="hero__card c1">
+              <img src={HERO_IMAGES[0]} alt="" />
+            </div>
+            <div className="hero__card c2">
+              <img src={HERO_IMAGES[1]} alt="" />
+            </div>
+            <div className="hero__card c3">
+              <img src={HERO_IMAGES[2]} alt="" />
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Bottone Cerca */}
-        <div className="col-12 col-md-2">
-          <button className="btn btn-primary w-100">Cerca</button>
-        </div>
-      </form>
-
-      {loading && <p className="mt-3">Caricamento…</p>}
-      {error && <p className="mt-3 text-danger">{error}</p>}
-      {info && !error && <p className="mt-3 text-success">{info}</p>}
-
-      {/* Stato “nessun evento disponibile” */}
-      {!loading && !error && data.events?.length === 0 && (
-        <div className="text-center text-light py-5">
-          <div className="mb-3">
-            <span className="display-1 d-block">🎧</span>
+      {/* ===== RICERCA + RISULTATI ===== */}
+      <section className="section" id="ricerca">
+        <div className="wrap">
+          <div className="section-head">
+            <h2>Scopri concerti nella tua città</h2>
+            <p>
+              Affina la ricerca per città, artista o periodo. I risultati si
+              aggiornano in tempo reale.
+            </p>
           </div>
-          <h4 className="mb-2">Nessun evento disponibile</h4>
-          <p className="text-muted mb-0">
-            Prova a cambiare città, data o parola chiave.
-          </p>
-        </div>
-      )}
 
-      {/* Griglia eventi */}
-      {data.events?.length > 0 && (
-        <div className="row row-cols-1 row-cols-md-3 g-3 mt-2">
-          {data.events.map((ev) => (
-            <div className="col" key={ev.id}>
-              <EventCard ev={ev} onAddFavorite={() => handleAddFavorite(ev)} />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {data.totalPages > 1 && (
-        <div className="d-flex align-items-center justify-content-between mt-3">
-          <button
-            className="btn btn-outline-secondary"
-            disabled={form.page <= 0}
-            onClick={() => runSearch(form.page - 1)}
+          <form
+            className="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              runSearch(0);
+            }}
           >
-            « Precedente
-          </button>
+            <div className="search__top">
+              <div className="field">
+                <label htmlFor="city">Città</label>
+                <div className="input-wrap">
+                  <PinIcon size={18} />
+                  <input
+                    id="city"
+                    className="input"
+                    placeholder="Es. Milano, Roma, Napoli…"
+                    value={form.city}
+                    onChange={(e) => update({ city: e.target.value })}
+                  />
+                </div>
+              </div>
 
-          <span className="small text-info-light">
-            Pagina {form.page + 1} di {data.totalPages || 1}
-          </span>
+              <div className="field">
+                <label htmlFor="keyword">Artista o genere</label>
+                <div className="input-wrap">
+                  <MusicIcon size={18} />
+                  <input
+                    id="keyword"
+                    className="input"
+                    placeholder="Es. Coldplay, rock, jazz…"
+                    value={form.keyword}
+                    onChange={(e) => update({ keyword: e.target.value })}
+                  />
+                </div>
+              </div>
 
-          <button
-            className="btn btn-outline-secondary"
-            disabled={form.page + 1 >= (data.totalPages || 1)}
-            onClick={() => runSearch(form.page + 1)}
-          >
-            Successiva »
-          </button>
+              <div className="field" style={{ justifyContent: "flex-end" }}>
+                <button type="submit" className="btn btn--primary">
+                  <SearchIcon size={18} />
+                  Cerca
+                </button>
+              </div>
+            </div>
+
+            <div className="search__bottom">
+              <div className="field">
+                <label>Periodo rapido</label>
+                <div className="chips">
+                  {[
+                    { id: "today", label: "Oggi" },
+                    { id: "week", label: "Questa settimana" },
+                    { id: "month", label: "Questo mese" },
+                  ].map((q) => (
+                    <button
+                      key={q.id}
+                      type="button"
+                      className={
+                        "chip" + (quickRange === q.id ? " is-active" : "")
+                      }
+                      onClick={() => applyQuickRange(q.id)}
+                    >
+                      <CalendarIcon size={15} />
+                      {q.label}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="chip chip--reset"
+                    onClick={clearDates}
+                    title="Azzera periodo"
+                    aria-label="Azzera periodo"
+                  >
+                    <RefreshIcon size={15} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="dates">
+                <div className="field">
+                  <label htmlFor="start">Dal</label>
+                  <input
+                    id="start"
+                    type="date"
+                    className="input"
+                    value={form.start}
+                    onChange={(e) => {
+                      setQuickRange(null);
+                      update({ start: e.target.value });
+                    }}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="end">Al</label>
+                  <input
+                    id="end"
+                    type="date"
+                    className="input"
+                    value={form.end}
+                    onChange={(e) => {
+                      setQuickRange(null);
+                      update({ end: e.target.value });
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </form>
+
+          {/* messaggi */}
+          {error && (
+            <div className="banner banner--error" style={{ marginTop: 24 }}>
+              {error}
+            </div>
+          )}
+          {info && !error && (
+            <div className="banner banner--ok" style={{ marginTop: 24 }}>
+              {info}
+            </div>
+          )}
+
+          {/* risultati */}
+          <div style={{ marginTop: 36 }}>
+            {!loading && hasResults && (
+              <div className="results-bar">
+                <h2>Eventi trovati</h2>
+                <span className="count">
+                  {data.totalElements ?? data.events.length} risultati
+                </span>
+              </div>
+            )}
+
+            {loading && (
+              <div className="events-grid">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div className="sk-card" key={i}>
+                    <div className="sk sk--media" />
+                    <div className="sk sk--line w70" />
+                    <div className="sk sk--line w45" />
+                    <div
+                      className="sk sk--line"
+                      style={{ marginBottom: 18 }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!loading && !error && !hasResults && (
+              <div className="state">
+                <div className="state__icon">
+                  <SearchIcon size={30} />
+                </div>
+                <h3>Nessun evento trovato</h3>
+                <p>
+                  Non abbiamo trovato eventi per questi filtri. Prova a cambiare
+                  città, periodo o parola chiave.
+                </p>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={clearDates}
+                >
+                  <RefreshIcon size={18} />
+                  Azzera filtri
+                </button>
+              </div>
+            )}
+
+            {!loading && hasResults && (
+              <div className="events-grid">
+                {data.events.map((ev) => (
+                  <EventCard
+                    key={ev.id}
+                    ev={ev}
+                    onAddFavorite={() => handleAddFavorite(ev)}
+                  />
+                ))}
+              </div>
+            )}
+
+            {!loading && hasResults && data.totalPages > 1 && (
+              <div className="pager">
+                <button
+                  type="button"
+                  className="btn btn--outline btn--sm"
+                  disabled={form.page <= 0}
+                  onClick={() => runSearch(form.page - 1)}
+                >
+                  ← Precedente
+                </button>
+                <span className="pager__info">
+                  Pagina {form.page + 1} di {data.totalPages || 1}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn--outline btn--sm"
+                  disabled={form.page + 1 >= (data.totalPages || 1)}
+                  onClick={() => runSearch(form.page + 1)}
+                >
+                  Successiva →
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      )}
-    </div>
+      </section>
+
+      {/* ===== PERCHÉ CONCERTHUB ===== */}
+      <section className="section" id="why">
+        <div className="wrap">
+          <div className="section-head">
+            <h2>Perché usare ConcertHub</h2>
+            <p>
+              Tutto quello che ti serve per non perderti più un concerto, in un
+              unico posto.
+            </p>
+          </div>
+
+          <div className="features">
+            {FEATURES.map((f) => (
+              <div className="feature" key={f.title}>
+                <div className="feature__icon">{f.icon}</div>
+                <h3>{f.title}</h3>
+                <p>{f.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== CALL TO ACTION ===== */}
+      <section className="section" id="how">
+        <div className="wrap">
+          <div
+            className="search"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 24,
+              flexWrap: "wrap",
+            }}
+          >
+            <div style={{ maxWidth: 520 }}>
+              <h2 style={{ fontSize: "1.7rem" }}>
+                Crea il tuo account e salva i tuoi eventi
+              </h2>
+              <p style={{ color: "var(--text-dim)", marginTop: 12 }}>
+                Registrati gratuitamente per costruire la tua lista di concerti
+                preferiti e ritrovarli su qualsiasi dispositivo.
+              </p>
+            </div>
+            <Link to="/login" className="btn btn--primary">
+              <TicketIcon size={18} />
+              Inizia ora
+              <ArrowRightIcon size={18} />
+            </Link>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

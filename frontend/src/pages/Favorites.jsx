@@ -1,8 +1,15 @@
 // frontend/src/pages/Favorites.jsx
 
 import { useEffect, useState } from "react";
-import { getFavorites, removeFavorite } from "../lib/api";
 import { Link } from "react-router-dom";
+import { getFavorites, removeFavorite } from "../lib/api";
+import EventCard from "../components/EventCard";
+import {
+  HeartIcon,
+  LockIcon,
+  SearchIcon,
+  ArrowRightIcon,
+} from "../components/Icons";
 
 export default function FavoritesPage() {
   const [items, setItems] = useState([]);
@@ -22,7 +29,9 @@ export default function FavoritesPage() {
         const res = await getFavorites();
         setItems(res);
       } catch (e) {
-        setError(e.message || "Errore caricamento preferiti");
+        setError(
+          e.message || "Non è stato possibile caricare i tuoi preferiti."
+        );
       } finally {
         setLoading(false);
       }
@@ -36,80 +45,111 @@ export default function FavoritesPage() {
       await removeFavorite(id);
       setItems((prev) => prev.filter((f) => f._id !== id));
     } catch (e) {
-      setError(e.message || "Errore eliminazione preferito");
+      setError(e.message || "Non è stato possibile rimuovere il preferito.");
     }
   }
 
+  // Non autenticato
   if (!token) {
     return (
-      <div className="container py-5 app-container">
-        <p>
-          Devi effettuare il login per vedere i preferiti.{" "}
-          <Link to="/login">Vai al login</Link>.
-        </p>
-      </div>
+      <section className="section">
+        <div className="wrap">
+          <div className="state" style={{ maxWidth: 560, margin: "0 auto" }}>
+            <div className="state__icon">
+              <LockIcon size={30} />
+            </div>
+            <h3>Accedi per vedere i tuoi preferiti</h3>
+            <p>
+              Crea un account o effettua il login per salvare i concerti che ami
+              e ritrovarli quando vuoi.
+            </p>
+            <Link to="/login" className="btn btn--primary">
+              Vai al login
+              <ArrowRightIcon size={18} />
+            </Link>
+          </div>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="container py-5 app-container">
-      <h2 className="mb-4">I tuoi preferiti</h2>
+    <section className="section">
+      <div className="wrap">
+        <div className="section-head" style={{ textAlign: "left", margin: 0 }}>
+          <span className="eyebrow">
+            <HeartIcon size={14} /> La tua collezione
+          </span>
+          <h2 style={{ marginTop: 16 }}>I tuoi eventi preferiti</h2>
+          <p style={{ marginTop: 10 }}>
+            {loading
+              ? "Caricamento della tua lista…"
+              : items.length > 0
+              ? `Hai ${items.length} ${
+                  items.length === 1 ? "evento salvato" : "eventi salvati"
+                }.`
+              : "Qui troverai tutti i concerti che salvi."}
+          </p>
+        </div>
 
-      {loading && <p>Caricamento…</p>}
-      {error && <p className="text-danger">{error}</p>}
-
-      {!loading && items.length === 0 && !error && (
-        <p>Nessun evento nei preferiti.</p>
-      )}
-
-      <div className="row row-cols-1 row-cols-md-3 g-3 mt-2">
-        {items.map((fav) => (
-          <div className="col" key={fav._id}>
-            <div className="card event h-100 border-0 appear">
-              {fav.image && (
-                <img
-                  src={fav.image}
-                  className="card-img-top"
-                  alt={fav.name}
-                  style={{ objectFit: "cover", height: 180 }}
-                />
-              )}
-              <div className="card-body d-flex flex-column">
-                <h5 className="card-title">{fav.name}</h5>
-
-                <p className="card-text mb-1">
-                  <strong>Quando:</strong>{" "}
-                  {fav.date ? new Date(fav.date).toLocaleString() : "—"}
-                </p>
-
-                <p className="card-text text-muted">
-                  {fav.venue} • {fav.city}
-                </p>
-
-                <div className="mt-auto">
-                  <div className="d-flex gap-2">
-                    <a
-                      href={fav.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn btn-primary w-100"
-                    >
-                      Biglietti
-                    </a>
-                    <button
-                      type="button"
-                      className="btn btn-outline-danger"
-                      onClick={() => handleDelete(fav._id)}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {error && (
+          <div className="banner banner--error" style={{ marginTop: 28 }}>
+            {error}
           </div>
-        ))}
+        )}
+
+        <div style={{ marginTop: 32 }}>
+          {loading && (
+            <div className="events-grid">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div className="sk-card" key={i}>
+                  <div className="sk sk--media" />
+                  <div className="sk sk--line w70" />
+                  <div className="sk sk--line w45" />
+                  <div className="sk sk--line" style={{ marginBottom: 18 }} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!loading && !error && items.length === 0 && (
+            <div className="state">
+              <div className="state__icon">
+                <HeartIcon size={30} />
+              </div>
+              <h3>Nessun preferito… per ora</h3>
+              <p>
+                Esplora gli eventi e tocca il cuore sulle card per salvarli
+                qui. La tua collezione personale ti aspetta.
+              </p>
+              <Link to="/home" className="btn btn--primary">
+                <SearchIcon size={18} />
+                Esplora eventi
+              </Link>
+            </div>
+          )}
+
+          {!loading && items.length > 0 && (
+            <div className="events-grid">
+              {items.map((fav) => (
+                <EventCard
+                  key={fav._id}
+                  ev={{
+                    id: fav._id,
+                    name: fav.name,
+                    image: fav.image,
+                    date: fav.date,
+                    venue: fav.venue,
+                    city: fav.city,
+                    url: fav.url,
+                  }}
+                  onRemove={() => handleDelete(fav._id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

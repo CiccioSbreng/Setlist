@@ -10,21 +10,15 @@ import FavoritesPage from "./pages/Favorites";
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="app-shell d-flex flex-column min-vh-100">
+      <div className="app-shell">
         <Navbar />
 
-        <main className="flex-grow-1">
+        <main className="app-main">
           <Routes>
-            {/* Home vera su /home */}
-            <Route path="/home" element={<Home />} />
-
-            {/* redirect da / a /home */}
             <Route path="/" element={<Navigate to="/home" replace />} />
-
+            <Route path="/home" element={<Home />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
-
-            {/* tutto il resto → /home */}
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </main>
