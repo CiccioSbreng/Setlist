@@ -30,8 +30,13 @@ async function tmRequest(params) {
     id: ev.id,
     name: ev.name,
     date: ev.dates?.start?.dateTime || ev.dates?.start?.localDate,
+    time: ev.dates?.start?.localTime || null,
     venue: ev._embedded?.venues?.[0]?.name,
     city: ev._embedded?.venues?.[0]?.city?.name,
+    genre: ev.classifications?.[0]?.genre?.name || null,
+    priceMin: ev.priceRanges?.[0]?.min ?? null,
+    priceMax: ev.priceRanges?.[0]?.max ?? null,
+    currency: ev.priceRanges?.[0]?.currency || null,
     url: ev.url,
     image: (ev.images || []).sort((a,b)=>b.width - a.width)[0]?.url
   }))
