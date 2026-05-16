@@ -136,6 +136,7 @@ export default function FavoritesPage() {
                   key={fav._id}
                   ev={{
                     id: fav._id,
+                    eventId: fav.eventId,
                     name: fav.name,
                     image: fav.image,
                     date: fav.date,

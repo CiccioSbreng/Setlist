@@ -6,6 +6,7 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import LoginPage from "./pages/login";
 import FavoritesPage from "./pages/Favorites";
+import EventDetail from "./pages/EventDetail";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/event/:id" element={<EventDetail />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </main>
