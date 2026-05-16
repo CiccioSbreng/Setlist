@@ -14,6 +14,7 @@ import {
   TicketIcon,
   ArrowRightIcon,
   RefreshIcon,
+  CalendarIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -276,80 +277,76 @@ export default function Home() {
           </div>
 
           <form
-            className="search"
+            className="searchbar"
             onSubmit={(e) => {
               e.preventDefault();
               runSearch(0);
             }}
           >
-            <div className="search__row">
-              <div className="field">
-                <label htmlFor="city">Città</label>
-                <div className="input-wrap">
-                  <PinIcon size={18} />
+            <div className="sb-bar">
+              <label className="sb-seg" htmlFor="city">
+                <PinIcon size={19} className="sb-seg__ic" />
+                <span className="sb-seg__body">
+                  <span className="sb-seg__label">Dove</span>
                   <input
                     id="city"
-                    className="input"
-                    placeholder="Es. Milano, Roma…"
+                    className="sb-seg__input"
+                    placeholder="Tutte le città"
                     value={form.city}
                     onChange={(e) => update({ city: e.target.value })}
                   />
-                </div>
-              </div>
+                </span>
+              </label>
 
-              <div className="field">
-                <label htmlFor="keyword">Artista o genere</label>
-                <div className="input-wrap">
-                  <MusicIcon size={18} />
+              <span className="sb-div" aria-hidden="true" />
+
+              <label className="sb-seg" htmlFor="keyword">
+                <MusicIcon size={19} className="sb-seg__ic" />
+                <span className="sb-seg__body">
+                  <span className="sb-seg__label">Chi o cosa</span>
                   <input
                     id="keyword"
-                    className="input"
-                    placeholder="Es. Coldplay, rock…"
+                    className="sb-seg__input"
+                    placeholder="Artista, band o genere"
                     value={form.keyword}
                     onChange={(e) => update({ keyword: e.target.value })}
                   />
-                </div>
-              </div>
+                </span>
+              </label>
 
-              <button
-                type="submit"
-                className="btn btn--primary search__submit"
-              >
+              <button type="submit" className="sb-go">
                 <SearchIcon size={18} />
-                Cerca
+                <span>Cerca</span>
               </button>
             </div>
 
-            <div className="search__filters">
-              <div className="filter-group">
-                <span className="filter-group__label">Periodo</span>
-                <div className="chips">
-                  {[
-                    { id: "today", label: "Oggi" },
-                    { id: "week", label: "Settimana" },
-                    { id: "month", label: "Mese" },
-                  ].map((q) => (
-                    <button
-                      key={q.id}
-                      type="button"
-                      className={
-                        "chip" + (quickRange === q.id ? " is-active" : "")
-                      }
-                      onClick={() => applyQuickRange(q.id)}
-                    >
-                      {q.label}
-                    </button>
-                  ))}
-                </div>
+            <div className="sb-tools">
+              <div className="chips" role="group" aria-label="Periodo rapido">
+                {[
+                  { id: "today", label: "Oggi" },
+                  { id: "week", label: "Questa settimana" },
+                  { id: "month", label: "Questo mese" },
+                ].map((q) => (
+                  <button
+                    key={q.id}
+                    type="button"
+                    className={
+                      "chip" + (quickRange === q.id ? " is-active" : "")
+                    }
+                    onClick={() => applyQuickRange(q.id)}
+                  >
+                    {q.label}
+                  </button>
+                ))}
               </div>
 
-              <div className="filter-group">
-                <span className="filter-group__label">Date</span>
-                <div className="dates">
+              <div className="sb-tools__right">
+                <div className="sb-range">
+                  <CalendarIcon size={16} className="sb-range__ic" />
                   <input
                     id="start"
                     type="date"
-                    className="input input--date"
+                    className="sb-date"
                     aria-label="Data di inizio"
                     value={form.start}
                     onChange={(e) => {
@@ -357,13 +354,13 @@ export default function Home() {
                       update({ start: e.target.value });
                     }}
                   />
-                  <span className="dates__sep" aria-hidden="true">
-                    →
+                  <span className="sb-range__sep" aria-hidden="true">
+                    –
                   </span>
                   <input
                     id="end"
                     type="date"
-                    className="input input--date"
+                    className="sb-date"
                     aria-label="Data di fine"
                     value={form.end}
                     onChange={(e) => {
@@ -372,18 +369,18 @@ export default function Home() {
                     }}
                   />
                 </div>
-              </div>
 
-              {hasActiveFilters && (
-                <button
-                  type="button"
-                  className="search__reset"
-                  onClick={clearDates}
-                >
-                  <RefreshIcon size={15} />
-                  Azzera
-                </button>
-              )}
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    className="sb-reset"
+                    onClick={clearDates}
+                  >
+                    <RefreshIcon size={15} />
+                    Azzera
+                  </button>
+                )}
+              </div>
             </div>
           </form>
 
