@@ -561,25 +561,47 @@ img {
   background: linear-gradient(180deg, var(--surface-2), var(--surface));
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
-  padding: 24px;
+  padding: 18px;
   box-shadow: var(--sh-md);
   backdrop-filter: blur(10px);
 }
 
-.search__top {
+.search__row {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
-  gap: 14px;
+  gap: 12px;
+  align-items: end;
 }
 
-.search__bottom {
+.search__submit {
+  height: 46px;
+  white-space: nowrap;
+}
+
+.search__filters {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 18px;
-  margin-top: 18px;
-  padding-top: 18px;
+  align-items: center;
+  gap: 14px 22px;
+  margin-top: 14px;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.filter-group__label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  white-space: nowrap;
 }
 
 .field {
@@ -647,19 +669,18 @@ input.input[type="date"] {
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 15px;
+  padding: 7px 13px;
   border-radius: var(--r-pill);
   background: rgba(8, 8, 12, 0.55);
   border: 1px solid var(--border);
   color: var(--text-dim);
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -678,43 +699,85 @@ input.input[type="date"] {
   font-weight: 600;
 }
 
-.chip--reset {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  justify-content: center;
-  border-radius: 50%;
-  color: var(--brand-soft);
+.search__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 7px 14px;
+  border-radius: var(--r-pill);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease,
+    background 0.15s ease;
 }
 
-.chip--reset:hover {
+.search__reset:hover {
   color: #fff;
+  border-color: var(--border-strong);
   background: var(--surface-2);
 }
 
 .dates {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
 }
 
-.dates .field {
-  min-width: 150px;
+.dates__sep {
+  color: var(--text-mute);
+  font-size: 0.85rem;
 }
 
-@media (max-width: 720px) {
-  .search__top {
+.input--date {
+  width: auto;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  color-scheme: dark;
+}
+
+@media (max-width: 760px) {
+  .search__row {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
-  .search__bottom {
+  .search__submit {
+    width: 100%;
+  }
+  .search__filters {
     flex-direction: column;
     align-items: stretch;
+    gap: 14px;
   }
-  .dates {
+  .filter-group {
     flex-wrap: wrap;
   }
-  .dates .field {
+  .search__reset {
+    margin-left: 0;
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 540px) {
+  .search {
+    padding: 14px;
+  }
+  .chip {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 40px;
+  }
+  .dates {
+    width: 100%;
+  }
+  .input--date {
     flex: 1;
+    min-height: 40px;
   }
 }
 

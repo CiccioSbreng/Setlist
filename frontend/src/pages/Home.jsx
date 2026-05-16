@@ -14,7 +14,6 @@ import {
   TicketIcon,
   ArrowRightIcon,
   RefreshIcon,
-  CalendarIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -196,6 +195,7 @@ export default function Home() {
   }
 
   const hasResults = data.events?.length > 0;
+  const hasActiveFilters = Boolean(form.start || form.end || quickRange);
 
   return (
     <>
@@ -282,7 +282,7 @@ export default function Home() {
               runSearch(0);
             }}
           >
-            <div className="search__top">
+            <div className="search__row">
               <div className="field">
                 <label htmlFor="city">Città</label>
                 <div className="input-wrap">
@@ -290,7 +290,7 @@ export default function Home() {
                   <input
                     id="city"
                     className="input"
-                    placeholder="Es. Milano, Roma, Napoli…"
+                    placeholder="Es. Milano, Roma…"
                     value={form.city}
                     onChange={(e) => update({ city: e.target.value })}
                   />
@@ -304,29 +304,30 @@ export default function Home() {
                   <input
                     id="keyword"
                     className="input"
-                    placeholder="Es. Coldplay, rock, jazz…"
+                    placeholder="Es. Coldplay, rock…"
                     value={form.keyword}
                     onChange={(e) => update({ keyword: e.target.value })}
                   />
                 </div>
               </div>
 
-              <div className="field" style={{ justifyContent: "flex-end" }}>
-                <button type="submit" className="btn btn--primary">
-                  <SearchIcon size={18} />
-                  Cerca
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="btn btn--primary search__submit"
+              >
+                <SearchIcon size={18} />
+                Cerca
+              </button>
             </div>
 
-            <div className="search__bottom">
-              <div className="field">
-                <label>Periodo rapido</label>
+            <div className="search__filters">
+              <div className="filter-group">
+                <span className="filter-group__label">Periodo</span>
                 <div className="chips">
                   {[
                     { id: "today", label: "Oggi" },
-                    { id: "week", label: "Questa settimana" },
-                    { id: "month", label: "Questo mese" },
+                    { id: "week", label: "Settimana" },
+                    { id: "month", label: "Mese" },
                   ].map((q) => (
                     <button
                       key={q.id}
@@ -336,42 +337,34 @@ export default function Home() {
                       }
                       onClick={() => applyQuickRange(q.id)}
                     >
-                      <CalendarIcon size={15} />
                       {q.label}
                     </button>
                   ))}
-                  <button
-                    type="button"
-                    className="chip chip--reset"
-                    onClick={clearDates}
-                    title="Azzera periodo"
-                    aria-label="Azzera periodo"
-                  >
-                    <RefreshIcon size={15} />
-                  </button>
                 </div>
               </div>
 
-              <div className="dates">
-                <div className="field">
-                  <label htmlFor="start">Dal</label>
+              <div className="filter-group">
+                <span className="filter-group__label">Date</span>
+                <div className="dates">
                   <input
                     id="start"
                     type="date"
-                    className="input"
+                    className="input input--date"
+                    aria-label="Data di inizio"
                     value={form.start}
                     onChange={(e) => {
                       setQuickRange(null);
                       update({ start: e.target.value });
                     }}
                   />
-                </div>
-                <div className="field">
-                  <label htmlFor="end">Al</label>
+                  <span className="dates__sep" aria-hidden="true">
+                    →
+                  </span>
                   <input
                     id="end"
                     type="date"
-                    className="input"
+                    className="input input--date"
+                    aria-label="Data di fine"
                     value={form.end}
                     onChange={(e) => {
                       setQuickRange(null);
@@ -380,6 +373,17 @@ export default function Home() {
                   />
                 </div>
               </div>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  className="search__reset"
+                  onClick={clearDates}
+                >
+                  <RefreshIcon size={15} />
+                  Azzera
+                </button>
+              )}
             </div>
           </form>
 
