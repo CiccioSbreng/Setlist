@@ -237,9 +237,9 @@ export default function Home() {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function goToPage(p) {
-    runSearch(p);
-    scrollToSearch();
+  async function goToPage(p) {
+    await runSearch(p);
+    document.getElementById("risultati")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   const hasResults = data.events?.length > 0;
@@ -420,7 +420,7 @@ export default function Home() {
           )}
 
           {/* risultati */}
-          <div style={{ marginTop: 36 }}>
+          <div id="risultati" style={{ marginTop: 36 }}>
             {!loading && hasResults && (
               <div className="results-bar">
                 <h2>Eventi trovati</h2>
