@@ -148,14 +148,6 @@ export default function EventCard({
         </div>
 
         <div className="ev-card__foot">
-          {detailId && (
-            <Link
-              to={`/event/${detailId}`}
-              className="btn btn--outline btn--block btn--sm"
-            >
-              Dettagli
-            </Link>
-          )}
           {ev.url ? (
             <a
               href={ev.url}
@@ -166,13 +158,15 @@ export default function EventCard({
               <TicketIcon size={18} />
               Biglietti
             </a>
-          ) : (
-            <span
+          ) : detailId ? (
+            <Link
+              to={`/event/${detailId}`}
               className="btn btn--outline btn--block btn--sm"
-              aria-disabled="true"
             >
-              Biglietti non disponibili
-            </span>
+              Dettagli
+            </Link>
+          ) : (
+            <span className="ev-card__no-ticket">Biglietti non disponibili</span>
           )}
         </div>
       </div>

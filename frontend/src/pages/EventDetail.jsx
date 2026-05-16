@@ -79,6 +79,7 @@ export default function EventDetail() {
   const [artistBio, setArtistBio] = useState("");
   const [spotifyArtist, setSpotifyArtist] = useState(null);
   const [activeTab, setActiveTab] = useState("evento");
+  const [bioExpanded, setBioExpanded] = useState(false);
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
@@ -417,7 +418,20 @@ export default function EventDetail() {
                 <span className="eyebrow"><MusicIcon size={14} /> Artista</span>
                 <h2>{artist.name}</h2>
                 {artist.genre && <p className="ed-artist__genre">{artist.genre}</p>}
-                {artistBio && <p className="ed-artist__bio">{artistBio}</p>}
+                {artistBio && (
+                <>
+                  <p className={"ed-artist__bio" + (bioExpanded ? " ed-artist__bio--expanded" : "")}>
+                    {artistBio}
+                  </p>
+                  <button
+                    type="button"
+                    className="ed-artist__bio-toggle"
+                    onClick={() => setBioExpanded((v) => !v)}
+                  >
+                    {bioExpanded ? "Riduci ▲" : "Leggi di più ▼"}
+                  </button>
+                </>
+              )}
                 <div className="ed-artist__links">
                   {artist.links?.instagram && (
                     <a href={artist.links.instagram} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--ig">
