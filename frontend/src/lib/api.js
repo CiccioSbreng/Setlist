@@ -59,10 +59,11 @@ export async function getEvent(id) {
 }
 
 // ---- YOUTUBE: ultimi video del canale artista ----
-export async function getYoutubeVideos(channelUrl) {
-  const res = await fetch(
-    `${BASE}/api/youtube/channel-videos?url=${encodeURIComponent(channelUrl)}`
-  );
+export async function getYoutubeVideos({ url, name }) {
+  const param = url
+    ? `url=${encodeURIComponent(url)}`
+    : `name=${encodeURIComponent(name)}`;
+  const res = await fetch(`${BASE}/api/youtube/channel-videos?${param}`);
   if (!res.ok) throw new Error(`API ${res.status}`);
   return res.json();
 }

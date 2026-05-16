@@ -107,10 +107,10 @@ export default function EventDetail() {
   }, [artistId, id]);
 
   useEffect(() => {
-    const ytUrl = ev?.artists?.[0]?.links?.youtube;
-    if (!ytUrl) return;
+    const a = ev?.artists?.[0];
+    if (!a?.name) return;
     let alive = true;
-    getYoutubeVideos(ytUrl)
+    getYoutubeVideos({ url: a.links?.youtube || null, name: a.name })
       .then((data) => { if (alive) setYtVideos(data.videos || []); })
       .catch(() => {});
     return () => { alive = false; };
@@ -236,7 +236,8 @@ export default function EventDetail() {
     return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : null;
   })();
   const ytUrl = artist?.links?.youtube || null;
-  const hasMedia = !!(spotifyEmbed || ytUrl);
+  // hasMedia è true se c'è un artista con nome (YouTube cerca sempre per nome)
+  const hasMedia = !!(artist?.name);
 
   const checkin = ev.date ? ev.date.slice(0, 10) : null;
   const checkout = (() => {
