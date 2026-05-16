@@ -14,6 +14,8 @@ const ticketmasterRouter = require('./routes/ticketmaster');
 // Routers Auth & Favorites
 const authRouter = require('./routes/auth');
 const favoritesRouter = require('./routes/favorites');
+// Router YouTube
+const youtubeRouter = require('./routes/youtube');
 
 const app = express();
 
@@ -41,6 +43,7 @@ app.use(
 app.use('/api/ticketmaster', ticketmasterRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/favorites', favoritesRouter);
+app.use('/api/youtube', youtubeRouter);
 
 // rotta diagnostica
 app.get('/__ping', (req, res) => res.json({ ok: true }));
