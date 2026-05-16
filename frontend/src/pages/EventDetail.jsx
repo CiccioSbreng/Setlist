@@ -62,6 +62,7 @@ export default function EventDetail() {
   const [parks, setParks] = useState([]);
   const [showMap, setShowMap] = useState(false);
   const [ytVideos, setYtVideos] = useState([]);
+  const [artistBio, setArtistBio] = useState("");
 
   useEffect(() => {
     let alive = true;
@@ -107,12 +108,33 @@ export default function EventDetail() {
   }, [artistId, id]);
 
   useEffect(() => {
-    const a = ev?.artists?.[0];
-    if (!a?.name) return;
+    const name = ev?.artists?.[0]?.name;
+    if (!name) return;
     let alive = true;
-    getYoutubeVideos({ url: a.links?.youtube || null, name: a.name })
+
+    // YouTube: sempre per nome, indipendente da Ticketmaster
+    getYoutubeVideos(name)
       .then((data) => { if (alive) setYtVideos(data.videos || []); })
       .catch(() => {});
+
+    // Bio: Wikipedia (IT con fallback EN), nessuna API key
+    const fetchBio = async () => {
+      for (const lang of ["it", "en"]) {
+        try {
+          const r = await fetch(
+            `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`
+          );
+          if (!r.ok) continue;
+          const d = await r.json();
+          if (d.extract && d.type !== "disambiguation") {
+            if (alive) setArtistBio(d.extract);
+            return;
+          }
+        } catch {}
+      }
+    };
+    fetchBio();
+
     return () => { alive = false; };
   }, [ev]);
 
@@ -358,7 +380,7 @@ export default function EventDetail() {
           </div>
         </article>
 
-        {artist && (artist.image || artist.links) && (
+        {artist && (
           <div className="ed-artist">
             {artist.image && (
               <img
@@ -375,6 +397,9 @@ export default function EventDetail() {
               <h2>{artist.name}</h2>
               {artist.genre && (
                 <p className="ed-artist__genre">{artist.genre}</p>
+              )}
+              {artistBio && (
+                <p className="ed-artist__bio">{artistBio}</p>
               )}
               <div className="ed-artist__links">
                 {artist.links?.instagram && (

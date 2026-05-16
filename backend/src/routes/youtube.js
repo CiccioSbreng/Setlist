@@ -30,35 +30,21 @@ async function resolveChannelId(ytUrl) {
   return null
 }
 
-// GET /api/youtube/channel-videos?url=<url> oppure ?name=<artist name>
+// GET /api/youtube/channel-videos?name=<artist name>
 router.get('/channel-videos', async (req, res) => {
-  const { url, name } = req.query
-  if (!url && !name) return res.status(400).json({ error: 'url o name richiesti' })
+  const { name } = req.query
+  if (!name) return res.status(400).json({ error: 'name richiesto' })
   if (!API_KEY) return res.status(503).json({ error: 'YouTube API key non configurata' })
 
-  const cacheKey = `yt:${url || name}`
+  const cacheKey = `yt:${name}`
   if (cache.has(cacheKey)) return res.json(cache.get(cacheKey))
 
   try {
-    let channelId = null
-
-    if (url) {
-      channelId = await resolveChannelId(url)
-    }
-
-    // Se non abbiamo ancora un channelId (nessun url o url non risolvibile), cerca per nome
-    if (!channelId && name) {
-      const { data } = await axios.get(`${YT_BASE}/search`, {
-        params: {
-          key: API_KEY,
-          q: `${name} official`,
-          type: 'channel',
-          maxResults: 1,
-          part: 'snippet'
-        }
-      })
-      channelId = data.items?.[0]?.id?.channelId || null
-    }
+    // Cerca il canale ufficiale per nome artista
+    const channelSearch = await axios.get(`${YT_BASE}/search`, {
+      params: { key: API_KEY, q: `${name} official`, type: 'channel', maxResults: 1, part: 'snippet' }
+    })
+    const channelId = channelSearch.data.items?.[0]?.id?.channelId || null
 
     if (!channelId) return res.status(404).json({ error: 'Canale non trovato' })
 
