@@ -38,6 +38,35 @@ export async function searchEvents({ city, keyword, size = 12, page = 0, start, 
   return res.json();
 }
 
+// ---- TICKETMASTER: dettaglio singolo evento ----
+export async function getEvent(id) {
+  const res = await fetch(
+    `${BASE}/api/ticketmaster/events/${encodeURIComponent(id)}`
+  );
+
+  if (res.status === 404) {
+    // Distingue il vero "evento inesistente" (JSON dal nostro backend)
+    // da un 404 di rotta assente (backend non aggiornato / URL errato).
+    const body = await res.json().catch(() => null);
+    if (body && body.error === "Evento non trovato") {
+      throw new Error("NOT_FOUND");
+    }
+    throw new Error("ENDPOINT_MISSING");
+  }
+
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return res.json();
+}
+
+// ---- TICKETMASTER: prossime date di un artista ----
+export async function getArtistEvents(id) {
+  const res = await fetch(
+    `${BASE}/api/ticketmaster/artists/${encodeURIComponent(id)}/events`
+  );
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return res.json();
+}
+
 // ---- AUTH: login / registrazione ----
 
 // POST /api/auth/login
