@@ -216,6 +216,17 @@ export default function EventDetail() {
     ? `https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lon}`
     : null;
 
+  const spotifyEmbed = (() => {
+    const u = artist?.links?.spotify;
+    if (!u) return null;
+    const m = u.match(
+      /open\.spotify\.com\/(artist|album|track|playlist)\/([a-zA-Z0-9]+)/
+    );
+    return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : null;
+  })();
+  const ytUrl = artist?.links?.youtube || null;
+  const hasMedia = !!(spotifyEmbed || ytUrl);
+
   const checkin = ev.date ? ev.date.slice(0, 10) : null;
   const checkout = (() => {
     if (!checkin) return null;
@@ -354,18 +365,6 @@ export default function EventDetail() {
                 <p className="ed-artist__genre">{artist.genre}</p>
               )}
               <div className="ed-artist__links">
-                {artist.links?.youtube && (
-                  <a href={artist.links.youtube} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--yt">
-                    <YoutubeIcon size={15} />
-                    YouTube
-                  </a>
-                )}
-                {artist.links?.spotify && (
-                  <a href={artist.links.spotify} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--sp">
-                    <SpotifyIcon size={15} />
-                    Spotify
-                  </a>
-                )}
                 {artist.links?.instagram && (
                   <a href={artist.links.instagram} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--ig">
                     <InstagramIcon size={15} />
@@ -421,40 +420,86 @@ export default function EventDetail() {
           </div>
         )}
 
-        {hasGeo && (
-          <div className="ed-map">
-            <div className="ed-map__head">
-              <h2>
-                <PinIcon size={18} />
-                Come arrivare
-              </h2>
-              <div className="ed-map__links">
-                <a href={gmaps} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">
-                  Google Maps
-                </a>
-                <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">
-                  Indicazioni
-                </a>
-              </div>
-            </div>
-            {showMap ? (
-              <iframe
-                title="Mappa del venue"
-                className="ed-map__frame"
-                src={osmSrc}
-              />
-            ) : (
-              <button
-                type="button"
-                className="ed-map__preview"
-                onClick={() => setShowMap(true)}
-              >
-                <PinIcon size={28} />
-                <span>Mostra mappa interattiva</span>
-                {(v.address || v.city) && (
-                  <small>{[v.address, v.city].filter(Boolean).join(" · ")}</small>
+        {(hasGeo || hasMedia) && (
+          <div
+            className={
+              "ed-media-row" +
+              (hasGeo && hasMedia ? "" : " ed-media-row--single")
+            }
+          >
+            {hasGeo && (
+              <div className="ed-map">
+                <div className="ed-map__head">
+                  <h2>
+                    <PinIcon size={18} />
+                    Come arrivare
+                  </h2>
+                  <div className="ed-map__links">
+                    <a href={gmaps} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">
+                      Google Maps
+                    </a>
+                    <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">
+                      Indicazioni
+                    </a>
+                  </div>
+                </div>
+                {showMap ? (
+                  <iframe
+                    title="Mappa del venue"
+                    className="ed-map__frame"
+                    src={osmSrc}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    className="ed-map__preview"
+                    onClick={() => setShowMap(true)}
+                  >
+                    <PinIcon size={28} />
+                    <span>Mostra mappa interattiva</span>
+                    {(v.address || v.city) && (
+                      <small>{[v.address, v.city].filter(Boolean).join(" · ")}</small>
+                    )}
+                  </button>
                 )}
-              </button>
+              </div>
+            )}
+
+            {hasMedia && (
+              <div className="ed-media-panel">
+                {spotifyEmbed && (
+                  <div className="ed-spotify">
+                    <h3>
+                      <SpotifyIcon size={16} />
+                      Ascolta su Spotify
+                    </h3>
+                    <iframe
+                      title="Player Spotify"
+                      className="ed-spotify__frame"
+                      src={spotifyEmbed}
+                      loading="lazy"
+                      allow="encrypted-media"
+                    />
+                  </div>
+                )}
+                {ytUrl && (
+                  <a
+                    href={ytUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="ed-yt-card"
+                  >
+                    <span className="ed-yt-card__icon">
+                      <YoutubeIcon size={26} />
+                    </span>
+                    <span className="ed-yt-card__text">
+                      <strong>Canale YouTube</strong>
+                      <small>Guarda i video di {artist?.name}</small>
+                    </span>
+                    <ArrowRightIcon size={18} />
+                  </a>
+                )}
+              </div>
             )}
           </div>
         )}
