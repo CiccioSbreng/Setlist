@@ -57,7 +57,7 @@ export default function Footer() {
         <div className="footer__bar">
           <span>© {year} ConcertHub · Tutti i diritti riservati</span>
           <span>
-            Creato da <span className="hl">Ciccio Sbreng</span>
+            Designed &amp; developed by <span className="hl">Fabio Annoni</span>
           </span>
         </div>
       </div>
