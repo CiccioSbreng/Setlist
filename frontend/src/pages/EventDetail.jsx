@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getEvent, getArtistEvents, addFavorite } from "../lib/api";
+import { getEvent, getArtistEvents, getYoutubeVideos, addFavorite } from "../lib/api";
 import {
   CalendarIcon,
   ClockIcon,
@@ -61,6 +61,7 @@ export default function EventDetail() {
   const [otherDates, setOtherDates] = useState([]);
   const [parks, setParks] = useState([]);
   const [showMap, setShowMap] = useState(false);
+  const [ytVideos, setYtVideos] = useState([]);
 
   useEffect(() => {
     let alive = true;
@@ -104,6 +105,16 @@ export default function EventDetail() {
       alive = false;
     };
   }, [artistId, id]);
+
+  useEffect(() => {
+    const ytUrl = ev?.artists?.[0]?.links?.youtube;
+    if (!ytUrl) return;
+    let alive = true;
+    getYoutubeVideos(ytUrl)
+      .then((data) => { if (alive) setYtVideos(data.videos || []); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [ev]);
 
   useEffect(() => {
     const lat = ev?.venue?.lat;
@@ -483,21 +494,47 @@ export default function EventDetail() {
                   </div>
                 )}
                 {ytUrl && (
-                  <a
-                    href={ytUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="ed-yt-card"
-                  >
-                    <span className="ed-yt-card__icon">
-                      <YoutubeIcon size={26} />
-                    </span>
-                    <span className="ed-yt-card__text">
-                      <strong>Canale YouTube</strong>
-                      <small>Guarda i video di {artist?.name}</small>
-                    </span>
-                    <ArrowRightIcon size={18} />
-                  </a>
+                  <div className="ed-yt">
+                    <h3>
+                      <YoutubeIcon size={16} />
+                      Ultimi video
+                    </h3>
+                    {ytVideos.length > 0 ? (
+                      <>
+                        <iframe
+                          className="ed-yt__embed"
+                          src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
+                          title={ytVideos[0].title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                        {ytVideos.length > 1 && (
+                          <div className="ed-yt__more">
+                            {ytVideos.slice(1).map((v) => (
+                              <a
+                                key={v.id}
+                                href={`https://www.youtube.com/watch?v=${v.id}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="ed-yt__thumb"
+                              >
+                                {v.thumb && (
+                                  <img src={v.thumb} alt={v.title} loading="lazy" />
+                                )}
+                                <span>{v.title}</span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <a href={ytUrl} target="_blank" rel="noreferrer" className="ed-yt__fallback">
+                        <YoutubeIcon size={22} />
+                        <span>Apri il canale YouTube</span>
+                        <ArrowRightIcon size={16} />
+                      </a>
+                    )}
+                  </div>
                 )}
               </div>
             )}

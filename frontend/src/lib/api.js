@@ -58,6 +58,15 @@ export async function getEvent(id) {
   return res.json();
 }
 
+// ---- YOUTUBE: ultimi video del canale artista ----
+export async function getYoutubeVideos(channelUrl) {
+  const res = await fetch(
+    `${BASE}/api/youtube/channel-videos?url=${encodeURIComponent(channelUrl)}`
+  );
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return res.json();
+}
+
 // ---- TICKETMASTER: prossime date di un artista ----
 export async function getArtistEvents(id) {
   const res = await fetch(
