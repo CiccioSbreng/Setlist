@@ -1957,3 +1957,149 @@ input.input[type="date"] {
     min-width: 0;
   }
 }
+
+/* ---- Nei dintorni (parchi via Overpass) ---- */
+.ed-nearby {
+  margin-top: 28px;
+  padding: 22px;
+  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-md);
+}
+
+.ed-nearby__head {
+  margin-bottom: 14px;
+}
+
+.ed-nearby__head h2 {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ed-nearby__head h2 svg {
+  color: var(--brand);
+}
+
+.ed-nearby__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ed-nearby__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 8px;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.95rem;
+  border-radius: var(--r-sm);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.ed-nearby__list li:first-child .ed-nearby__item {
+  border-top: 0;
+}
+
+.ed-nearby__item:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ed-nearby__item svg:first-child {
+  color: var(--brand);
+  flex: none;
+}
+
+.ed-nearby__item span {
+  flex: 1;
+}
+
+.ed-nearby__item svg:last-child {
+  opacity: 0.35;
+  flex: none;
+}
+
+/* ---- Dove dormire (Booking + Airbnb) ---- */
+.ed-travel {
+  margin-top: 28px;
+  padding: 22px;
+  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-md);
+}
+
+.ed-travel h2 {
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+
+.ed-travel__cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.ed-travel__card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.2s ease, background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.ed-travel__card:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  transform: translateY(-2px);
+}
+
+.ed-travel__card-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 138, 0, 0.12);
+  border: 1px solid rgba(255, 138, 0, 0.26);
+  color: var(--brand-soft);
+  flex: none;
+}
+
+.ed-travel__card-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ed-travel__card-sub {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-top: 3px;
+}
+
+.ed-travel__arrow {
+  margin-left: auto;
+  color: var(--text-mute);
+  flex: none;
+}
+
+@media (max-width: 600px) {
+  .ed-travel__cards {
+    grid-template-columns: 1fr;
+  }
+}

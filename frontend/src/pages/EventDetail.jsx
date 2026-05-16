@@ -13,6 +13,8 @@ import {
   ArrowRightIcon,
   SearchIcon,
   GlobeIcon,
+  TreeIcon,
+  BedIcon,
 } from "../components/Icons";
 
 function formatWhen(date, time) {
@@ -54,6 +56,7 @@ export default function EventDetail() {
   const [error, setError] = useState("");
   const [favMsg, setFavMsg] = useState("");
   const [otherDates, setOtherDates] = useState([]);
+  const [parks, setParks] = useState([]);
 
   useEffect(() => {
     let alive = true;
@@ -61,6 +64,7 @@ export default function EventDetail() {
     setNotFound(false);
     setError("");
     setOtherDates([]);
+    setParks([]);
     getEvent(id)
       .then((data) => {
         if (alive) setEv(data);
@@ -96,6 +100,32 @@ export default function EventDetail() {
       alive = false;
     };
   }, [artistId, id]);
+
+  useEffect(() => {
+    const lat = ev?.venue?.lat;
+    const lon = ev?.venue?.lon;
+    if (lat == null || lon == null) return;
+    let alive = true;
+    const q = `[out:json][timeout:10];(node(around:2000,${lat},${lon})[leisure~"park|garden"][name];way(around:2000,${lat},${lon})[leisure~"park|garden"][name];);out center 5;`;
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!alive) return;
+        const items = (data.elements || [])
+          .filter((el) => el.tags?.name)
+          .slice(0, 5)
+          .map((el) => ({
+            id: el.id,
+            type: el.type,
+            name: el.tags.name,
+          }));
+        setParks(items);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [ev]);
 
   async function handleFav() {
     setFavMsg("");
@@ -185,6 +215,20 @@ export default function EventDetail() {
     : null;
   const gdir = hasGeo
     ? `https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lon}`
+    : null;
+
+  const checkin = ev.date ? ev.date.slice(0, 10) : null;
+  const checkout = (() => {
+    if (!checkin) return null;
+    const d = new Date(`${checkin}T12:00:00`);
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
+  })();
+  const bookingUrl = v.city
+    ? `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(v.city)}${checkin ? `&checkin=${checkin}&checkout=${checkout}` : ""}`
+    : null;
+  const airbnbUrl = v.city
+    ? `https://www.airbnb.it/s/${encodeURIComponent(v.city)}/homes${checkin ? `?checkin=${checkin}&checkout=${checkout}` : ""}`
     : null;
 
   return (
@@ -404,6 +448,79 @@ export default function EventDetail() {
               src={osmSrc}
               loading="lazy"
             />
+          </div>
+        )}
+
+        {parks.length > 0 && (
+          <div className="ed-nearby">
+            <div className="ed-nearby__head">
+              <h2>
+                <TreeIcon size={20} />
+                Parchi e giardini nei dintorni
+              </h2>
+            </div>
+            <ul className="ed-nearby__list">
+              {parks.map((p) => (
+                <li key={p.id}>
+                  <a
+                    href={`https://www.openstreetmap.org/${p.type}/${p.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="ed-nearby__item"
+                  >
+                    <TreeIcon size={16} />
+                    <span>{p.name}</span>
+                    <ArrowRightIcon size={14} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {(bookingUrl || airbnbUrl) && (
+          <div className="ed-travel">
+            <h2>Dove dormire</h2>
+            <div className="ed-travel__cards">
+              {bookingUrl && (
+                <a
+                  href={bookingUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="ed-travel__card"
+                >
+                  <div className="ed-travel__card-icon">
+                    <BedIcon size={22} />
+                  </div>
+                  <div>
+                    <div className="ed-travel__card-title">Booking.com</div>
+                    <div className="ed-travel__card-sub">
+                      Hotel, B&amp;B e appartamenti vicino al venue
+                    </div>
+                  </div>
+                  <ArrowRightIcon size={18} className="ed-travel__arrow" />
+                </a>
+              )}
+              {airbnbUrl && (
+                <a
+                  href={airbnbUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="ed-travel__card"
+                >
+                  <div className="ed-travel__card-icon">
+                    <GlobeIcon size={22} />
+                  </div>
+                  <div>
+                    <div className="ed-travel__card-title">Airbnb</div>
+                    <div className="ed-travel__card-sub">
+                      Case e stanze a {v.city || "destinazione"}
+                    </div>
+                  </div>
+                  <ArrowRightIcon size={18} className="ed-travel__arrow" />
+                </a>
+              )}
+            </div>
           </div>
         )}
       </div>
