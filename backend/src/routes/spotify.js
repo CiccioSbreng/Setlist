@@ -64,6 +64,7 @@ router.get('/artist', async (req, res) => {
     artistCache.set(cacheKey, out);
     res.json(out);
   } catch (err) {
+    console.error('Spotify error:', JSON.stringify(err.response?.data), 'status:', err.response?.status);
     const status = err.response?.status || 500;
     res.status(status).json({ error: 'Spotify API error', details: err.response?.data || err.message });
   }
