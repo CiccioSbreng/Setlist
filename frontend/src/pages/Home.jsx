@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { searchEvents, toUtcStart, toUtcEnd, addFavorite } from "../lib/api";
 import EventCard from "../components/EventCard";
+import DateRangePopover from "../components/DateRangePopover";
 import {
   SearchIcon,
   PinIcon,
@@ -14,7 +15,6 @@ import {
   TicketIcon,
   ArrowRightIcon,
   RefreshIcon,
-  CalendarIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -74,7 +74,6 @@ export default function Home() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [quickRange, setQuickRange] = useState(null);
-  const [showCustomDates, setShowCustomDates] = useState(false);
 
   function update(p) {
     setForm((f) => ({ ...f, ...p }));
@@ -198,15 +197,6 @@ export default function Home() {
 
   const hasResults = data.events?.length > 0;
   const hasActiveFilters = Boolean(form.start || form.end || quickRange);
-  const datesOpen = showCustomDates || Boolean(form.start || form.end);
-  const dm = (v) => (v ? `${v.slice(8, 10)}/${v.slice(5, 7)}` : "…");
-  const dateChipLabel =
-    form.start || form.end ? `${dm(form.start)} – ${dm(form.end)}` : "Date";
-
-  function resetFilters() {
-    setShowCustomDates(false);
-    clearDates();
-  }
 
   return (
     <>
@@ -343,64 +333,31 @@ export default function Home() {
                   </button>
                 ))}
 
-                <button
-                  type="button"
-                  className={
-                    "chip chip--cal" +
-                    (form.start || form.end ? " is-active" : "")
-                  }
-                  aria-expanded={datesOpen}
-                  onClick={() => setShowCustomDates((v) => !v)}
-                >
-                  <CalendarIcon size={15} />
-                  {dateChipLabel}
-                </button>
+                <DateRangePopover
+                  start={form.start}
+                  end={form.end}
+                  onChange={({ start, end }) => {
+                    setQuickRange(null);
+                    update({ start, end });
+                  }}
+                  onClear={() => {
+                    setQuickRange(null);
+                    update({ start: "", end: "" });
+                  }}
+                />
               </div>
 
               {hasActiveFilters && (
                 <button
                   type="button"
                   className="sb-reset"
-                  onClick={resetFilters}
+                  onClick={clearDates}
                 >
                   <RefreshIcon size={15} />
                   Azzera
                 </button>
               )}
             </div>
-
-            {datesOpen && (
-              <div className="sb-daterow">
-                <div className="sb-field">
-                  <span className="sb-field__lbl">Dal</span>
-                  <input
-                    id="start"
-                    type="date"
-                    className="sb-date"
-                    aria-label="Data di inizio"
-                    value={form.start}
-                    onChange={(e) => {
-                      setQuickRange(null);
-                      update({ start: e.target.value });
-                    }}
-                  />
-                </div>
-                <div className="sb-field">
-                  <span className="sb-field__lbl">Al</span>
-                  <input
-                    id="end"
-                    type="date"
-                    className="sb-date"
-                    aria-label="Data di fine"
-                    value={form.end}
-                    onChange={(e) => {
-                      setQuickRange(null);
-                      update({ end: e.target.value });
-                    }}
-                  />
-                </div>
-              </div>
-            )}
           </form>
 
           {/* messaggi */}
