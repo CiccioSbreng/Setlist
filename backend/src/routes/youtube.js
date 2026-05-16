@@ -55,7 +55,7 @@ router.get('/channel-videos', async (req, res) => {
         part: 'snippet',
         type: 'video',
         order: 'date',
-        maxResults: 3
+        maxResults: 1
       }
     })
 

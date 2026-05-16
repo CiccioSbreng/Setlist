@@ -2009,6 +2009,18 @@ input.input[type="date"] {
   transition: background 0.15s ease;
 }
 .ed-yt__fallback:hover { background: rgba(255,69,69,0.12); }
+.ed-yt__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: #ff4545;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+.ed-yt__open:hover { opacity: 1; }
 
 @media (max-width: 820px) {
   .ed-media-row {

@@ -547,7 +547,7 @@ export default function EventDetail() {
                   <div className="ed-yt">
                     <h3>
                       <YoutubeIcon size={16} />
-                      Ultimi video
+                      Ultimo video
                     </h3>
                     <iframe
                       className="ed-yt__embed"
@@ -556,24 +556,16 @@ export default function EventDetail() {
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
-                    {ytVideos.length > 1 && (
-                      <div className="ed-yt__more">
-                        {ytVideos.slice(1).map((v) => (
-                          <a
-                            key={v.id}
-                            href={`https://www.youtube.com/watch?v=${v.id}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="ed-yt__thumb"
-                          >
-                            {v.thumb && (
-                              <img src={v.thumb} alt={v.title} loading="lazy" />
-                            )}
-                            <span>{v.title}</span>
-                          </a>
-                        ))}
-                      </div>
-                    )}
+                    <a
+                      href={`https://www.youtube.com/watch?v=${ytVideos[0].id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ed-yt__open"
+                    >
+                      <YoutubeIcon size={14} />
+                      Apri su YouTube
+                      <ArrowRightIcon size={14} />
+                    </a>
                   </div>
                 )}
               </div>
