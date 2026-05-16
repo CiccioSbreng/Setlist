@@ -61,18 +61,53 @@ body {
 }
 
 body {
-  background:
-    radial-gradient(900px 520px at 88% -6%, rgba(124, 92, 255, 0.16), transparent 60%),
-    radial-gradient(820px 540px at 6% 4%, rgba(255, 61, 139, 0.13), transparent 58%),
-    radial-gradient(1100px 720px at 50% 120%, rgba(255, 138, 0, 0.12), transparent 60%),
-    var(--bg-900);
-  background-attachment: fixed;
+  background: var(--bg-900);
   color: var(--text);
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* ── Animated aurora background ───────────────────────────────────── */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::before {
+  background:
+    radial-gradient(ellipse 800px 600px at 80% -5%, rgba(124, 92, 255, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 700px 500px at 5% 10%, rgba(255, 61, 139, 0.14) 0%, transparent 60%);
+  animation: aurora-a 28s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+body::after {
+  background:
+    radial-gradient(ellipse 900px 600px at 50% 110%, rgba(255, 138, 0, 0.13) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 400px at 30% 60%, rgba(124, 92, 255, 0.09) 0%, transparent 55%);
+  animation: aurora-b 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes aurora-a {
+  0%   { transform: translate(0,    0)    scale(1);    }
+  33%  { transform: translate(40px, 30px) scale(1.04); }
+  66%  { transform: translate(-30px, 20px) scale(0.97); }
+  100% { transform: translate(20px, -25px) scale(1.02); }
+}
+
+@keyframes aurora-b {
+  0%   { transform: translate(0,    0)    scale(1);    }
+  33%  { transform: translate(-35px, -20px) scale(1.03); }
+  66%  { transform: translate(25px, 30px) scale(0.98); }
+  100% { transform: translate(-15px, 15px) scale(1.04); }
 }
 
 h1,
