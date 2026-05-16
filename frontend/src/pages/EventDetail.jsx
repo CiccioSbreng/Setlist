@@ -65,6 +65,10 @@ export default function EventDetail() {
       .catch((e) => {
         if (!alive) return;
         if (e.message === "NOT_FOUND") setNotFound(true);
+        else if (e.message === "ENDPOINT_MISSING")
+          setError(
+            "Dettaglio non disponibile su questo backend: la rotta /events/:id non è ancora attiva (backend non aggiornato o VITE_API_BASE_URL che punta alla versione online vecchia)."
+          );
         else setError("Non siamo riusciti a caricare l'evento. Riprova.");
       })
       .finally(() => alive && setLoading(false));
