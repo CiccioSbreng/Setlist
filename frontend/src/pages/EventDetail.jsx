@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getEvent, getArtistEvents, getYoutubeVideos, addFavorite } from "../lib/api";
+import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite } from "../lib/api";
 import {
   CalendarIcon,
   ClockIcon,
@@ -63,6 +63,7 @@ export default function EventDetail() {
   const [showMap, setShowMap] = useState(false);
   const [ytVideos, setYtVideos] = useState([]);
   const [artistBio, setArtistBio] = useState("");
+  const [spotifyArtist, setSpotifyArtist] = useState(null);
 
   useEffect(() => {
     let alive = true;
@@ -115,6 +116,11 @@ export default function EventDetail() {
     // YouTube: sempre per nome, indipendente da Ticketmaster
     getYoutubeVideos(name)
       .then((data) => { if (alive) setYtVideos(data.videos || []); })
+      .catch(() => {});
+
+    // Spotify: cerca artista per nome, indipendente da Ticketmaster
+    getSpotifyArtist(name)
+      .then((data) => { if (alive) setSpotifyArtist(data); })
       .catch(() => {});
 
     // Bio: Wikipedia (IT con fallback EN), nessuna API key
@@ -249,16 +255,6 @@ export default function EventDetail() {
     ? `https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lon}`
     : null;
 
-  const spotifyEmbed = (() => {
-    const u = artist?.links?.spotify;
-    if (!u) return null;
-    const m = u.match(
-      /open\.spotify\.com\/(artist|album|track|playlist)\/([a-zA-Z0-9]+)/
-    );
-    return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : null;
-  })();
-  const ytUrl = artist?.links?.youtube || null;
-  // hasMedia è true se c'è un artista con nome (YouTube cerca sempre per nome)
   const hasMedia = !!(artist?.name);
 
   const checkin = ev.date ? ev.date.slice(0, 10) : null;
@@ -504,61 +500,79 @@ export default function EventDetail() {
 
             {hasMedia && (
               <div className="ed-media-panel">
-                {spotifyEmbed && (
+                {spotifyArtist && (
                   <div className="ed-spotify">
-                    <h3>
-                      <SpotifyIcon size={16} />
-                      Ascolta su Spotify
-                    </h3>
+                    <div className="ed-spotify__header">
+                      <h3>
+                        <SpotifyIcon size={16} />
+                        Ascolta su Spotify
+                      </h3>
+                      <div className="ed-spotify__meta">
+                        {spotifyArtist.genres.length > 0 && (
+                          <div className="ed-spotify__genres">
+                            {spotifyArtist.genres.map((g) => (
+                              <span key={g} className="tag tag--sm">{g}</span>
+                            ))}
+                          </div>
+                        )}
+                        {spotifyArtist.followers > 0 && (
+                          <span className="ed-spotify__followers">
+                            {spotifyArtist.followers.toLocaleString("it-IT")} follower
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     <iframe
                       title="Player Spotify"
                       className="ed-spotify__frame"
-                      src={spotifyEmbed}
+                      src={spotifyArtist.embedUrl}
                       loading="lazy"
-                      allow="encrypted-media"
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     />
+                    {spotifyArtist.externalUrl && (
+                      <a
+                        href={spotifyArtist.externalUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ed-spotify__open"
+                      >
+                        <SpotifyIcon size={14} />
+                        Apri su Spotify
+                        <ArrowRightIcon size={14} />
+                      </a>
+                    )}
                   </div>
                 )}
-                {ytUrl && (
+                {ytVideos.length > 0 && (
                   <div className="ed-yt">
                     <h3>
                       <YoutubeIcon size={16} />
                       Ultimi video
                     </h3>
-                    {ytVideos.length > 0 ? (
-                      <>
-                        <iframe
-                          className="ed-yt__embed"
-                          src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
-                          title={ytVideos[0].title}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                        {ytVideos.length > 1 && (
-                          <div className="ed-yt__more">
-                            {ytVideos.slice(1).map((v) => (
-                              <a
-                                key={v.id}
-                                href={`https://www.youtube.com/watch?v=${v.id}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="ed-yt__thumb"
-                              >
-                                {v.thumb && (
-                                  <img src={v.thumb} alt={v.title} loading="lazy" />
-                                )}
-                                <span>{v.title}</span>
-                              </a>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <a href={ytUrl} target="_blank" rel="noreferrer" className="ed-yt__fallback">
-                        <YoutubeIcon size={22} />
-                        <span>Apri il canale YouTube</span>
-                        <ArrowRightIcon size={16} />
-                      </a>
+                    <iframe
+                      className="ed-yt__embed"
+                      src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
+                      title={ytVideos[0].title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                    {ytVideos.length > 1 && (
+                      <div className="ed-yt__more">
+                        {ytVideos.slice(1).map((v) => (
+                          <a
+                            key={v.id}
+                            href={`https://www.youtube.com/watch?v=${v.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="ed-yt__thumb"
+                          >
+                            {v.thumb && (
+                              <img src={v.thumb} alt={v.title} loading="lazy" />
+                            )}
+                            <span>{v.title}</span>
+                          </a>
+                        ))}
+                      </div>
                     )}
                   </div>
                 )}

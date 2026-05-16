@@ -58,6 +58,15 @@ export async function getEvent(id) {
   return res.json();
 }
 
+// ---- SPOTIFY: artista per nome ----
+export async function getSpotifyArtist(name) {
+  const res = await fetch(
+    `${BASE}/api/spotify/artist?name=${encodeURIComponent(name)}`
+  );
+  if (!res.ok) throw new Error(`Spotify API ${res.status}`);
+  return res.json();
+}
+
 // ---- YOUTUBE: ultimi video del canale artista ----
 export async function getYoutubeVideos(name) {
   const res = await fetch(

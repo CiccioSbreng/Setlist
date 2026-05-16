@@ -1887,12 +1887,34 @@ input.input[type="date"] {
   box-shadow: var(--sh-md);
   padding: 16px 18px;
 }
+.ed-spotify__header {
+  margin-bottom: 12px;
+}
 .ed-spotify h3 {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 1rem;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+}
+.ed-spotify__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ed-spotify__genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tag--sm {
+  padding: 3px 8px;
+  font-size: 0.68rem;
+}
+.ed-spotify__followers {
+  font-size: 0.78rem;
+  color: var(--muted);
 }
 .ed-spotify__frame {
   width: 100%;
@@ -1900,6 +1922,20 @@ input.input[type="date"] {
   border: 0;
   border-radius: 12px;
   display: block;
+}
+.ed-spotify__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: #1db954;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+.ed-spotify__open:hover {
+  opacity: 1;
 }
 
 .ed-yt {
