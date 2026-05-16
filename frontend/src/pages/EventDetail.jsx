@@ -51,6 +51,20 @@ function formatPrice(min, max, currency) {
   return `da ${fmt(min ?? max)}`;
 }
 
+function getDaysLeft(date, time) {
+  if (!date) return null;
+  const d = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
+  if (Number.isNaN(d.getTime())) return null;
+  const diff = d - new Date();
+  if (diff < 0) return null;
+  const days = Math.floor(diff / 86400000);
+  if (days === 0) return "Oggi!";
+  if (days === 1) return "Domani!";
+  if (days < 30) return `Tra ${days} giorni`;
+  const months = Math.floor(days / 30);
+  return `Tra ${months} ${months === 1 ? "mese" : "mesi"}`;
+}
+
 export default function EventDetail() {
   const { id } = useParams();
   const [ev, setEv] = useState(null);
@@ -64,6 +78,9 @@ export default function EventDetail() {
   const [ytVideos, setYtVideos] = useState([]);
   const [artistBio, setArtistBio] = useState("");
   const [spotifyArtist, setSpotifyArtist] = useState(null);
+  const [activeTab, setActiveTab] = useState("evento");
+
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
   useEffect(() => {
     let alive = true;
@@ -239,6 +256,7 @@ export default function EventDetail() {
 
   const when = formatWhen(ev.date, ev.time);
   const price = formatPrice(ev.priceMin, ev.priceMax, ev.currency);
+  const daysLeft = getDaysLeft(ev.date, ev.time);
   const v = ev.venue || {};
   const artist = ev.artists?.[0];
   const hasGeo = v.lat != null && v.lon != null;
@@ -274,53 +292,57 @@ export default function EventDetail() {
   return (
     <section className="section">
       <div className="wrap">
-        <Link to="/home" className="ed-back">
-          ← Tutti gli eventi
-        </Link>
+        <Link to="/home" className="ed-back">← Tutti gli eventi</Link>
 
-        <article className="ed">
-          <div className="ed__media">
-            {ev.image ? (
-              <img src={ev.image} alt={ev.name} />
-            ) : (
-              <div className="ed__noimg">
-                <MusicIcon size={64} />
+        {/* HERO */}
+        <div className={`ed-hero${!ev.image ? " ed-hero--noimg" : ""}`}>
+          {ev.image && <img className="ed-hero__img" src={ev.image} alt={ev.name} />}
+          <div className="ed-hero__overlay">
+            <div className="ed-hero__inner">
+              <div className="ed__tags">
+                {ev.segment && <span className="tag">{ev.segment}</span>}
+                {ev.genre && <span className="tag">{ev.genre}</span>}
+                {ev.status === "cancelled" && <span className="tag tag--warn">Annullato</span>}
               </div>
-            )}
-          </div>
-
-          <div className="ed__body">
-            <div className="ed__tags">
-              {ev.segment && <span className="tag">{ev.segment}</span>}
-              {ev.genre && <span className="tag">{ev.genre}</span>}
-              {ev.status === "cancelled" && (
-                <span className="tag tag--warn">Annullato</span>
-              )}
+              <h1 className="ed-hero__title">{ev.name}</h1>
+              {ev.lineup?.length > 1 && <p className="ed-hero__lineup">{ev.lineup.join(" · ")}</p>}
+              <div className="ed-hero__when">
+                <CalendarIcon size={15} />
+                <span>{when.dateLabel}</span>
+                {when.timeLabel && (
+                  <>
+                    <span className="ed-hero__sep">·</span>
+                    <ClockIcon size={15} />
+                    <span>Ore {when.timeLabel}</span>
+                  </>
+                )}
+                {daysLeft && <span className="ed-hero__countdown">{daysLeft}</span>}
+              </div>
             </div>
+          </div>
+        </div>
 
-            <h1 className="ed__title">{ev.name}</h1>
+        {/* MOBILE TABS */}
+        <div className="ed-tabs">
+          {[["evento", "Evento"], ["artista", "Artista"], ["dove", "Dove & Come"]].map(([tab, label]) => (
+            <button
+              key={tab}
+              type="button"
+              className={`ed-tabs__btn${activeTab === tab ? " active" : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
 
-            {ev.lineup?.length > 1 && (
-              <p className="ed__lineup">{ev.lineup.join(" · ")}</p>
-            )}
-
+        {/* SECTION: EVENTO */}
+        <div className={`ed-section${activeTab === "evento" ? " ed-section--active" : ""}`}>
+          <div className="ed-card">
             <div className="ed__meta">
               <div className="ed__row">
-                <CalendarIcon size={18} />
-                <span>{when.dateLabel}</span>
-              </div>
-              {when.timeLabel && (
-                <div className="ed__row">
-                  <ClockIcon size={18} />
-                  <span>Ore {when.timeLabel}</span>
-                </div>
-              )}
-              <div className="ed__row">
                 <PinIcon size={18} />
-                <span>
-                  {[v.name, v.address, v.city].filter(Boolean).join(" · ") ||
-                    "Location da annunciare"}
-                </span>
+                <span>{[v.name, v.address, v.city].filter(Boolean).join(" · ") || "Location da annunciare"}</span>
               </div>
               {price && (
                 <div className="ed__row">
@@ -329,44 +351,27 @@ export default function EventDetail() {
                 </div>
               )}
             </div>
-
             <div className="ed__actions">
               {ev.url && (
-                <a
-                  href={ev.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn--primary"
-                >
+                <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary">
                   <TicketIcon size={18} />
                   Biglietti su Ticketmaster
                   <ArrowRightIcon size={18} />
                 </a>
               )}
-              <button
-                type="button"
-                className="btn btn--ghost"
-                onClick={handleFav}
-              >
+              <button type="button" className="btn btn--ghost" onClick={handleFav}>
                 <HeartIcon size={18} />
                 Salva nei preferiti
               </button>
             </div>
-
             {favMsg && (
               <div
-                className={
-                  "banner " +
-                  (favMsg.includes("aggiunto")
-                    ? "banner--ok"
-                    : "banner--error")
-                }
+                className={"banner " + (favMsg.includes("aggiunto") ? "banner--ok" : "banner--error")}
                 style={{ marginTop: 16 }}
               >
                 {favMsg}
               </div>
             )}
-
             {(ev.info || ev.note) && (
               <div className="ed__note">
                 {ev.info && <p>{ev.info}</p>}
@@ -374,285 +379,183 @@ export default function EventDetail() {
               </div>
             )}
           </div>
-        </article>
 
-        {artist && (
-          <div className="ed-artist">
-            {artist.image && (
-              <img
-                className="ed-artist__img"
-                src={artist.image}
-                alt={artist.name}
-                loading="lazy"
-              />
-            )}
-            <div className="ed-artist__body">
-              <span className="eyebrow">
-                <MusicIcon size={14} /> Artista
-              </span>
-              <h2>{artist.name}</h2>
-              {artist.genre && (
-                <p className="ed-artist__genre">{artist.genre}</p>
-              )}
-              {artistBio && (
-                <p className="ed-artist__bio">{artistBio}</p>
-              )}
-              <div className="ed-artist__links">
-                {artist.links?.instagram && (
-                  <a href={artist.links.instagram} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--ig">
-                    <InstagramIcon size={15} />
-                    Instagram
-                  </a>
-                )}
-                {artist.links?.homepage && (
-                  <a href={artist.links.homepage} target="_blank" rel="noreferrer" className="ed-artist__link">
-                    <GlobeIcon size={15} />
-                    Sito ufficiale
-                  </a>
-                )}
-                {artist.links?.twitter && (
-                  <a href={artist.links.twitter} target="_blank" rel="noreferrer" className="ed-artist__link">
-                    Twitter / X
-                  </a>
-                )}
-                {artist.links?.facebook && (
-                  <a href={artist.links.facebook} target="_blank" rel="noreferrer" className="ed-artist__link">
-                    Facebook
-                  </a>
-                )}
-              </div>
+          {otherDates.length > 0 && (
+            <div className="ed-dates">
+              <h2>Prossime date{artist?.name ? ` di ${artist.name}` : ""}</h2>
+              <ul className="ed-dates__list">
+                {otherDates.map((e) => {
+                  const w = formatWhen(e.date, e.time);
+                  return (
+                    <li key={e.id}>
+                      <Link to={`/event/${e.id}`} className="ed-dates__row">
+                        <span className="ed-dates__when">
+                          <CalendarIcon size={16} />
+                          {w.dateLabel}
+                        </span>
+                        <span className="ed-dates__where">
+                          {[e.venue, e.city].filter(Boolean).join(" · ") || "Location da annunciare"}
+                        </span>
+                        <ArrowRightIcon size={16} />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {otherDates.length > 0 && (
-          <div className="ed-dates">
-            <h2>
-              Prossime date{artist?.name ? ` di ${artist.name}` : ""}
-            </h2>
-            <ul className="ed-dates__list">
-              {otherDates.map((e) => {
-                const w = formatWhen(e.date, e.time);
-                return (
-                  <li key={e.id}>
-                    <Link to={`/event/${e.id}`} className="ed-dates__row">
-                      <span className="ed-dates__when">
-                        <CalendarIcon size={16} />
-                        {w.dateLabel}
-                      </span>
-                      <span className="ed-dates__where">
-                        {[e.venue, e.city].filter(Boolean).join(" · ") ||
-                          "Location da annunciare"}
-                      </span>
-                      <ArrowRightIcon size={16} />
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-
-        {(hasGeo || hasMedia) && (
-          <div
-            className={
-              "ed-media-row" +
-              (hasGeo && hasMedia ? "" : " ed-media-row--single")
-            }
-          >
-            {hasGeo && (
-              <div className="ed-map">
-                <div className="ed-map__head">
-                  <h2>
-                    <PinIcon size={18} />
-                    Come arrivare
-                  </h2>
-                  <div className="ed-map__links">
-                    <a href={gmaps} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">
-                      Google Maps
+        {/* SECTION: ARTISTA */}
+        <div className={`ed-section${activeTab === "artista" ? " ed-section--active" : ""}`}>
+          {artist && (
+            <div className="ed-artist">
+              {artist.image && (
+                <img className="ed-artist__img" src={artist.image} alt={artist.name} loading="lazy" />
+              )}
+              <div className="ed-artist__body">
+                <span className="eyebrow"><MusicIcon size={14} /> Artista</span>
+                <h2>{artist.name}</h2>
+                {artist.genre && <p className="ed-artist__genre">{artist.genre}</p>}
+                {artistBio && <p className="ed-artist__bio">{artistBio}</p>}
+                <div className="ed-artist__links">
+                  {artist.links?.instagram && (
+                    <a href={artist.links.instagram} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--ig">
+                      <InstagramIcon size={15} />Instagram
                     </a>
-                    <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">
-                      Indicazioni
+                  )}
+                  {artist.links?.homepage && (
+                    <a href={artist.links.homepage} target="_blank" rel="noreferrer" className="ed-artist__link">
+                      <GlobeIcon size={15} />Sito ufficiale
                     </a>
-                  </div>
+                  )}
+                  {artist.links?.twitter && (
+                    <a href={artist.links.twitter} target="_blank" rel="noreferrer" className="ed-artist__link">Twitter / X</a>
+                  )}
+                  {artist.links?.facebook && (
+                    <a href={artist.links.facebook} target="_blank" rel="noreferrer" className="ed-artist__link">Facebook</a>
+                  )}
                 </div>
-                {showMap ? (
-                  <iframe
-                    title="Mappa del venue"
-                    className="ed-map__frame"
-                    src={osmSrc}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    className="ed-map__preview"
-                    onClick={() => setShowMap(true)}
-                  >
-                    <PinIcon size={28} />
-                    <span>Mostra mappa interattiva</span>
-                    {(v.address || v.city) && (
-                      <small>{[v.address, v.city].filter(Boolean).join(" · ")}</small>
-                    )}
-                  </button>
-                )}
               </div>
-            )}
-
-            {hasMedia && (
-              <div className="ed-media-panel">
-                {spotifyArtist && (
-                  <div className="ed-spotify">
-                    <div className="ed-spotify__header">
-                      <h3>
-                        <SpotifyIcon size={16} />
-                        Ascolta su Spotify
-                      </h3>
-                      <div className="ed-spotify__meta">
-                        {spotifyArtist.genres.length > 0 && (
-                          <div className="ed-spotify__genres">
-                            {spotifyArtist.genres.map((g) => (
-                              <span key={g} className="tag tag--sm">{g}</span>
-                            ))}
-                          </div>
-                        )}
-                        {spotifyArtist.followers > 0 && (
-                          <span className="ed-spotify__followers">
-                            {spotifyArtist.followers.toLocaleString("it-IT")} follower
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <iframe
-                      title="Player Spotify"
-                      className="ed-spotify__frame"
-                      src={spotifyArtist.embedUrl}
-                      loading="lazy"
-                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    />
-                    {spotifyArtist.externalUrl && (
-                      <a
-                        href={spotifyArtist.externalUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="ed-spotify__open"
-                      >
-                        <SpotifyIcon size={14} />
-                        Apri su Spotify
-                        <ArrowRightIcon size={14} />
-                      </a>
-                    )}
-                  </div>
-                )}
-                {ytVideos.length > 0 && (
-                  <div className="ed-yt">
-                    <h3>
-                      <YoutubeIcon size={16} />
-                      Ultimi video
-                    </h3>
-                    <iframe
-                      className="ed-yt__embed"
-                      src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
-                      title={ytVideos[0].title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                    {ytVideos.length > 1 && (
-                      <div className="ed-yt__more">
-                        {ytVideos.slice(1).map((v) => (
-                          <a
-                            key={v.id}
-                            href={`https://www.youtube.com/watch?v=${v.id}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="ed-yt__thumb"
-                          >
-                            {v.thumb && (
-                              <img src={v.thumb} alt={v.title} loading="lazy" />
-                            )}
-                            <span>{v.title}</span>
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {parks.length > 0 && (
-          <div className="ed-nearby">
-            <div className="ed-nearby__head">
-              <h2>
-                <TreeIcon size={20} />
-                Parchi e giardini nei dintorni
-              </h2>
             </div>
-            <ul className="ed-nearby__list">
-              {parks.map((p) => (
-                <li key={p.id}>
-                  <a
-                    href={`https://www.openstreetmap.org/${p.type}/${p.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="ed-nearby__item"
-                  >
-                    <TreeIcon size={16} />
-                    <span>{p.name}</span>
-                    <ArrowRightIcon size={14} />
+          )}
+          {spotifyArtist && (
+            <div className="ed-spotify">
+              <div className="ed-spotify__header">
+                <h3><SpotifyIcon size={16} />Ascolta su Spotify</h3>
+                <div className="ed-spotify__meta">
+                  {spotifyArtist.genres.length > 0 && (
+                    <div className="ed-spotify__genres">
+                      {spotifyArtist.genres.map((g) => (
+                        <span key={g} className="tag tag--sm">{g}</span>
+                      ))}
+                    </div>
+                  )}
+                  {spotifyArtist.followers > 0 && (
+                    <span className="ed-spotify__followers">
+                      {spotifyArtist.followers.toLocaleString("it-IT")} follower
+                    </span>
+                  )}
+                </div>
+              </div>
+              <iframe
+                title="Player Spotify"
+                className="ed-spotify__frame"
+                src={spotifyArtist.embedUrl}
+                loading="lazy"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              />
+              {spotifyArtist.externalUrl && (
+                <a href={spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-spotify__open">
+                  <SpotifyIcon size={14} />Apri su Spotify<ArrowRightIcon size={14} />
+                </a>
+              )}
+            </div>
+          )}
+          {ytVideos.length > 0 && (
+            <div className="ed-yt">
+              <h3><YoutubeIcon size={16} />Ultimo video</h3>
+              <iframe
+                className="ed-yt__embed"
+                src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
+                title={ytVideos[0].title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+              <a href={`https://www.youtube.com/watch?v=${ytVideos[0].id}`} target="_blank" rel="noreferrer" className="ed-yt__open">
+                <YoutubeIcon size={14} />Apri su YouTube<ArrowRightIcon size={14} />
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* SECTION: DOVE & COME */}
+        <div className={`ed-section${activeTab === "dove" ? " ed-section--active" : ""}`}>
+          {hasGeo && (
+            <div className="ed-map">
+              <div className="ed-map__head">
+                <h2><PinIcon size={18} />Come arrivare</h2>
+                <div className="ed-map__links">
+                  <a href={gmaps} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Google Maps</a>
+                  <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Indicazioni</a>
+                </div>
+              </div>
+              {showMap ? (
+                <iframe title="Mappa del venue" className="ed-map__frame" src={osmSrc} />
+              ) : (
+                <button type="button" className="ed-map__preview" onClick={() => setShowMap(true)}>
+                  <PinIcon size={28} />
+                  <span>Mostra mappa interattiva</span>
+                  {(v.address || v.city) && <small>{[v.address, v.city].filter(Boolean).join(" · ")}</small>}
+                </button>
+              )}
+            </div>
+          )}
+          {parks.length > 0 && (
+            <div className="ed-nearby">
+              <div className="ed-nearby__head">
+                <h2><TreeIcon size={20} />Parchi e giardini nei dintorni</h2>
+              </div>
+              <ul className="ed-nearby__list">
+                {parks.map((p) => (
+                  <li key={p.id}>
+                    <a href={`https://www.openstreetmap.org/${p.type}/${p.id}`} target="_blank" rel="noreferrer" className="ed-nearby__item">
+                      <TreeIcon size={16} /><span>{p.name}</span><ArrowRightIcon size={14} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {(bookingUrl || airbnbUrl) && (
+            <div className="ed-travel">
+              <h2>Dove dormire</h2>
+              <div className="ed-travel__cards">
+                {bookingUrl && (
+                  <a href={bookingUrl} target="_blank" rel="noreferrer" className="ed-travel__card">
+                    <div className="ed-travel__card-icon"><BedIcon size={22} /></div>
+                    <div>
+                      <div className="ed-travel__card-title">Booking.com</div>
+                      <div className="ed-travel__card-sub">Hotel, B&amp;B e appartamenti vicino al venue</div>
+                    </div>
+                    <ArrowRightIcon size={18} className="ed-travel__arrow" />
                   </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {(bookingUrl || airbnbUrl) && (
-          <div className="ed-travel">
-            <h2>Dove dormire</h2>
-            <div className="ed-travel__cards">
-              {bookingUrl && (
-                <a
-                  href={bookingUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ed-travel__card"
-                >
-                  <div className="ed-travel__card-icon">
-                    <BedIcon size={22} />
-                  </div>
-                  <div>
-                    <div className="ed-travel__card-title">Booking.com</div>
-                    <div className="ed-travel__card-sub">
-                      Hotel, B&amp;B e appartamenti vicino al venue
+                )}
+                {airbnbUrl && (
+                  <a href={airbnbUrl} target="_blank" rel="noreferrer" className="ed-travel__card">
+                    <div className="ed-travel__card-icon"><GlobeIcon size={22} /></div>
+                    <div>
+                      <div className="ed-travel__card-title">Airbnb</div>
+                      <div className="ed-travel__card-sub">Case e stanze a {v.city || "destinazione"}</div>
                     </div>
-                  </div>
-                  <ArrowRightIcon size={18} className="ed-travel__arrow" />
-                </a>
-              )}
-              {airbnbUrl && (
-                <a
-                  href={airbnbUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ed-travel__card"
-                >
-                  <div className="ed-travel__card-icon">
-                    <GlobeIcon size={22} />
-                  </div>
-                  <div>
-                    <div className="ed-travel__card-title">Airbnb</div>
-                    <div className="ed-travel__card-sub">
-                      Case e stanze a {v.city || "destinazione"}
-                    </div>
-                  </div>
-                  <ArrowRightIcon size={18} className="ed-travel__arrow" />
-                </a>
-              )}
+                    <ArrowRightIcon size={18} className="ed-travel__arrow" />
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+
       </div>
     </section>
   );
