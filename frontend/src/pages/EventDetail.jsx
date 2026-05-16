@@ -60,6 +60,7 @@ export default function EventDetail() {
   const [favMsg, setFavMsg] = useState("");
   const [otherDates, setOtherDates] = useState([]);
   const [parks, setParks] = useState([]);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -108,26 +109,21 @@ export default function EventDetail() {
     const lat = ev?.venue?.lat;
     const lon = ev?.venue?.lon;
     if (lat == null || lon == null) return;
-    let alive = true;
-    const q = `[out:json][timeout:10];(node(around:2000,${lat},${lon})[leisure~"park|garden"][name];way(around:2000,${lat},${lon})[leisure~"park|garden"][name];);out center 5;`;
-    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`)
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const q = `[out:json][timeout:8];(node(around:2000,${lat},${lon})[leisure~"park|garden"][name];way(around:2000,${lat},${lon})[leisure~"park|garden"][name];);out center 5;`;
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`, { signal: ctrl.signal })
       .then((r) => r.json())
       .then((data) => {
-        if (!alive) return;
         const items = (data.elements || [])
           .filter((el) => el.tags?.name)
           .slice(0, 5)
-          .map((el) => ({
-            id: el.id,
-            type: el.type,
-            name: el.tags.name,
-          }));
+          .map((el) => ({ id: el.id, type: el.type, name: el.tags.name }));
         setParks(items);
       })
-      .catch(() => {});
-    return () => {
-      alive = false;
-    };
+      .catch(() => {})
+      .finally(() => clearTimeout(tid));
+    return () => { ctrl.abort(); clearTimeout(tid); };
   }, [ev]);
 
   async function handleFav() {
@@ -428,22 +424,38 @@ export default function EventDetail() {
         {hasGeo && (
           <div className="ed-map">
             <div className="ed-map__head">
-              <h2>Come arrivare</h2>
+              <h2>
+                <PinIcon size={18} />
+                Come arrivare
+              </h2>
               <div className="ed-map__links">
                 <a href={gmaps} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">
-                  Apri mappa
+                  Google Maps
                 </a>
                 <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">
                   Indicazioni
                 </a>
               </div>
             </div>
-            <iframe
-              title="Mappa del venue"
-              className="ed-map__frame"
-              src={osmSrc}
-              loading="lazy"
-            />
+            {showMap ? (
+              <iframe
+                title="Mappa del venue"
+                className="ed-map__frame"
+                src={osmSrc}
+              />
+            ) : (
+              <button
+                type="button"
+                className="ed-map__preview"
+                onClick={() => setShowMap(true)}
+              >
+                <PinIcon size={28} />
+                <span>Mostra mappa interattiva</span>
+                {(v.address || v.city) && (
+                  <small>{[v.address, v.city].filter(Boolean).join(" · ")}</small>
+                )}
+              </button>
+            )}
           </div>
         )}
 
