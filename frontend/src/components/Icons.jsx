@@ -142,3 +142,18 @@ export const RefreshIcon = (p) => (
     <path d="M20 12a8 8 0 0 1-13.7 5.6L4 16M4 20v-4h4" />
   </Svg>
 );
+
+export const TreeIcon = (p) => (
+  <Svg {...p}>
+    <path d="M12 3 4.5 13H9v8h6v-8h4.5L12 3Z" />
+  </Svg>
+);
+
+export const BedIcon = (p) => (
+  <Svg {...p}>
+    <rect x="2" y="9" width="20" height="12" rx="2" />
+    <path d="M2 14h20" />
+    <path d="M2 9V6.5A2.5 2.5 0 0 1 4.5 4h15A2.5 2.5 0 0 1 22 6.5V9" />
+    <path d="M7 9V7a1 1 0 0 1 2 0v2" />
+  </Svg>
+);
