@@ -58,6 +58,15 @@ export async function getEvent(id) {
   return res.json();
 }
 
+// ---- TICKETMASTER: prossime date di un artista ----
+export async function getArtistEvents(id) {
+  const res = await fetch(
+    `${BASE}/api/ticketmaster/artists/${encodeURIComponent(id)}/events`
+  );
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return res.json();
+}
+
 // ---- AUTH: login / registrazione ----
 
 // POST /api/auth/login

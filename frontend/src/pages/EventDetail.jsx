@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getEvent, addFavorite } from "../lib/api";
+import { getEvent, getArtistEvents, addFavorite } from "../lib/api";
 import {
   CalendarIcon,
   ClockIcon,
@@ -12,6 +12,7 @@ import {
   HeartIcon,
   ArrowRightIcon,
   SearchIcon,
+  GlobeIcon,
 } from "../components/Icons";
 
 function formatWhen(date, time) {
@@ -52,12 +53,14 @@ export default function EventDetail() {
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState("");
   const [favMsg, setFavMsg] = useState("");
+  const [otherDates, setOtherDates] = useState([]);
 
   useEffect(() => {
     let alive = true;
     setLoading(true);
     setNotFound(false);
     setError("");
+    setOtherDates([]);
     getEvent(id)
       .then((data) => {
         if (alive) setEv(data);
@@ -76,6 +79,23 @@ export default function EventDetail() {
       alive = false;
     };
   }, [id]);
+
+  const artistId = ev?.artists?.[0]?.id;
+
+  useEffect(() => {
+    if (!artistId) return;
+    let alive = true;
+    getArtistEvents(artistId)
+      .then((res) => {
+        if (!alive) return;
+        const list = (res.events || []).filter((e) => e.id !== id).slice(0, 6);
+        setOtherDates(list);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [artistId, id]);
 
   async function handleFav() {
     setFavMsg("");
@@ -152,6 +172,7 @@ export default function EventDetail() {
   const when = formatWhen(ev.date, ev.time);
   const price = formatPrice(ev.priceMin, ev.priceMax, ev.currency);
   const v = ev.venue || {};
+  const artist = ev.artists?.[0];
   const hasGeo = v.lat != null && v.lon != null;
   const d = 0.008;
   const osmSrc = hasGeo
@@ -270,6 +291,99 @@ export default function EventDetail() {
             )}
           </div>
         </article>
+
+        {artist && (artist.image || artist.links) && (
+          <div className="ed-artist">
+            {artist.image && (
+              <img
+                className="ed-artist__img"
+                src={artist.image}
+                alt={artist.name}
+                loading="lazy"
+              />
+            )}
+            <div className="ed-artist__body">
+              <span className="eyebrow">
+                <MusicIcon size={14} /> Artista
+              </span>
+              <h2>{artist.name}</h2>
+              {artist.genre && (
+                <p className="ed-artist__genre">{artist.genre}</p>
+              )}
+              <div className="ed-artist__links">
+                {artist.links?.youtube && (
+                  <a
+                    href={artist.links.youtube}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn--primary btn--sm"
+                  >
+                    Video su YouTube
+                  </a>
+                )}
+                {artist.links?.spotify && (
+                  <a
+                    href={artist.links.spotify}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn--outline btn--sm"
+                  >
+                    Spotify
+                  </a>
+                )}
+                {artist.links?.homepage && (
+                  <a
+                    href={artist.links.homepage}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn--outline btn--sm"
+                  >
+                    <GlobeIcon size={16} />
+                    Sito ufficiale
+                  </a>
+                )}
+                {artist.links?.instagram && (
+                  <a
+                    href={artist.links.instagram}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn--outline btn--sm"
+                  >
+                    Instagram
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {otherDates.length > 0 && (
+          <div className="ed-dates">
+            <h2>
+              Prossime date{artist?.name ? ` di ${artist.name}` : ""}
+            </h2>
+            <ul className="ed-dates__list">
+              {otherDates.map((e) => {
+                const w = formatWhen(e.date, e.time);
+                return (
+                  <li key={e.id}>
+                    <Link to={`/event/${e.id}`} className="ed-dates__row">
+                      <span className="ed-dates__when">
+                        <CalendarIcon size={16} />
+                        {w.dateLabel}
+                      </span>
+                      <span className="ed-dates__where">
+                        {[e.venue, e.city].filter(Boolean).join(" · ") ||
+                          "Location da annunciare"}
+                      </span>
+                      <ArrowRightIcon size={16} />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
         {hasGeo && (
           <div className="ed-map">

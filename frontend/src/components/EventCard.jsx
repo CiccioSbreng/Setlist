@@ -48,11 +48,21 @@ function formatPrice(min, max, currency) {
   return `da ${fmt(min ?? max)}`;
 }
 
-export default function EventCard({ ev, onAddFavorite, onRemove }) {
+export default function EventCard({
+  ev,
+  onAddFavorite,
+  onRemove,
+  onToggleFavorite,
+  favorited = false,
+}) {
   const when = parseWhen(ev.date, ev.time);
   const price = formatPrice(ev.priceMin, ev.priceMax, ev.currency);
-  const isFav = typeof onRemove === "function";
   const detailId = ev.eventId || ev.id;
+
+  const favAction = onRemove || onToggleFavorite || onAddFavorite;
+  // cuore acceso (rosso) se è nei preferiti: sempre nella pagina Preferiti,
+  // oppure quando l'evento risulta salvato in home.
+  const active = typeof onRemove === "function" ? true : Boolean(favorited);
 
   return (
     <article className="ev-card appear">
@@ -77,20 +87,21 @@ export default function EventCard({ ev, onAddFavorite, onRemove }) {
           </div>
         )}
 
-        {(onAddFavorite || onRemove) && (
+        {favAction && (
           <div className="ev-card__fav">
             <button
               type="button"
-              className={"icon-btn icon-btn--fav" + (isFav ? " is-on" : "")}
-              onClick={isFav ? onRemove : onAddFavorite}
+              className={"icon-btn icon-btn--fav" + (active ? " is-on" : "")}
+              onClick={favAction}
               title={
-                isFav ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
+                active ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
               }
               aria-label={
-                isFav ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
+                active ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
               }
+              aria-pressed={active}
             >
-              <HeartIcon size={19} filled={isFav} />
+              <HeartIcon size={19} filled={active} />
             </button>
           </div>
         )}

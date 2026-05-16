@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { searchEvents, toUtcStart, toUtcEnd, addFavorite } from "../lib/api";
+import {
+  searchEvents,
+  toUtcStart,
+  toUtcEnd,
+  addFavorite,
+  getFavorites,
+  removeFavorite,
+} from "../lib/api";
 import EventCard from "../components/EventCard";
 import DateRangePopover from "../components/DateRangePopover";
 import {
@@ -74,6 +81,64 @@ export default function Home() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [quickRange, setQuickRange] = useState(null);
+  // eventId Ticketmaster -> _id del preferito (per toggle e cuore acceso)
+  const [favMap, setFavMap] = useState({});
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    getFavorites()
+      .then((list) => {
+        const m = {};
+        for (const f of list) m[f.eventId] = f._id;
+        setFavMap(m);
+      })
+      .catch(() => {});
+  }, []);
+
+  async function toggleFavorite(ev) {
+    setError("");
+    setInfo("");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError(
+        "Per salvare un evento nei preferiti devi prima accedere o registrarti."
+      );
+      return;
+    }
+
+    const favId = favMap[ev.id];
+    if (favId) {
+      try {
+        await removeFavorite(favId);
+        setFavMap((m) => {
+          const next = { ...m };
+          delete next[ev.id];
+          return next;
+        });
+        setInfo(`"${ev.name}" rimosso dai preferiti.`);
+      } catch (e) {
+        setError(e.message || "Non è stato possibile rimuovere il preferito.");
+      }
+      return;
+    }
+
+    try {
+      const created = await addFavorite({
+        eventId: ev.id,
+        name: ev.name,
+        image: ev.image,
+        date: ev.date,
+        venue: ev.venue,
+        city: ev.city,
+        url: ev.url,
+      });
+      setFavMap((m) => ({ ...m, [ev.id]: created._id }));
+      setInfo(`"${ev.name}" aggiunto ai preferiti.`);
+    } catch (e) {
+      setError(e.message || "Non è stato possibile salvare il preferito.");
+    }
+  }
 
   function update(p) {
     setForm((f) => ({ ...f, ...p }));
@@ -168,31 +233,9 @@ export default function Home() {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  async function handleAddFavorite(ev) {
-    setError("");
-    setInfo("");
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("Accedi al tuo account per salvare gli eventi tra i preferiti.");
-      return;
-    }
-
-    try {
-      await addFavorite({
-        eventId: ev.id,
-        name: ev.name,
-        image: ev.image,
-        date: ev.date,
-        venue: ev.venue,
-        city: ev.city,
-        url: ev.url,
-      });
-      setInfo(`"${ev.name}" è stato aggiunto ai tuoi preferiti.`);
-    } catch (e) {
-      console.error(e);
-      setError(e.message || "Non è stato possibile salvare il preferito.");
-    }
+  function goToPage(p) {
+    runSearch(p);
+    scrollToSearch();
   }
 
   const hasResults = data.events?.length > 0;
@@ -426,7 +469,8 @@ export default function Home() {
                   <EventCard
                     key={ev.id}
                     ev={ev}
-                    onAddFavorite={() => handleAddFavorite(ev)}
+                    favorited={Boolean(favMap[ev.id])}
+                    onToggleFavorite={() => toggleFavorite(ev)}
                   />
                 ))}
               </div>
@@ -438,7 +482,7 @@ export default function Home() {
                   type="button"
                   className="btn btn--outline btn--sm"
                   disabled={form.page <= 0}
-                  onClick={() => runSearch(form.page - 1)}
+                  onClick={() => goToPage(form.page - 1)}
                 >
                   ← Precedente
                 </button>
@@ -449,7 +493,7 @@ export default function Home() {
                   type="button"
                   className="btn btn--outline btn--sm"
                   disabled={form.page + 1 >= (data.totalPages || 1)}
-                  onClick={() => runSearch(form.page + 1)}
+                  onClick={() => goToPage(form.page + 1)}
                 >
                   Successiva →
                 </button>

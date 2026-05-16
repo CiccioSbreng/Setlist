@@ -33,6 +33,30 @@ function num(v){
   return Number.isFinite(n) ? n : null
 }
 
+function firstUrl(v){
+  return Array.isArray(v) && v[0]?.url ? v[0].url : null
+}
+
+function mapArtists(list){
+  return (list || []).map(a => {
+    const el = a.externalLinks || {}
+    return {
+      id: a.id,
+      name: a.name,
+      image: bestImage(a.images),
+      genre: a.classifications?.[0]?.genre?.name || null,
+      links: {
+        youtube: firstUrl(el.youtube),
+        spotify: firstUrl(el.spotify),
+        homepage: firstUrl(el.homepage),
+        instagram: firstUrl(el.instagram),
+        twitter: firstUrl(el.twitter),
+        facebook: firstUrl(el.facebook)
+      }
+    }
+  })
+}
+
 function mapVenue(v){
   if (!v) return null
   return {
@@ -95,6 +119,7 @@ function mapDetail(ev){
     info: ev.info || null,
     note: ev.pleaseNote || null,
     lineup: (ev._embedded?.attractions || []).map(a => a.name).filter(Boolean),
+    artists: mapArtists(ev._embedded?.attractions),
     url: ev.url,
     image: bestImage(ev.images)
   }
@@ -161,6 +186,29 @@ router.get('/events/:id', async (req, res) => {
     if (status === 404) {
       return res.status(404).json({ error: 'Evento non trovato' })
     }
+    res.status(status).json({ error: 'Ticketmaster API error', details: err.response?.data || err.message })
+  }
+})
+
+// Prossime date di un artista (per la pagina dettaglio)
+router.get('/artists/:id/events', async (req, res) => {
+  try {
+    const { id } = req.params
+    const cacheKey = `artist-events:${id}`
+    if (cache.has(cacheKey)) return res.json(cache.get(cacheKey))
+
+    const out = await tmRequest({
+      apikey: API_KEY,
+      attractionId: id,
+      sort: 'date,asc',
+      size: 12,
+      locale: '*'
+    })
+
+    cache.set(cacheKey, out)
+    res.json(out)
+  } catch (err) {
+    const status = err.response?.status || 500
     res.status(status).json({ error: 'Ticketmaster API error', details: err.response?.data || err.message })
   }
 })
