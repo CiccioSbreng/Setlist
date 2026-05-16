@@ -85,6 +85,10 @@ export default function Home() {
   const [favMap, setFavMap] = useState({});
 
   useEffect(() => {
+    runSearch(0, { city: "", keyword: "", start: "", end: "", size: 12, page: 0 });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
     getFavorites()
@@ -529,21 +533,10 @@ export default function Home() {
       {/* ===== CALL TO ACTION ===== */}
       <section className="section" id="how">
         <div className="wrap">
-          <div
-            className="search"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 24,
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ maxWidth: 520 }}>
-              <h2 style={{ fontSize: "1.7rem" }}>
-                Crea il tuo account e salva i tuoi eventi
-              </h2>
-              <p style={{ color: "var(--text-dim)", marginTop: 12 }}>
+          <div className="cta-band">
+            <div className="cta-band__text">
+              <h2>Crea il tuo account e salva i tuoi eventi</h2>
+              <p>
                 Registrati gratuitamente per costruire la tua lista di concerti
                 preferiti e ritrovarli su qualsiasi dispositivo.
               </p>
