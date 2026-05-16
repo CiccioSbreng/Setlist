@@ -16,6 +16,8 @@ const authRouter = require('./routes/auth');
 const favoritesRouter = require('./routes/favorites');
 // Router YouTube
 const youtubeRouter = require('./routes/youtube');
+// Router Spotify
+const spotifyRouter = require('./routes/spotify');
 
 const app = express();
 
@@ -44,6 +46,7 @@ app.use('/api/ticketmaster', ticketmasterRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/favorites', favoritesRouter);
 app.use('/api/youtube', youtubeRouter);
+app.use('/api/spotify', spotifyRouter);
 
 // rotta diagnostica
 app.get('/__ping', (req, res) => res.json({ ok: true }));
