@@ -65,6 +65,8 @@ export default function EventDetail() {
   const [artistBio, setArtistBio] = useState("");
   const [spotifyArtist, setSpotifyArtist] = useState(null);
 
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
+
   useEffect(() => {
     let alive = true;
     setLoading(true);
