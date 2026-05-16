@@ -15,6 +15,9 @@ import {
   GlobeIcon,
   TreeIcon,
   BedIcon,
+  YoutubeIcon,
+  SpotifyIcon,
+  InstagramIcon,
 } from "../components/Icons";
 
 function formatWhen(date, time) {
@@ -356,44 +359,37 @@ export default function EventDetail() {
               )}
               <div className="ed-artist__links">
                 {artist.links?.youtube && (
-                  <a
-                    href={artist.links.youtube}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn--primary btn--sm"
-                  >
-                    Video su YouTube
+                  <a href={artist.links.youtube} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--yt">
+                    <YoutubeIcon size={15} />
+                    YouTube
                   </a>
                 )}
                 {artist.links?.spotify && (
-                  <a
-                    href={artist.links.spotify}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn--outline btn--sm"
-                  >
+                  <a href={artist.links.spotify} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--sp">
+                    <SpotifyIcon size={15} />
                     Spotify
                   </a>
                 )}
+                {artist.links?.instagram && (
+                  <a href={artist.links.instagram} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--ig">
+                    <InstagramIcon size={15} />
+                    Instagram
+                  </a>
+                )}
                 {artist.links?.homepage && (
-                  <a
-                    href={artist.links.homepage}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn--outline btn--sm"
-                  >
-                    <GlobeIcon size={16} />
+                  <a href={artist.links.homepage} target="_blank" rel="noreferrer" className="ed-artist__link">
+                    <GlobeIcon size={15} />
                     Sito ufficiale
                   </a>
                 )}
-                {artist.links?.instagram && (
-                  <a
-                    href={artist.links.instagram}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn--outline btn--sm"
-                  >
-                    Instagram
+                {artist.links?.twitter && (
+                  <a href={artist.links.twitter} target="_blank" rel="noreferrer" className="ed-artist__link">
+                    Twitter / X
+                  </a>
+                )}
+                {artist.links?.facebook && (
+                  <a href={artist.links.facebook} target="_blank" rel="noreferrer" className="ed-artist__link">
+                    Facebook
                   </a>
                 )}
               </div>

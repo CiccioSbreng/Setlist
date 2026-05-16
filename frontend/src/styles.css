@@ -1878,9 +1878,36 @@ input.input[type="date"] {
 .ed-artist__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
+  gap: 8px;
+  margin-top: 18px;
 }
+
+.ed-artist__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.04);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.ed-artist__link:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--text);
+}
+.ed-artist__link--yt { color: #ff4545; border-color: rgba(255, 69, 69, 0.28); }
+.ed-artist__link--yt:hover { background: rgba(255, 69, 69, 0.1); border-color: #ff4545; color: #ff4545; }
+.ed-artist__link--sp { color: #1db954; border-color: rgba(29, 185, 84, 0.28); }
+.ed-artist__link--sp:hover { background: rgba(29, 185, 84, 0.1); border-color: #1db954; color: #1db954; }
+.ed-artist__link--ig { color: #e1306c; border-color: rgba(225, 48, 108, 0.28); }
+.ed-artist__link--ig:hover { background: rgba(225, 48, 108, 0.1); border-color: #e1306c; color: #e1306c; }
 
 .ed-dates {
   margin-top: 28px;

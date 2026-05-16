@@ -157,3 +157,27 @@ export const BedIcon = (p) => (
     <path d="M7 9V7a1 1 0 0 1 2 0v2" />
   </Svg>
 );
+
+export const YoutubeIcon = (p) => (
+  <Svg {...p}>
+    <rect x="2.5" y="5.5" width="19" height="13" rx="3.5" />
+    <path d="M10 9.5l5.5 2.5L10 14.5V9.5Z" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+export const SpotifyIcon = (p) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M8 10.5q4-1.5 8 .5" />
+    <path d="M8 13q3-1.2 7 .5" />
+    <path d="M8.5 15.5q2.5-.8 5.5.5" />
+  </Svg>
+);
+
+export const InstagramIcon = (p) => (
+  <Svg {...p}>
+    <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="16.8" cy="7.2" r=".9" fill="currentColor" stroke="none" />
+  </Svg>
+);
