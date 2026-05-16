@@ -284,16 +284,16 @@ export default function Home() {
 
             <div className="hero__stats">
               <div className="hero__stat">
-                <div className="n">1000+</div>
-                <div className="l">Eventi in catalogo</div>
-              </div>
-              <div className="hero__stat">
-                <div className="n">90+</div>
-                <div className="l">Città coperte</div>
-              </div>
-              <div className="hero__stat">
                 <div className="n">Live</div>
-                <div className="l">Dati sempre aggiornati</div>
+                <div className="l">Eventi da Ticketmaster</div>
+              </div>
+              <div className="hero__stat">
+                <div className="n">Spotify · YouTube</div>
+                <div className="l">Anteprime artista</div>
+              </div>
+              <div className="hero__stat">
+                <div className="n">Mappa · Hotel</div>
+                <div className="l">Pianifica la serata</div>
               </div>
             </div>
           </div>
