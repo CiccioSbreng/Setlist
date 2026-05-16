@@ -482,9 +482,10 @@ img {
 
 .hero__stat .n {
   font-family: "Sora", sans-serif;
-  font-size: 1.7rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #fff;
+  white-space: nowrap;
 }
 
 .hero__stat .l {
@@ -2367,6 +2368,42 @@ input.input[type="date"] {
   color: var(--text-mute);
   text-align: center;
   padding: 8px 0;
+}
+
+/* ===== PAGINE LEGALI ===== */
+.legal {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.legal__title {
+  font-size: clamp(1.8rem, 1rem + 2.4vw, 2.4rem);
+  font-weight: 800;
+  margin-top: 18px;
+}
+.legal__updated {
+  color: var(--text-mute);
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+.legal__block {
+  margin-top: 28px;
+}
+.legal__block h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.legal__block p {
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+.legal__note {
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  color: var(--text-mute);
+  font-size: 0.88rem;
 }
 
 @media (max-width: 820px) {
