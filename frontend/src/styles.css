@@ -576,13 +576,24 @@ img {
 .sb-bar {
   display: flex;
   align-items: stretch;
-  gap: 2px;
-  padding: 6px;
-  background: linear-gradient(180deg, var(--surface-2), var(--surface));
-  border: 1px solid var(--border);
-  border-radius: 18px;
+  gap: 0;
+  padding: 7px;
+  background: radial-gradient(
+      130% 200% at 100% 0%,
+      rgba(255, 122, 24, 0.1),
+      transparent 55%
+    ),
+    linear-gradient(180deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
   box-shadow: var(--sh-md);
   backdrop-filter: blur(10px);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.sb-bar:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--ring), var(--sh-md);
 }
 
 .sb-seg {
@@ -591,18 +602,19 @@ img {
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding: 11px 18px;
-  border-radius: 13px;
+  height: 52px;
+  padding: 0 18px;
+  border-radius: 11px;
   cursor: text;
   transition: background 0.16s ease;
 }
 
 .sb-seg:hover {
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .sb-seg:focus-within {
-  background: rgba(255, 255, 255, 0.045);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .sb-seg__ic {
@@ -615,22 +627,6 @@ img {
   color: var(--brand);
 }
 
-.sb-seg__body {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-  flex: 1;
-}
-
-.sb-seg__label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-mute);
-}
-
 .sb-seg__input {
   width: 100%;
   background: transparent;
@@ -638,7 +634,7 @@ img {
   padding: 0;
   color: var(--text);
   font: inherit;
-  font-size: 0.96rem;
+  font-size: 0.98rem;
   outline: none;
   text-overflow: ellipsis;
 }
@@ -650,7 +646,7 @@ img {
 .sb-div {
   width: 1px;
   align-self: center;
-  height: 36px;
+  height: 26px;
   background: var(--border);
   flex: none;
 }
@@ -659,22 +655,23 @@ img {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-left: 4px;
-  padding: 0 26px;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 30px;
   border: 0;
-  border-radius: 13px;
+  border-radius: 11px;
   background: var(--grad-brand);
   color: #1c0900;
   font: inherit;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 0.97rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: filter 0.16s ease, transform 0.16s ease;
+  transition: filter 0.16s ease, transform 0.12s ease;
 }
 
 .sb-go:hover {
-  filter: brightness(1.06);
+  filter: brightness(1.07);
 }
 
 .sb-go:active {
@@ -776,68 +773,25 @@ input.input[type="date"] {
   font-weight: 600;
 }
 
-/* ---- Riga strumenti: periodo rapido + intervallo date ---- */
+/* ---- Riga strumenti: quando + reset ---- */
 .sb-tools {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px 18px;
-  padding: 0 4px;
+  gap: 10px 16px;
+  padding: 0 2px;
 }
 
-.sb-tools__right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.sb-range {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: var(--r-pill);
-  background: rgba(8, 8, 12, 0.5);
-  border: 1px solid var(--border);
-  transition: border-color 0.16s ease;
-}
-
-.sb-range:focus-within {
-  border-color: var(--border-strong);
-}
-
-.sb-range__ic {
-  color: var(--text-mute);
-  flex: none;
-}
-
-.sb-range__sep {
-  color: var(--text-mute);
-}
-
-.sb-date {
-  background: transparent;
-  border: 0;
-  padding: 2px 0;
-  color: var(--text);
-  font: inherit;
-  font-size: 0.84rem;
-  outline: none;
-  color-scheme: dark;
-  cursor: pointer;
-}
-
-.sb-date::-webkit-calendar-picker-indicator {
-  filter: invert(0.7);
-  cursor: pointer;
+.chip--cal {
+  gap: 6px;
 }
 
 .sb-reset {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 7px 14px;
   border-radius: var(--r-pill);
   background: transparent;
   border: 1px solid var(--border);
@@ -856,6 +810,70 @@ input.input[type="date"] {
   background: var(--surface-2);
 }
 
+/* ---- Intervallo date personalizzato ---- */
+.sb-daterow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 16px;
+  background: rgba(8, 8, 12, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  animation: sbFade 0.18s ease;
+}
+
+@keyframes sbFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sb-field {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sb-field__lbl {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+.sb-date {
+  width: 100%;
+  background: rgba(8, 8, 12, 0.6);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 10px 12px;
+  outline: none;
+  color-scheme: dark;
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.sb-date:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.sb-date::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
 @media (max-width: 860px) {
   .sb-bar {
     flex-direction: column;
@@ -863,8 +881,9 @@ input.input[type="date"] {
     padding: 8px;
   }
   .sb-seg {
-    padding: 12px 14px;
-    border-radius: 12px;
+    height: auto;
+    padding: 14px;
+    border-radius: 11px;
   }
   .sb-seg + .sb-seg {
     border-top: 1px solid var(--border);
@@ -874,20 +893,15 @@ input.input[type="date"] {
     display: none;
   }
   .sb-go {
-    margin-left: 0;
     margin-top: 8px;
     width: 100%;
-    justify-content: center;
-    padding: 14px;
-    min-height: 48px;
+    padding: 15px;
+    min-height: 50px;
   }
   .sb-tools {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
-  }
-  .sb-tools__right {
-    justify-content: space-between;
   }
   .chips {
     justify-content: flex-start;
@@ -900,12 +914,8 @@ input.input[type="date"] {
     justify-content: center;
     min-height: 42px;
   }
-  .sb-range {
-    flex: 1;
-    justify-content: center;
-  }
-  .sb-date {
-    min-height: 36px;
+  .sb-field {
+    min-width: 100%;
   }
 }
 

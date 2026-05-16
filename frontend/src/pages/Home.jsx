@@ -74,6 +74,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [quickRange, setQuickRange] = useState(null);
+  const [showCustomDates, setShowCustomDates] = useState(false);
 
   function update(p) {
     setForm((f) => ({ ...f, ...p }));
@@ -197,6 +198,15 @@ export default function Home() {
 
   const hasResults = data.events?.length > 0;
   const hasActiveFilters = Boolean(form.start || form.end || quickRange);
+  const datesOpen = showCustomDates || Boolean(form.start || form.end);
+  const dm = (v) => (v ? `${v.slice(8, 10)}/${v.slice(5, 7)}` : "…");
+  const dateChipLabel =
+    form.start || form.end ? `${dm(form.start)} – ${dm(form.end)}` : "Date";
+
+  function resetFilters() {
+    setShowCustomDates(false);
+    clearDates();
+  }
 
   return (
     <>
@@ -285,33 +295,27 @@ export default function Home() {
           >
             <div className="sb-bar">
               <label className="sb-seg" htmlFor="city">
-                <PinIcon size={19} className="sb-seg__ic" />
-                <span className="sb-seg__body">
-                  <span className="sb-seg__label">Dove</span>
-                  <input
-                    id="city"
-                    className="sb-seg__input"
-                    placeholder="Tutte le città"
-                    value={form.city}
-                    onChange={(e) => update({ city: e.target.value })}
-                  />
-                </span>
+                <PinIcon size={20} className="sb-seg__ic" />
+                <input
+                  id="city"
+                  className="sb-seg__input"
+                  placeholder="In quale città?"
+                  value={form.city}
+                  onChange={(e) => update({ city: e.target.value })}
+                />
               </label>
 
               <span className="sb-div" aria-hidden="true" />
 
               <label className="sb-seg" htmlFor="keyword">
-                <MusicIcon size={19} className="sb-seg__ic" />
-                <span className="sb-seg__body">
-                  <span className="sb-seg__label">Chi o cosa</span>
-                  <input
-                    id="keyword"
-                    className="sb-seg__input"
-                    placeholder="Artista, band o genere"
-                    value={form.keyword}
-                    onChange={(e) => update({ keyword: e.target.value })}
-                  />
-                </span>
+                <MusicIcon size={20} className="sb-seg__ic" />
+                <input
+                  id="keyword"
+                  className="sb-seg__input"
+                  placeholder="Artista, band o genere"
+                  value={form.keyword}
+                  onChange={(e) => update({ keyword: e.target.value })}
+                />
               </label>
 
               <button type="submit" className="sb-go">
@@ -321,7 +325,7 @@ export default function Home() {
             </div>
 
             <div className="sb-tools">
-              <div className="chips" role="group" aria-label="Periodo rapido">
+              <div className="chips" role="group" aria-label="Quando">
                 {[
                   { id: "today", label: "Oggi" },
                   { id: "week", label: "Questa settimana" },
@@ -338,11 +342,37 @@ export default function Home() {
                     {q.label}
                   </button>
                 ))}
+
+                <button
+                  type="button"
+                  className={
+                    "chip chip--cal" +
+                    (form.start || form.end ? " is-active" : "")
+                  }
+                  aria-expanded={datesOpen}
+                  onClick={() => setShowCustomDates((v) => !v)}
+                >
+                  <CalendarIcon size={15} />
+                  {dateChipLabel}
+                </button>
               </div>
 
-              <div className="sb-tools__right">
-                <div className="sb-range">
-                  <CalendarIcon size={16} className="sb-range__ic" />
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  className="sb-reset"
+                  onClick={resetFilters}
+                >
+                  <RefreshIcon size={15} />
+                  Azzera
+                </button>
+              )}
+            </div>
+
+            {datesOpen && (
+              <div className="sb-daterow">
+                <div className="sb-field">
+                  <span className="sb-field__lbl">Dal</span>
                   <input
                     id="start"
                     type="date"
@@ -354,9 +384,9 @@ export default function Home() {
                       update({ start: e.target.value });
                     }}
                   />
-                  <span className="sb-range__sep" aria-hidden="true">
-                    –
-                  </span>
+                </div>
+                <div className="sb-field">
+                  <span className="sb-field__lbl">Al</span>
                   <input
                     id="end"
                     type="date"
@@ -369,19 +399,8 @@ export default function Home() {
                     }}
                   />
                 </div>
-
-                {hasActiveFilters && (
-                  <button
-                    type="button"
-                    className="sb-reset"
-                    onClick={clearDates}
-                  >
-                    <RefreshIcon size={15} />
-                    Azzera
-                  </button>
-                )}
               </div>
-            </div>
+            )}
           </form>
 
           {/* messaggi */}
