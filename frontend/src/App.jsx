@@ -8,11 +8,13 @@ import LoginPage from "./pages/login";
 import FavoritesPage from "./pages/Favorites";
 import EventDetail from "./pages/EventDetail";
 import Legal from "./pages/Legal";
+import AmbientBackground from "./components/AmbientBackground";
 
 export default function App() {
   return (
     <BrowserRouter>
       <div className="app-shell">
+        <AmbientBackground />
         <Navbar />
 
         <main className="app-main">
