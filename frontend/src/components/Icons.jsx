@@ -149,6 +149,13 @@ export const TreeIcon = (p) => (
   </Svg>
 );
 
+export const ForkIcon = (p) => (
+  <Svg {...p}>
+    <path d="M3 2v7c0 1.1.9 2 2 2h1v11h2V11h1a2 2 0 0 0 2-2V2h-2v5H7V2H5v5H4V2H3Z" />
+    <path d="M19 2c-1.66 0-3 2.24-3 5 0 2.34 1.09 4.31 2.6 4.86L18 22h2l-.4-10.14C21.09 11.31 22 9.34 22 7c0-2.76-1.34-5-3-5Z" />
+  </Svg>
+);
+
 export const BedIcon = (p) => (
   <Svg {...p}>
     <rect x="2" y="9" width="20" height="12" rx="2" />

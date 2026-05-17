@@ -15,6 +15,7 @@ import {
   GlobeIcon,
   TreeIcon,
   BedIcon,
+  ForkIcon,
   YoutubeIcon,
   SpotifyIcon,
   InstagramIcon,
@@ -74,6 +75,7 @@ export default function EventDetail() {
   const [favMsg, setFavMsg] = useState("");
   const [otherDates, setOtherDates] = useState([]);
   const [parks, setParks] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
   const [showMap, setShowMap] = useState(false);
   const [ytVideos, setYtVideos] = useState([]);
   const [artistBio, setArtistBio] = useState("");
@@ -177,6 +179,27 @@ export default function EventDetail() {
           .slice(0, 5)
           .map((el) => ({ id: el.id, type: el.type, name: el.tags.name }));
         setParks(items);
+      })
+      .catch(() => {})
+      .finally(() => clearTimeout(tid));
+    return () => { ctrl.abort(); clearTimeout(tid); };
+  }, [ev]);
+
+  useEffect(() => {
+    const lat = ev?.venue?.lat;
+    const lon = ev?.venue?.lon;
+    if (lat == null || lon == null) return;
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const q = `[out:json][timeout:8];(node(around:1000,${lat},${lon})[amenity~"restaurant|bar|cafe|fast_food|pub"][name];);out 6;`;
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`, { signal: ctrl.signal })
+      .then((r) => r.json())
+      .then((data) => {
+        const items = (data.elements || [])
+          .filter((el) => el.tags?.name)
+          .slice(0, 6)
+          .map((el) => ({ id: el.id, name: el.tags.name, type: el.tags.amenity }));
+        setRestaurants(items);
       })
       .catch(() => {})
       .finally(() => clearTimeout(tid));
@@ -505,69 +528,100 @@ export default function EventDetail() {
 
         {/* SECTION: DOVE & COME */}
         <div className={`ed-section${activeTab === "dove" ? " ed-section--active" : ""}`}>
-          {hasGeo && (
-            <div className="ed-map">
-              <div className="ed-map__head">
-                <h2><PinIcon size={18} />Come arrivare</h2>
-                <div className="ed-map__links">
-                  <a href={gmaps} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Google Maps</a>
-                  <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Indicazioni</a>
+          <div className="ed-grid4">
+
+            {/* Card 1 — Mappa */}
+            {hasGeo && (
+              <div className="ed-tile">
+                <div className="ed-tile__head">
+                  <PinIcon size={16} /><span>Come arrivare</span>
+                  <div className="ed-tile__links">
+                    <a href={gmaps} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Maps</a>
+                    <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Vai</a>
+                  </div>
+                </div>
+                {showMap ? (
+                  <iframe title="Mappa del venue" className="ed-tile__map" src={osmSrc} />
+                ) : (
+                  <button type="button" className="ed-tile__map-preview" onClick={() => setShowMap(true)}>
+                    <PinIcon size={24} />
+                    <span>Mostra mappa</span>
+                    {(v.address || v.city) && <small>{[v.address, v.city].filter(Boolean).join(" · ")}</small>}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Card 2 — Parchi */}
+            {parks.length > 0 && (
+              <div className="ed-tile">
+                <div className="ed-tile__head">
+                  <TreeIcon size={16} /><span>Parchi e verde</span>
+                </div>
+                <ul className="ed-tile__list">
+                  {parks.map((p) => (
+                    <li key={p.id}>
+                      <a href={`https://www.openstreetmap.org/${p.type}/${p.id}`} target="_blank" rel="noreferrer" className="ed-tile__row">
+                        <TreeIcon size={14} /><span>{p.name}</span><ArrowRightIcon size={12} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Card 3 — Ristoranti */}
+            {restaurants.length > 0 && (
+              <div className="ed-tile">
+                <div className="ed-tile__head">
+                  <ForkIcon size={16} /><span>Dove mangiare</span>
+                </div>
+                <ul className="ed-tile__list">
+                  {restaurants.map((r) => (
+                    <li key={r.id}>
+                      <div className="ed-tile__row ed-tile__row--static">
+                        <ForkIcon size={14} />
+                        <span>{r.name}</span>
+                        <small className="ed-tile__tag">{r.type === "fast_food" ? "fast food" : r.type}</small>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Card 4 — Dormire */}
+            {(bookingUrl || airbnbUrl) && (
+              <div className="ed-tile">
+                <div className="ed-tile__head">
+                  <BedIcon size={16} /><span>Dove dormire</span>
+                </div>
+                <div className="ed-tile__sleep">
+                  {bookingUrl && (
+                    <a href={bookingUrl} target="_blank" rel="noreferrer" className="ed-tile__sleep-card">
+                      <div className="ed-tile__sleep-icon"><BedIcon size={20} /></div>
+                      <div>
+                        <div className="ed-tile__sleep-title">Booking.com</div>
+                        <div className="ed-tile__sleep-sub">Hotel, B&amp;B e appartamenti</div>
+                      </div>
+                      <ArrowRightIcon size={16} />
+                    </a>
+                  )}
+                  {airbnbUrl && (
+                    <a href={airbnbUrl} target="_blank" rel="noreferrer" className="ed-tile__sleep-card">
+                      <div className="ed-tile__sleep-icon"><GlobeIcon size={20} /></div>
+                      <div>
+                        <div className="ed-tile__sleep-title">Airbnb</div>
+                        <div className="ed-tile__sleep-sub">Case e stanze a {v.city || "destinazione"}</div>
+                      </div>
+                      <ArrowRightIcon size={16} />
+                    </a>
+                  )}
                 </div>
               </div>
-              {showMap ? (
-                <iframe title="Mappa del venue" className="ed-map__frame" src={osmSrc} />
-              ) : (
-                <button type="button" className="ed-map__preview" onClick={() => setShowMap(true)}>
-                  <PinIcon size={28} />
-                  <span>Mostra mappa interattiva</span>
-                  {(v.address || v.city) && <small>{[v.address, v.city].filter(Boolean).join(" · ")}</small>}
-                </button>
-              )}
-            </div>
-          )}
-          {parks.length > 0 && (
-            <div className="ed-nearby">
-              <div className="ed-nearby__head">
-                <h2><TreeIcon size={20} />Parchi e giardini nei dintorni</h2>
-              </div>
-              <ul className="ed-nearby__list">
-                {parks.map((p) => (
-                  <li key={p.id}>
-                    <a href={`https://www.openstreetmap.org/${p.type}/${p.id}`} target="_blank" rel="noreferrer" className="ed-nearby__item">
-                      <TreeIcon size={16} /><span>{p.name}</span><ArrowRightIcon size={14} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {(bookingUrl || airbnbUrl) && (
-            <div className="ed-travel">
-              <h2>Dove dormire</h2>
-              <div className="ed-travel__cards">
-                {bookingUrl && (
-                  <a href={bookingUrl} target="_blank" rel="noreferrer" className="ed-travel__card">
-                    <div className="ed-travel__card-icon"><BedIcon size={22} /></div>
-                    <div>
-                      <div className="ed-travel__card-title">Booking.com</div>
-                      <div className="ed-travel__card-sub">Hotel, B&amp;B e appartamenti vicino al venue</div>
-                    </div>
-                    <ArrowRightIcon size={18} className="ed-travel__arrow" />
-                  </a>
-                )}
-                {airbnbUrl && (
-                  <a href={airbnbUrl} target="_blank" rel="noreferrer" className="ed-travel__card">
-                    <div className="ed-travel__card-icon"><GlobeIcon size={22} /></div>
-                    <div>
-                      <div className="ed-travel__card-title">Airbnb</div>
-                      <div className="ed-travel__card-sub">Case e stanze a {v.city || "destinazione"}</div>
-                    </div>
-                    <ArrowRightIcon size={18} className="ed-travel__arrow" />
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
+            )}
+
+          </div>
         </div>
 
       </div>
