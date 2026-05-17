@@ -225,6 +225,8 @@ export default function Home() {
   }
 
   useEffect(() => {
+    runSearch(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -255,6 +257,8 @@ export default function Home() {
 
   const hasResults = data.events?.length > 0;
   const hasActiveFilters = Boolean(form.start || form.end || quickRange);
+  const isShowcase =
+    !form.city && !form.keyword && !form.start && !form.end && !quickRange;
 
   return (
     <>
@@ -449,7 +453,7 @@ export default function Home() {
           <div id="risultati" style={{ marginTop: 36 }}>
             {!loading && hasResults && (
               <div className="results-bar">
-                <h2>Eventi trovati</h2>
+                <h2>{isShowcase ? "Prossimi concerti in Italia" : "Eventi trovati"}</h2>
                 <span className="count">
                   {data.totalElements ?? data.events.length} risultati
                 </span>
