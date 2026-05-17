@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, removeFavorite, getFavorites, getSetlist, getWeather, getHotels } from "../lib/api";
+import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, removeFavorite, getFavorites, getSetlist, getWeather } from "../lib/api";
 import {
   CalendarIcon,
   ClockIcon,
@@ -95,7 +95,6 @@ export default function EventDetail() {
   const [weather, setWeather] = useState(null);
   const [parkings, setParkings] = useState([]);
   const [cityInfo, setCityInfo] = useState(null);
-  const [hotelOffers, setHotelOffers] = useState([]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
@@ -250,22 +249,6 @@ export default function EventDetail() {
     let alive = true;
     getWeather({ lat, lon, date })
       .then((w) => alive && setWeather(w))
-      .catch(() => {});
-    return () => { alive = false; };
-  }, [ev]);
-
-  useEffect(() => {
-    setHotelOffers([]);
-    const city = ev?.venue?.city;
-    const date = ev?.date;
-    if (!city || !date) return;
-    const checkin = date.slice(0, 10);
-    const d = new Date(checkin);
-    d.setDate(d.getDate() + 1);
-    const checkout = d.toISOString().slice(0, 10);
-    let alive = true;
-    getHotels({ city, checkin, checkout })
-      .then((r) => { if (alive) setHotelOffers(r.hotels || []); })
       .catch(() => {});
     return () => { alive = false; };
   }, [ev]);
@@ -854,39 +837,11 @@ export default function EventDetail() {
             )}
 
             {/* Card 4 — Dormire */}
-            {(bookingUrl || airbnbUrl || hotelOffers.length > 0) && (
+            {(bookingUrl || airbnbUrl) && (
               <div className="ed-tile">
                 <div className="ed-tile__head">
                   <BedIcon size={16} /><span>Dove dormire</span>
                 </div>
-
-                {hotelOffers.length > 0 && (
-                  <div className="ed-hotels">
-                    {hotelOffers.map((h) => (
-                      <a
-                        key={h.id}
-                        href={h.bookingUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="ed-hotel__row"
-                      >
-                        <div className="ed-hotel__info">
-                          <span className="ed-hotel__name">{h.name}</span>
-                          {h.stars && (
-                            <span className="ed-hotel__stars">
-                              {"★".repeat(Math.min(h.stars, 5))}
-                            </span>
-                          )}
-                        </div>
-                        <span className="ed-hotel__price">
-                          €{h.price}<span className="ed-hotel__night">/notte</span>
-                        </span>
-                      </a>
-                    ))}
-                    <p className="ed-hotels__note">Prezzi indicativi · dati sandbox Amadeus</p>
-                  </div>
-                )}
-
                 <div className="ed-tile__sleep">
                   {bookingUrl && (
                     <a href={bookingUrl} target="_blank" rel="noreferrer" className="ed-tile__sleep-card">
@@ -911,6 +866,7 @@ export default function EventDetail() {
                 </div>
               </div>
             )}
+
 
             {/* Card 5 — Trasporti */}
             {hasGeo && (
