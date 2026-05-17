@@ -139,7 +139,7 @@ body::after {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.28) saturate(1.4) blur(0.5px);
+  filter: brightness(0.12) saturate(1.3) blur(3px);
   display: block;
 }
 
@@ -147,8 +147,8 @@ body::after {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 50% 40%, rgba(8, 8, 12, 0.25) 0%, rgba(8, 8, 12, 0.78) 100%),
-    linear-gradient(rgba(8, 8, 12, 0.45), rgba(8, 8, 12, 0.45));
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(8, 8, 12, 0.55) 0%, rgba(8, 8, 12, 0.9) 100%),
+    rgba(8, 8, 12, 0.6);
 }
 
 @keyframes mosaic-drift {
