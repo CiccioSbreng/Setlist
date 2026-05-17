@@ -249,6 +249,19 @@ export default function Home() {
     <>
       {/* ===== HERO ===== */}
       <section className="hero">
+        {/* Video background — metti il file in frontend/public/hero-bg.mp4 */}
+        <video
+          className="hero__video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster=""
+        >
+          <source src="/hero-bg.mp4" type="video/mp4" />
+          <source src="/hero-bg.webm" type="video/webm" />
+        </video>
         <div className="hero__glow" />
         <div className="wrap hero__inner">
           <div>
