@@ -10,11 +10,13 @@ import EventDetail from "./pages/EventDetail";
 import Legal from "./pages/Legal";
 import NotFound from "./pages/NotFound";
 import GradientBackground from "./components/GradientBackground";
+import VideoBackground from "./components/VideoBackground";
 
 export default function App() {
   return (
     <BrowserRouter>
       <div className="app-shell">
+        <VideoBackground />
         <GradientBackground />
         <Navbar />
 

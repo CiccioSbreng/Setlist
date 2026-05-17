@@ -73,13 +73,34 @@ body {
 /* ── Gradient mesh background (stile sito musicale) ──────────────── */
 /* Grandi macchie di colore sfocate che si muovono lente e si fondono  */
 
+/* Video background globale — dietro tutto */
+.video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--bg-900);
+}
+
+.video-bg__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.38) saturate(1.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-bg__video { display: none; }
+}
+
 .gradient-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  background: var(--bg-900);
+  background: transparent;
 }
 
 .gradient-bg__blob {
@@ -87,7 +108,7 @@ body {
   display: block;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.65;
+  opacity: 0.42;
   will-change: transform;
 }
 
@@ -132,8 +153,8 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 75% 70% at 50% 38%, transparent 0%, rgba(8, 8, 12, 0.5) 100%),
-    linear-gradient(180deg, rgba(8, 8, 12, 0.38) 0%, rgba(8, 8, 12, 0.62) 100%);
+    radial-gradient(ellipse 75% 70% at 50% 38%, transparent 0%, rgba(8, 8, 12, 0.3) 100%),
+    linear-gradient(180deg, rgba(8, 8, 12, 0.22) 0%, rgba(8, 8, 12, 0.42) 100%);
 }
 
 @keyframes blob-1 {
@@ -162,7 +183,6 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .gradient-bg__blob { animation: none; }
-  .hero__video { display: none; }
 }
 
 h1,
@@ -522,26 +542,15 @@ img {
   padding: clamp(60px, 8vw, 100px) 0 clamp(48px, 6vw, 80px);
 }
 
-/* Video background della hero */
-.hero__video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.55) saturate(1.2);
-  z-index: 0;
-}
-
-/* Overlay scuro sopra il video per leggibilità del testo */
+/* Overlay hero: scurisce leggermente la zona del testo */
 .hero__overlay {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 0;
   background: linear-gradient(
     180deg,
-    rgba(8, 8, 12, 0.45) 0%,
-    rgba(8, 8, 12, 0.6) 100%
+    rgba(8, 8, 12, 0.35) 0%,
+    rgba(8, 8, 12, 0.55) 100%
   );
 }
 
@@ -549,15 +558,15 @@ img {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
   background:
-    radial-gradient(900px 700px at 80% 0%, rgba(124, 92, 255, 0.28), transparent 60%),
-    radial-gradient(700px 550px at 15% 90%, rgba(255, 61, 139, 0.22), transparent 58%);
+    radial-gradient(900px 700px at 80% 0%, rgba(124, 92, 255, 0.25), transparent 60%),
+    radial-gradient(700px 550px at 15% 90%, rgba(255, 61, 139, 0.18), transparent 58%);
 }
 
 .hero__inner {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   gap: 52px;
