@@ -1,6 +1,6 @@
 // frontend/src/components/VideoBackground.jsx
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const VIDEOS = [
   "https://res.cloudinary.com/disymrucq/video/upload/v1779008693/hero-bg-1_s9fjwm.mp4",
@@ -11,8 +11,27 @@ const VIDEOS = [
   "https://res.cloudinary.com/disymrucq/video/upload/v1779008699/hero-bg-7_juctvt.mp4",
 ];
 
+const CLIP_DURATION = 15000;
+
+function randomNext(current) {
+  if (VIDEOS.length === 1) return 0;
+  let next;
+  do { next = Math.floor(Math.random() * VIDEOS.length); } while (next === current);
+  return next;
+}
+
 export default function VideoBackground() {
-  const [idx, setIdx] = useState(0);
+  const [idx, setIdx] = useState(() => Math.floor(Math.random() * VIDEOS.length));
+  const timerRef = useRef(null);
+
+  function advance() {
+    setIdx((i) => randomNext(i));
+  }
+
+  useEffect(() => {
+    timerRef.current = setTimeout(advance, CLIP_DURATION);
+    return () => clearTimeout(timerRef.current);
+  }, [idx]);
 
   return (
     <div className="video-bg" aria-hidden="true">
@@ -23,7 +42,6 @@ export default function VideoBackground() {
         autoPlay
         playsInline
         preload="auto"
-        onEnded={() => setIdx((i) => (i + 1) % VIDEOS.length)}
       >
         <source src={VIDEOS[idx]} type="video/mp4" />
       </video>
