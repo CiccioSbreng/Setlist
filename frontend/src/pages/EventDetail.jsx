@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, removeFavorite, getFavorites, getSetlist } from "../lib/api";
+import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, removeFavorite, getFavorites, getSetlist, getWeather } from "../lib/api";
 import {
   CalendarIcon,
   ClockIcon,
@@ -19,10 +19,13 @@ import {
   ShareIcon,
   DownloadIcon,
   ListMusicIcon,
+  CloudIcon,
   YoutubeIcon,
   SpotifyIcon,
   InstagramIcon,
 } from "../components/Icons";
+import BudgetEstimate from "../components/BudgetEstimate";
+import ConcertChecklist from "../components/ConcertChecklist";
 
 function formatWhen(date, time) {
   if (!date) return { dateLabel: "Data da definire", timeLabel: null };
@@ -89,6 +92,9 @@ export default function EventDetail() {
   const [spotifyArtist, setSpotifyArtist] = useState(null);
   const [activeTab, setActiveTab] = useState("evento");
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [weather, setWeather] = useState(null);
+  const [parkings, setParkings] = useState([]);
+  const [cityInfo, setCityInfo] = useState(null);
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
@@ -232,6 +238,75 @@ export default function EventDetail() {
     const name = ev?.artists?.[0]?.name;
     if (!name) return;
     getSetlist(name).then(setSetlistData).catch(() => {});
+  }, [ev]);
+
+  useEffect(() => {
+    setWeather(null);
+    const lat = ev?.venue?.lat;
+    const lon = ev?.venue?.lon;
+    const date = ev?.date;
+    if (lat == null || lon == null || !date) return;
+    let alive = true;
+    getWeather({ lat, lon, date })
+      .then((w) => alive && setWeather(w))
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [ev]);
+
+  useEffect(() => {
+    setParkings([]);
+    const lat = ev?.venue?.lat;
+    const lon = ev?.venue?.lon;
+    if (lat == null || lon == null) return;
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const q = `[out:json][timeout:8];(node(around:1200,${lat},${lon})[amenity=parking][name];way(around:1200,${lat},${lon})[amenity=parking][name];);out center 5;`;
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`, { signal: ctrl.signal })
+      .then((r) => r.json())
+      .then((data) => {
+        const items = (data.elements || [])
+          .filter((el) => el.tags?.name)
+          .slice(0, 5)
+          .map((el) => ({
+            id: el.id,
+            name: el.tags.name,
+            lat: el.lat ?? el.center?.lat,
+            lon: el.lon ?? el.center?.lon,
+          }));
+        setParkings(items);
+      })
+      .catch(() => {})
+      .finally(() => clearTimeout(tid));
+    return () => { ctrl.abort(); clearTimeout(tid); };
+  }, [ev]);
+
+  useEffect(() => {
+    setCityInfo(null);
+    const city = ev?.venue?.city;
+    if (!city) return;
+    let alive = true;
+    (async () => {
+      for (const lang of ["it", "en"]) {
+        try {
+          const r = await fetch(
+            `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(city)}`
+          );
+          if (!r.ok) continue;
+          const d = await r.json();
+          if (d.extract && d.type !== "disambiguation") {
+            if (alive)
+              setCityInfo({
+                title: d.title || city,
+                extract: d.extract,
+                url: d.content_urls?.desktop?.page || null,
+                thumb: d.thumbnail?.source || null,
+              });
+            return;
+          }
+        } catch {}
+      }
+    })();
+    return () => { alive = false; };
   }, [ev]);
 
   function generateICS() {
@@ -582,6 +657,21 @@ export default function EventDetail() {
                 loading="lazy"
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               />
+              {spotifyArtist.topTracks?.length > 0 && (
+                <ul className="ed-toptracks">
+                  {spotifyArtist.topTracks.map((t, i) => (
+                    <li key={t.id}>
+                      <a href={t.url || spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-toptracks__row">
+                        <span className="ed-toptracks__n">{i + 1}</span>
+                        {t.image && <img src={t.image} alt="" loading="lazy" />}
+                        <span className="ed-toptracks__name">{t.name}</span>
+                        {t.preview && <span className="ed-toptracks__tag">anteprima</span>}
+                        <ArrowRightIcon size={13} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
               {spotifyArtist.externalUrl && (
                 <a href={spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-spotify__open">
                   <SpotifyIcon size={14} />Apri su Spotify<ArrowRightIcon size={14} />
@@ -631,6 +721,30 @@ export default function EventDetail() {
         {/* SECTION: DOVE & COME */}
         <div id="section-dove" className="ed-section">
           <div className="ed-grid4">
+
+            {/* Card 0 — Meteo del concerto */}
+            {weather?.status === "ok" && (
+              <div className="ed-tile">
+                <div className="ed-tile__head">
+                  <CloudIcon size={16} /><span>Meteo del concerto</span>
+                </div>
+                <div className="ed-wx">
+                  <div className="ed-wx__main">
+                    <span className="ed-wx__icon" aria-hidden="true">{weather.icon}</span>
+                    <div>
+                      <div className="ed-wx__temp">
+                        {weather.tMax}° <span>/ {weather.tMin}°</span>
+                      </div>
+                      <div className="ed-wx__desc">{weather.desc}</div>
+                    </div>
+                  </div>
+                  <div className="ed-wx__meta">
+                    <span>💧 {weather.precip}% pioggia</span>
+                    <span>💨 {weather.wind} km/h</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Card 1 — Mappa */}
             {hasGeo && (
@@ -689,6 +803,31 @@ export default function EventDetail() {
                         <ForkIcon size={14} />
                         <span>{r.name}</span>
                         <small className="ed-tile__tag">{r.type === "fast_food" ? "fast food" : r.type}</small>
+                        <ArrowRightIcon size={12} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Card 3b — Parcheggi */}
+            {parkings.length > 0 && (
+              <div className="ed-tile">
+                <div className="ed-tile__head">
+                  <PinIcon size={16} /><span>Dove parcheggiare</span>
+                </div>
+                <ul className="ed-tile__list">
+                  {parkings.map((p) => (
+                    <li key={p.id}>
+                      <a
+                        href={p.lat ? `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ed-tile__row"
+                      >
+                        <PinIcon size={14} />
+                        <span>{p.name}</span>
                         <ArrowRightIcon size={12} />
                       </a>
                     </li>
@@ -778,6 +917,32 @@ export default function EventDetail() {
               </div>
             )}
 
+          </div>
+
+          {cityInfo && (
+            <div className="ed-card ed-cityinfo">
+              <div className="ed-tile__head">
+                <GlobeIcon size={16} /><span>La città: {cityInfo.title}</span>
+              </div>
+              <div className="ed-cityinfo__body">
+                {cityInfo.thumb && (
+                  <img src={cityInfo.thumb} alt={cityInfo.title} loading="lazy" />
+                )}
+                <div>
+                  <p>{cityInfo.extract}</p>
+                  {cityInfo.url && (
+                    <a href={cityInfo.url} target="_blank" rel="noreferrer" className="ed-cityinfo__more">
+                      Approfondisci su Wikipedia <ArrowRightIcon size={13} />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="ed-plan__grid">
+            <BudgetEstimate ev={ev} />
+            <ConcertChecklist ev={ev} />
           </div>
         </div>
 

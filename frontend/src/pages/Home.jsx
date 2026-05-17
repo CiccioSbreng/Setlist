@@ -313,7 +313,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <SpotifyIcon size={20} />
+                    <SpotifyIcon size={15} />
                     Spotify
                   </a>
                   <span className="brand-sep"> · </span>
@@ -323,7 +323,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <YoutubeIcon size={20} />
+                    <YoutubeIcon size={15} />
                     YouTube
                   </a>
                 </div>
