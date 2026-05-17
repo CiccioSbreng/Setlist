@@ -87,10 +87,6 @@ export default function Home() {
   const [favMap, setFavMap] = useState({});
 
   useEffect(() => {
-    runSearch(0, { city: "", keyword: "", start: "", end: "", size: 12, page: 0 });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
     getFavorites()
@@ -229,8 +225,6 @@ export default function Home() {
   }
 
   useEffect(() => {
-    runSearch(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -483,19 +477,20 @@ export default function Home() {
                 <div className="state__icon">
                   <SearchIcon size={30} />
                 </div>
-                <h3>Nessun evento trovato</h3>
-                <p>
-                  Non abbiamo trovato eventi per questi filtri. Prova a cambiare
-                  città, periodo o parola chiave.
-                </p>
-                <button
-                  type="button"
-                  className="btn btn--ghost"
-                  onClick={clearDates}
-                >
-                  <RefreshIcon size={18} />
-                  Azzera filtri
-                </button>
+                {(form.city || form.keyword || form.start || form.end) ? (
+                  <>
+                    <h3>Nessun evento trovato</h3>
+                    <p>Prova a cambiare città, periodo o parola chiave.</p>
+                    <button type="button" className="btn btn--ghost" onClick={clearDates}>
+                      <RefreshIcon size={18} />Azzera filtri
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3>Cerca il tuo prossimo concerto</h3>
+                    <p>Inserisci una città o il nome di un artista per iniziare.</p>
+                  </>
+                )}
               </div>
             )}
 

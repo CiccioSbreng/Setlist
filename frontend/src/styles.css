@@ -2997,6 +2997,72 @@ input.input[type="date"] {
   }
 }
 
+/* ── Profilo ────────────────────────────────────────────── */
+.profile-page {
+  max-width: 480px;
+  margin: 60px auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-page__avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.profile-page__email {
+  font-size: 1.3rem;
+  font-weight: 700;
+  word-break: break-all;
+}
+
+.profile-page__stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.profile-page__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.profile-page__logout {
+  color: #ff5c5c;
+  border-color: rgba(255,92,92,0.3);
+}
+
+.profile-page__logout:hover {
+  background: rgba(255,92,92,0.08);
+  border-color: rgba(255,92,92,0.5);
+}
+
+/* ── Bottone preferito attivo ───────────────────────────── */
+.btn--fav-active {
+  background: rgba(255,92,92,0.12);
+  border: 1px solid rgba(255,92,92,0.4);
+  color: #ff5c5c;
+}
+
+.btn--fav-active:hover {
+  background: rgba(255,92,92,0.2);
+}
+
 /* ── Autocomplete città ─────────────────────────────────── */
 .sb-seg--autocomplete { position: relative; }
 

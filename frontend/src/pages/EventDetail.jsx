@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, getSetlist } from "../lib/api";
+import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, removeFavorite, getFavorites, getSetlist } from "../lib/api";
 import {
   CalendarIcon,
   ClockIcon,
@@ -80,6 +80,8 @@ export default function EventDetail() {
   const [parks, setParks] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
   const [setlistData, setSetlistData] = useState(null);
+  const [isFav, setIsFav] = useState(false);
+  const [favId, setFavId] = useState(null);
   const [showMap, setShowMap] = useState(false);
   const [shareMsg, setShareMsg] = useState("");
   const [ytVideos, setYtVideos] = useState([]);
@@ -117,6 +119,17 @@ export default function EventDetail() {
   }, [id]);
 
   const artistId = ev?.artists?.[0]?.id;
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token || !id) return;
+    getFavorites()
+      .then((list) => {
+        const found = list.find((f) => f.eventId === id);
+        if (found) { setIsFav(true); setFavId(found._id); }
+      })
+      .catch(() => {});
+  }, [id]);
 
   useEffect(() => {
     if (!artistId) return;
@@ -256,24 +269,33 @@ export default function EventDetail() {
   async function handleFav() {
     setFavMsg("");
     const token = localStorage.getItem("token");
-    if (!token) {
-      setFavMsg("Accedi al tuo account per salvare questo evento.");
-      return;
-    }
+    if (!token) { setFavMsg("Accedi al tuo account per salvare questo evento."); return; }
     try {
-      await addFavorite({
-        eventId: ev.id,
-        name: ev.name,
-        image: ev.image,
-        date: ev.date,
-        venue: ev.venue?.name,
-        city: ev.venue?.city,
-        url: ev.url,
-      });
-      setFavMsg(`"${ev.name}" aggiunto ai preferiti.`);
+      if (isFav && favId) {
+        await removeFavorite(favId);
+        setIsFav(false); setFavId(null);
+        setFavMsg("Rimosso dai preferiti.");
+      } else {
+        const created = await addFavorite({
+          eventId: ev.id, name: ev.name, image: ev.image,
+          date: ev.date, venue: ev.venue?.name, city: ev.venue?.city, url: ev.url,
+        });
+        setIsFav(true); setFavId(created._id);
+        setFavMsg("Aggiunto ai preferiti!");
+      }
     } catch (e) {
-      setFavMsg(e.message || "Non è stato possibile salvare il preferito.");
+      setFavMsg(e.message || "Errore.");
     }
+  }
+
+  function openGoogleCalendar() {
+    const v = ev.venue || {};
+    const dt = ev.date ? ev.date.replace(/[-:]/g, '').replace('T', '') : '';
+    const start = dt ? dt.slice(0, 8) + 'T' + (ev.time ? ev.time.replace(':', '') + '00' : '200000') : '';
+    const end = start ? start.slice(0, 9) + String(parseInt(start.slice(9, 11)) + 3).padStart(2, '0') + '0000' : '';
+    const location = [v.name, v.address, v.city].filter(Boolean).join(', ');
+    const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(ev.name || '')}&dates=${start}/${end}&location=${encodeURIComponent(location)}&details=${encodeURIComponent(ev.url || '')}`;
+    window.open(url, '_blank');
   }
 
   if (loading) {
@@ -433,15 +455,15 @@ export default function EventDetail() {
                   <ArrowRightIcon size={18} />
                 </a>
               )}
-              <button type="button" className="btn btn--ghost" onClick={handleFav}>
-                <HeartIcon size={18} />
-                Salva nei preferiti
+              <button type="button" className={`btn ${isFav ? "btn--fav-active" : "btn--ghost"}`} onClick={handleFav}>
+                <HeartIcon size={18} filled={isFav} />
+                {isFav ? "Nei preferiti" : "Salva"}
               </button>
               <button type="button" className="btn btn--ghost" onClick={shareEvent}>
                 <ShareIcon size={18} />
                 {shareMsg || "Condividi"}
               </button>
-              <button type="button" className="btn btn--ghost" onClick={generateICS}>
+              <button type="button" className="btn btn--ghost" onClick={openGoogleCalendar}>
                 <DownloadIcon size={18} />
                 Aggiungi al calendario
               </button>
