@@ -162,6 +162,39 @@ export async function addFavorite(event) {
   return res.json();
 }
 
+// ---- PROFILO UTENTE ----
+export async function getProfile() {
+  const token = getToken();
+  const res = await fetch(`${BASE}/api/auth/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Errore caricamento profilo');
+  return res.json();
+}
+
+export async function updateProfile(data) {
+  const token = getToken();
+  const res = await fetch(`${BASE}/api/auth/profile`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Errore aggiornamento profilo');
+  return res.json();
+}
+
+export async function updatePassword(currentPassword, newPassword) {
+  const token = getToken();
+  const res = await fetch(`${BASE}/api/auth/password`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || 'Errore aggiornamento password');
+  return data;
+}
+
 // ---- WEATHER: meteo attuale al venue ----
 export async function getWeather({ lat, lon }) {
   const res = await fetch(`${BASE}/api/weather?${qs({ lat, lon })}`);

@@ -6,6 +6,17 @@ const User = require('../models/User');
 
 const router = express.Router();
 
+function requireAuth(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth?.startsWith('Bearer ')) return res.status(401).json({ message: 'Non autorizzato.' });
+  try {
+    req.user = jwt.verify(auth.slice(7), process.env.JWT_SECRET);
+    next();
+  } catch {
+    res.status(401).json({ message: 'Token non valido.' });
+  }
+}
+
 function createToken(user) {
   const payload = { id: user._id.toString(), email: user.email };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -74,6 +85,49 @@ router.post('/login', async (req, res) => {
   } catch (err) {
     console.error('Login error:', err);
     return res.status(500).json({ message: 'Errore server durante il login.' });
+  }
+});
+
+// GET /api/auth/profile
+router.get('/profile', requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'Utente non trovato.' });
+    res.json(user.toSafeObject());
+  } catch {
+    res.status(500).json({ message: 'Errore server.' });
+  }
+});
+
+// PUT /api/auth/profile
+router.put('/profile', requireAuth, async (req, res) => {
+  try {
+    const { displayName, bio, avatar } = req.body;
+    const update = {};
+    if (displayName !== undefined) update.displayName = String(displayName).slice(0, 60);
+    if (bio !== undefined) update.bio = String(bio).slice(0, 200);
+    if (avatar !== undefined) update.avatar = avatar; // base64 jpeg, già ridimensionato dal client
+    const user = await User.findByIdAndUpdate(req.user.id, update, { new: true });
+    res.json(user.toSafeObject());
+  } catch {
+    res.status(500).json({ message: 'Errore aggiornamento profilo.' });
+  }
+});
+
+// PUT /api/auth/password
+router.put('/password', requireAuth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword || newPassword.length < 6)
+      return res.status(400).json({ message: 'Password non valida (min 6 caratteri).' });
+    const user = await User.findById(req.user.id);
+    const ok = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!ok) return res.status(401).json({ message: 'Password attuale errata.' });
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ message: 'Errore aggiornamento password.' });
   }
 });
 
