@@ -16,12 +16,6 @@ if (missing.length) {
   console.error(`❌ Variabili d'ambiente mancanti: ${missing.join(', ')}`);
   process.exit(1);
 }
-if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET) {
-  console.warn('⚠️  SPOTIFY_CLIENT_ID/SECRET non configurati: endpoint Spotify disabilitato');
-}
-if (!process.env.YOUTUBE_API_KEY) {
-  console.warn('⚠️  YOUTUBE_API_KEY non configurata: endpoint YouTube disabilitato');
-}
 
 const ticketmasterRouter = require('./routes/ticketmaster');
 const authRouter = require('./routes/auth');
@@ -77,18 +71,57 @@ app.get('/__ping', (req, res) => res.json({ ok: true }));
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/concerthub';
 
+function printBanner({ port, dbOk }) {
+  const tty = process.stdout.isTTY;
+  const C = tty
+    ? {
+        bar: '\x1b[38;5;208m',
+        title: '\x1b[1m\x1b[38;5;208m',
+        key: '\x1b[2m',
+        ok: '\x1b[32m',
+        warn: '\x1b[33m',
+        reset: '\x1b[0m',
+      }
+    : { bar: '', title: '', key: '', ok: '', warn: '', reset: '' };
+
+  const env = process.env.NODE_ENV || 'development';
+  const flag = (on) =>
+    on ? `${C.ok}attivo${C.reset}` : `${C.warn}non configurato${C.reset}`;
+  const row = (k, v) =>
+    `  ${C.bar}▌${C.reset}  ${C.key}${k.padEnd(13)}${C.reset}${v}`;
+
+  console.log(
+    [
+      '',
+      `  ${C.bar}▌${C.reset}  ${C.title}ConcertHub API${C.reset}`,
+      `  ${C.bar}▌${C.reset}`,
+      row('Ambiente', env),
+      row('URL', `http://localhost:${port}`),
+      row(
+        'MongoDB',
+        dbOk ? `${C.ok}connesso${C.reset}` : `${C.warn}offline${C.reset}`
+      ),
+      row('Ticketmaster', `${C.ok}attivo${C.reset}`),
+      row(
+        'Spotify',
+        flag(process.env.SPOTIFY_CLIENT_ID && process.env.SPOTIFY_CLIENT_SECRET)
+      ),
+      row('YouTube', flag(process.env.YOUTUBE_API_KEY)),
+      '',
+    ].join('\n')
+  );
+}
+
 async function start() {
+  let dbOk = false;
   try {
     await mongoose.connect(MONGO_URI);
-    console.log('✅ MongoDB connesso');
+    dbOk = true;
   } catch (err) {
-    console.error('⚠️ MongoDB non raggiungibile, avvio senza DB');
-    console.error(err.message);
+    console.error(`MongoDB non raggiungibile, avvio senza DB (${err.message})`);
   }
 
-  app.listen(PORT, () => {
-    console.log(`🚀 ConcertHub API → http://localhost:${PORT}`);
-  });
+  app.listen(PORT, () => printBanner({ port: PORT, dbOk }));
 }
 
 start();
