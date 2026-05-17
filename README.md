@@ -1,96 +1,87 @@
-# ConcertHub — Trova i concerti nella tua città
+# ConcertHub
 
-ConcertHub è un’applicazione web che permette agli utenti di cercare e visualizzare concerti ed eventi musicali nella propria città, con un focus particolare sul mercato italiano.  
-L’app integra API esterne per ottenere eventi aggiornati e offre funzionalità personalizzate tramite autenticazione e gestione dei preferiti.
+Piattaforma per scoprire concerti ed eventi live. Cerca per città o artista, guarda bio, video e musica dell'artista, salva i tuoi preferiti e pianifica la serata con mappa e hotel.
 
----
-
-## Caratteristiche principali
-
-- Ricerca dei concerti per città, parola chiave e intervallo di date
-- Visualizzazione degli eventi con immagini, venue, data e link esterno
-- Registrazione e autenticazione tramite JWT
-- Possibilità per l’utente registrato di salvare concerti tra i preferiti
-- Interfaccia responsive basata su React + Bootstrap
-- Backend Node.js con Express e MongoDB Atlas
+**Progetto portfolio** — dati da Ticketmaster, Spotify, YouTube, Wikipedia, OpenStreetMap.
 
 ---
 
-## Tecnologie utilizzate
+## Stack
 
-### Frontend
-- React (con Vite)
-- Bootstrap
-- Fetch API per chiamate al backend
-
-### Backend
-- Node.js + Express
-- MongoDB Atlas + Mongoose
-- JWT per autenticazione
-- BcryptJS per hashing password
-- Axios per chiamate alle API esterne
-- Helmet, CORS, Express-rate-limit, Morgan
-
-### API esterne
-- Ticketmaster API (eventi musicali)
+| Layer | Tecnologie |
+|---|---|
+| Frontend | React 18, Vite, React Router, CSS custom |
+| Backend | Node.js, Express, MongoDB Atlas, Mongoose |
+| Auth | JWT + bcrypt |
+| API esterne | Ticketmaster Discovery v2, Spotify Web API, YouTube Data v3, Wikipedia REST, OpenStreetMap/Overpass |
 
 ---
 
-## Struttura del progetto
+## Funzionalità
 
-# ConcertHub — Trova i concerti nella tua città
-
-ConcertHub è un’applicazione web che permette agli utenti di cercare e visualizzare concerti ed eventi musicali nella propria città, con un focus particolare sul mercato italiano.  
-L’app integra API esterne per ottenere eventi aggiornati e offre funzionalità personalizzate tramite autenticazione e gestione dei preferiti.
-
----
-
-## Caratteristiche principali
-
-- Ricerca dei concerti per città, parola chiave e intervallo di date
-- Visualizzazione degli eventi con immagini, venue, data e link esterno
-- Registrazione e autenticazione tramite JWT
-- Possibilità per l’utente registrato di salvare concerti tra i preferiti
-- Interfaccia responsive basata su React + Bootstrap
-- Backend Node.js con Express e MongoDB Atlas
+- Ricerca eventi per città, keyword, range di date
+- Dettaglio evento: venue, prezzi, lineup, note
+- Profilo artista: bio Wikipedia, embed Spotify, ultimo video YouTube
+- Mappa interattiva OpenStreetMap + link Google Maps
+- Parchi/aree verdi nei dintorni (Overpass API)
+- Link hotel Booking.com e Airbnb
+- Autenticazione (registrazione / login)
+- Lista preferiti persistita su MongoDB
+- Sfondo gradient mesh animato
+- Pagine legali (Privacy, Termini, Cookie)
+- Responsive desktop + mobile
 
 ---
 
-## Tecnologie utilizzate
+## Avvio locale
 
-### Frontend
-- React (con Vite)
-- Bootstrap
-- Fetch API per chiamate al backend
+```bash
+# Backend
+cd backend
+cp .env.example .env   # compila le chiavi API
+npm install
+npm run dev            # porta 4000
 
-### Backend
-- Node.js + Express
-- MongoDB Atlas + Mongoose
-- JWT per autenticazione
-- BcryptJS per hashing password
-- Axios per chiamate alle API esterne
-- Helmet, CORS, Express-rate-limit, Morgan
+# Frontend
+cd frontend
+npm install
+npm run dev            # porta 5173
+```
 
-### API esterne
-- Ticketmaster API (eventi musicali)
+### Variabili d'ambiente (backend/.env)
+
+```
+PORT=4000
+CLIENT_ORIGIN=http://localhost:5173
+TICKETMASTER_API_KEY=...
+MONGO_URI=...
+JWT_SECRET=...
+YOUTUBE_API_KEY=...
+SPOTIFY_CLIENT_ID=...
+SPOTIFY_CLIENT_SECRET=...
+```
 
 ---
 
-## Struttura del progetto
+## Struttura
 
-project/
+```
+concertHub/
 ├── backend/
-│ ├── src/
-│ │ ├── server.js
-│ │ ├── routes/
-│ │ ├── controllers/
-│ │ └── models/
-│ ├── package.json
-│ └── .env (non incluso nel repository)
+│   ├── src/
+│   │   ├── server.js
+│   │   ├── routes/          # ticketmaster, auth, favorites, youtube, spotify
+│   │   └── models/          # User, Favorite
+│   └── .env                 # non in repo
 └── frontend/
-├── src/
-│ ├── pages/
-│ ├── components/
-│ ├── lib/api.js
-│ └── App.jsx
-├── package.json
+    ├── src/
+    │   ├── pages/           # Home, EventDetail, Favorites, Login, Legal, NotFound
+    │   ├── components/      # Navbar, Footer, EventCard, GradientBackground, …
+    │   ├── lib/api.js
+    │   └── styles.css
+    └── index.html
+```
+
+---
+
+Designed & developed by **Fabio Annoni**

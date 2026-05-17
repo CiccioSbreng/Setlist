@@ -8,6 +8,7 @@ import LoginPage from "./pages/login";
 import FavoritesPage from "./pages/Favorites";
 import EventDetail from "./pages/EventDetail";
 import Legal from "./pages/Legal";
+import NotFound from "./pages/NotFound";
 import GradientBackground from "./components/GradientBackground";
 
 export default function App() {
@@ -27,7 +28,7 @@ export default function App() {
             <Route path="/privacy" element={<Legal doc="privacy" />} />
             <Route path="/termini" element={<Legal doc="termini" />} />
             <Route path="/cookie" element={<Legal doc="cookie" />} />
-            <Route path="*" element={<Navigate to="/home" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
 
