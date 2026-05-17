@@ -2852,6 +2852,52 @@ input.input[type="date"] {
   flex-shrink: 0;
 }
 
+.ed-wx {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ed-wx__main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ed-wx__icon {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.ed-wx__temp {
+  font-family: "Sora", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.ed-wx__temp span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.ed-wx__desc {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.ed-wx__meta {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
 @media (max-width: 640px) {
   .ed-grid4 { grid-template-columns: 1fr; }
 }

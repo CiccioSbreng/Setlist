@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, removeFavorite, getFavorites, getSetlist } from "../lib/api";
+import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, removeFavorite, getFavorites, getSetlist, getWeather } from "../lib/api";
 import {
   CalendarIcon,
   ClockIcon,
@@ -19,6 +19,7 @@ import {
   ShareIcon,
   DownloadIcon,
   ListMusicIcon,
+  CloudIcon,
   YoutubeIcon,
   SpotifyIcon,
   InstagramIcon,
@@ -89,6 +90,7 @@ export default function EventDetail() {
   const [spotifyArtist, setSpotifyArtist] = useState(null);
   const [activeTab, setActiveTab] = useState("evento");
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [weather, setWeather] = useState(null);
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
@@ -232,6 +234,19 @@ export default function EventDetail() {
     const name = ev?.artists?.[0]?.name;
     if (!name) return;
     getSetlist(name).then(setSetlistData).catch(() => {});
+  }, [ev]);
+
+  useEffect(() => {
+    setWeather(null);
+    const lat = ev?.venue?.lat;
+    const lon = ev?.venue?.lon;
+    const date = ev?.date;
+    if (lat == null || lon == null || !date) return;
+    let alive = true;
+    getWeather({ lat, lon, date })
+      .then((w) => alive && setWeather(w))
+      .catch(() => {});
+    return () => { alive = false; };
   }, [ev]);
 
   function generateICS() {
@@ -631,6 +646,30 @@ export default function EventDetail() {
         {/* SECTION: DOVE & COME */}
         <div id="section-dove" className="ed-section">
           <div className="ed-grid4">
+
+            {/* Card 0 — Meteo del concerto */}
+            {weather?.status === "ok" && (
+              <div className="ed-tile">
+                <div className="ed-tile__head">
+                  <CloudIcon size={16} /><span>Meteo del concerto</span>
+                </div>
+                <div className="ed-wx">
+                  <div className="ed-wx__main">
+                    <span className="ed-wx__icon" aria-hidden="true">{weather.icon}</span>
+                    <div>
+                      <div className="ed-wx__temp">
+                        {weather.tMax}° <span>/ {weather.tMin}°</span>
+                      </div>
+                      <div className="ed-wx__desc">{weather.desc}</div>
+                    </div>
+                  </div>
+                  <div className="ed-wx__meta">
+                    <span>💧 {weather.precip}% pioggia</span>
+                    <span>💨 {weather.wind} km/h</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Card 1 — Mappa */}
             {hasGeo && (

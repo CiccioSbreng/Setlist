@@ -195,9 +195,9 @@ export async function updatePassword(currentPassword, newPassword) {
   return data;
 }
 
-// ---- WEATHER: meteo attuale al venue ----
-export async function getWeather({ lat, lon }) {
-  const res = await fetch(`${BASE}/api/weather?${qs({ lat, lon })}`);
+// ---- WEATHER: previsione per la data del concerto ----
+export async function getWeather({ lat, lon, date }) {
+  const res = await fetch(`${BASE}/api/weather?${qs({ lat, lon, date })}`);
   if (!res.ok) throw new Error(`Weather ${res.status}`);
   return res.json();
 }
