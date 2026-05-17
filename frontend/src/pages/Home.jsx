@@ -80,6 +80,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
+  const [citySugg, setCitySugg] = useState([]);
+  const [showCitySugg, setShowCitySugg] = useState(false);
   const [quickRange, setQuickRange] = useState(null);
   // eventId Ticketmaster -> _id del preferito (per toggle e cuore acceso)
   const [favMap, setFavMap] = useState({});
@@ -231,6 +233,21 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const city = form.city.trim();
+    if (city.length < 2) { setCitySugg([]); return; }
+    const tid = setTimeout(() => {
+      searchEvents({ city, size: 6 })
+        .then((res) => {
+          const cities = [...new Set((res.events || []).map((e) => e.city).filter(Boolean))].slice(0, 5);
+          setCitySugg(cities);
+        })
+        .catch(() => {});
+    }, 300);
+    return () => clearTimeout(tid);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.city]);
+
   function scrollToSearch() {
     document
       .getElementById("ricerca")
@@ -332,15 +349,29 @@ export default function Home() {
             }}
           >
             <div className="sb-bar">
-              <label className="sb-seg" htmlFor="city">
+              <label className="sb-seg sb-seg--autocomplete" htmlFor="city">
                 <PinIcon size={20} className="sb-seg__ic" />
                 <input
                   id="city"
                   className="sb-seg__input"
                   placeholder="In quale città?"
                   value={form.city}
-                  onChange={(e) => update({ city: e.target.value })}
+                  autoComplete="off"
+                  onChange={(e) => { update({ city: e.target.value }); setShowCitySugg(true); }}
+                  onFocus={() => setShowCitySugg(true)}
+                  onBlur={() => setTimeout(() => setShowCitySugg(false), 150)}
                 />
+                {showCitySugg && citySugg.length > 0 && (
+                  <ul className="sb-sugg">
+                    {citySugg.map((c) => (
+                      <li key={c}>
+                        <button type="button" onMouseDown={() => { update({ city: c }); setShowCitySugg(false); runSearch(0, { ...form, city: c, page: 0 }); }}>
+                          <PinIcon size={14} />{c}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </label>
 
               <span className="sb-div" aria-hidden="true" />

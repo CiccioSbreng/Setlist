@@ -28,6 +28,8 @@ const authRouter = require('./routes/auth');
 const favoritesRouter = require('./routes/favorites');
 const youtubeRouter = require('./routes/youtube');
 const spotifyRouter = require('./routes/spotify');
+const weatherRouter = require('./routes/weather');
+const setlistRouter = require('./routes/setlist');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -67,6 +69,8 @@ app.use('/api/auth', authRouter);
 app.use('/api/favorites', favoritesRouter);
 app.use('/api/youtube', youtubeRouter);
 app.use('/api/spotify', spotifyRouter);
+app.use('/api/weather', weatherRouter);
+app.use('/api/setlist', setlistRouter);
 
 app.get('/__ping', (req, res) => res.json({ ok: true }));
 

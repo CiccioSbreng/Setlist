@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite } from "../lib/api";
+import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, getWeather, getSetlist } from "../lib/api";
 import {
   CalendarIcon,
   ClockIcon,
@@ -16,6 +16,10 @@ import {
   TreeIcon,
   BedIcon,
   ForkIcon,
+  ShareIcon,
+  DownloadIcon,
+  CloudIcon,
+  ListMusicIcon,
   YoutubeIcon,
   SpotifyIcon,
   InstagramIcon,
@@ -76,7 +80,10 @@ export default function EventDetail() {
   const [otherDates, setOtherDates] = useState([]);
   const [parks, setParks] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
+  const [weather, setWeather] = useState(null);
+  const [setlistData, setSetlistData] = useState(null);
   const [showMap, setShowMap] = useState(false);
+  const [shareMsg, setShareMsg] = useState("");
   const [ytVideos, setYtVideos] = useState([]);
   const [artistBio, setArtistBio] = useState("");
   const [spotifyArtist, setSpotifyArtist] = useState(null);
@@ -205,6 +212,51 @@ export default function EventDetail() {
       .finally(() => clearTimeout(tid));
     return () => { ctrl.abort(); clearTimeout(tid); };
   }, [ev]);
+
+  useEffect(() => {
+    const lat = ev?.venue?.lat;
+    const lon = ev?.venue?.lon;
+    if (lat == null || lon == null) return;
+    getWeather({ lat, lon }).then(setWeather).catch(() => {});
+  }, [ev]);
+
+  useEffect(() => {
+    const name = ev?.artists?.[0]?.name;
+    if (!name) return;
+    getSetlist(name).then(setSetlistData).catch(() => {});
+  }, [ev]);
+
+  function generateICS() {
+    const v = ev.venue || {};
+    const dt = ev.date ? ev.date.replace(/[-:]/g, '').replace('T', '') : '';
+    const dtStr = dt ? dt.slice(0, 8) + 'T' + (ev.time ? ev.time.replace(':', '') + '00' : '200000') : '';
+    const location = [v.name, v.address, v.city].filter(Boolean).join(', ');
+    const ics = [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ConcertHub//IT',
+      'BEGIN:VEVENT',
+      dtStr ? `DTSTART:${dtStr}` : '',
+      `SUMMARY:${(ev.name || '').replace(/[,;\\]/g, ' ')}`,
+      `LOCATION:${location.replace(/[,;\\]/g, ' ')}`,
+      `URL:${ev.url || ''}`,
+      'END:VEVENT', 'END:VCALENDAR',
+    ].filter(Boolean).join('\r\n');
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${(ev.name || 'evento').replace(/[^a-z0-9]/gi, '_')}.ics`; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function shareEvent() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: ev.name, url }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(url).catch(() => {});
+      setShareMsg('Link copiato!');
+      setTimeout(() => setShareMsg(''), 2500);
+    }
+  }
 
   async function handleFav() {
     setFavMsg("");
@@ -346,14 +398,17 @@ export default function EventDetail() {
           </div>
         </div>
 
-        {/* MOBILE TABS */}
+        {/* TABS — scroll nav su mobile */}
         <div className="ed-tabs">
           {[["evento", "Evento"], ["artista", "Artista"], ["dove", "Dove & Come"]].map(([tab, label]) => (
             <button
               key={tab}
               type="button"
               className={`ed-tabs__btn${activeTab === tab ? " active" : ""}`}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab);
+                document.getElementById(`section-${tab}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
             >
               {label}
             </button>
@@ -361,7 +416,7 @@ export default function EventDetail() {
         </div>
 
         {/* SECTION: EVENTO */}
-        <div className={`ed-section${activeTab === "evento" ? " ed-section--active" : ""}`}>
+        <div id="section-evento" className="ed-section">
           <div className="ed-card">
             <div className="ed__meta">
               <div className="ed__row">
@@ -386,6 +441,14 @@ export default function EventDetail() {
               <button type="button" className="btn btn--ghost" onClick={handleFav}>
                 <HeartIcon size={18} />
                 Salva nei preferiti
+              </button>
+              <button type="button" className="btn btn--ghost" onClick={shareEvent}>
+                <ShareIcon size={18} />
+                {shareMsg || "Condividi"}
+              </button>
+              <button type="button" className="btn btn--ghost" onClick={generateICS}>
+                <DownloadIcon size={18} />
+                Aggiungi al calendario
               </button>
             </div>
             {favMsg && (
@@ -431,7 +494,7 @@ export default function EventDetail() {
         </div>
 
         {/* SECTION: ARTISTA */}
-        <div className={`ed-section${activeTab === "artista" ? " ed-section--active" : ""}`}>
+        <div id="section-artista" className="ed-section">
           {artist && (
             <div className="ed-artist">
               {artist.image && (
@@ -524,10 +587,32 @@ export default function EventDetail() {
               </a>
             </div>
           )}
+
+          {setlistData?.songs?.length > 0 && (
+            <div className="ed-setlist">
+              <div className="ed-setlist__head">
+                <h3><ListMusicIcon size={16} />Scaletta probabile</h3>
+                {setlistData.event && (
+                  <span className="ed-setlist__meta">
+                    da {setlistData.event.venue}{setlistData.event.city ? `, ${setlistData.event.city}` : ""}
+                  </span>
+                )}
+              </div>
+              <ol className="ed-setlist__list">
+                {setlistData.songs.map((s, i) => (
+                  <li key={i} className={s.encore ? "encore" : ""}>
+                    <span className="ed-setlist__num">{i + 1}</span>
+                    <span className="ed-setlist__name">{s.name}</span>
+                    {s.encore && <span className="ed-setlist__tag">encore</span>}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
 
         {/* SECTION: DOVE & COME */}
-        <div className={`ed-section${activeTab === "dove" ? " ed-section--active" : ""}`}>
+        <div id="section-dove" className="ed-section">
           <div className="ed-grid4">
 
             {/* Card 1 — Mappa */}
@@ -616,6 +701,29 @@ export default function EventDetail() {
                       <ArrowRightIcon size={16} />
                     </a>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Card 5 — Meteo */}
+            {weather && (
+              <div className="ed-tile">
+                <div className="ed-tile__head">
+                  <CloudIcon size={16} /><span>Meteo al venue</span>
+                </div>
+                <div className="ed-weather">
+                  <img
+                    className="ed-weather__icon"
+                    src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+                    alt={weather.desc}
+                  />
+                  <div className="ed-weather__temp">{weather.temp}°C</div>
+                  <div className="ed-weather__desc">{weather.desc}</div>
+                  <div className="ed-weather__details">
+                    <span>Percepita {weather.feels_like}°C</span>
+                    <span>Vento {weather.wind} km/h</span>
+                    <span>Umidità {weather.humidity}%</span>
+                  </div>
                 </div>
               </div>
             )}

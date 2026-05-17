@@ -162,6 +162,20 @@ export async function addFavorite(event) {
   return res.json();
 }
 
+// ---- WEATHER: meteo attuale al venue ----
+export async function getWeather({ lat, lon }) {
+  const res = await fetch(`${BASE}/api/weather?${qs({ lat, lon })}`);
+  if (!res.ok) throw new Error(`Weather ${res.status}`);
+  return res.json();
+}
+
+// ---- SETLIST: ultima scaletta dell'artista ----
+export async function getSetlist(artist) {
+  const res = await fetch(`${BASE}/api/setlist?artist=${encodeURIComponent(artist)}`);
+  if (!res.ok) throw new Error(`Setlist ${res.status}`);
+  return res.json();
+}
+
 // DELETE /api/favorites/:id
 export async function removeFavorite(id) {
   const token = getToken();

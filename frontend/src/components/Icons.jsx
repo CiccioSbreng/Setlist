@@ -181,6 +181,33 @@ export const SpotifyIcon = (p) => (
   </Svg>
 );
 
+export const ShareIcon = (p) => (
+  <Svg {...p}>
+    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+  </Svg>
+);
+
+export const DownloadIcon = (p) => (
+  <Svg {...p}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+  </Svg>
+);
+
+export const CloudIcon = (p) => (
+  <Svg {...p}>
+    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+  </Svg>
+);
+
+export const ListMusicIcon = (p) => (
+  <Svg {...p}>
+    <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0"/>
+    <path d="M3 6h12M3 12h10M3 18h6"/>
+  </Svg>
+);
+
 export const InstagramIcon = (p) => (
   <Svg {...p}>
     <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
