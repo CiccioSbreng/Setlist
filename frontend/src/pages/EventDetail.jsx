@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, getWeather, getSetlist } from "../lib/api";
+import { getEvent, getArtistEvents, getYoutubeVideos, getSpotifyArtist, addFavorite, getSetlist } from "../lib/api";
 import {
   CalendarIcon,
   ClockIcon,
@@ -18,7 +18,6 @@ import {
   ForkIcon,
   ShareIcon,
   DownloadIcon,
-  CloudIcon,
   ListMusicIcon,
   YoutubeIcon,
   SpotifyIcon,
@@ -80,7 +79,6 @@ export default function EventDetail() {
   const [otherDates, setOtherDates] = useState([]);
   const [parks, setParks] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
-  const [weather, setWeather] = useState(null);
   const [setlistData, setSetlistData] = useState(null);
   const [showMap, setShowMap] = useState(false);
   const [shareMsg, setShareMsg] = useState("");
@@ -215,13 +213,6 @@ export default function EventDetail() {
       .catch(() => {})
       .finally(() => clearTimeout(tid));
     return () => { ctrl.abort(); clearTimeout(tid); };
-  }, [ev]);
-
-  useEffect(() => {
-    const lat = ev?.venue?.lat;
-    const lon = ev?.venue?.lon;
-    if (lat == null || lon == null) return;
-    getWeather({ lat, lon }).then(setWeather).catch(() => {});
   }, [ev]);
 
   useEffect(() => {
@@ -715,25 +706,52 @@ export default function EventDetail() {
               </div>
             )}
 
-            {/* Card 5 — Meteo */}
-            {weather && (
+            {/* Card 5 — Trasporti */}
+            {hasGeo && (
               <div className="ed-tile">
                 <div className="ed-tile__head">
-                  <CloudIcon size={16} /><span>Meteo al venue</span>
+                  <GlobeIcon size={16} /><span>Come spostarsi</span>
                 </div>
-                <div className="ed-weather">
-                  <img
-                    className="ed-weather__icon"
-                    src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
-                    alt={weather.desc}
-                  />
-                  <div className="ed-weather__temp">{weather.temp}°C</div>
-                  <div className="ed-weather__desc">{weather.desc}</div>
-                  <div className="ed-weather__details">
-                    <span>Percepita {weather.feels_like}°C</span>
-                    <span>Vento {weather.wind} km/h</span>
-                    <span>Umidità {weather.humidity}%</span>
-                  </div>
+                <div className="ed-tile__sleep">
+                  <a
+                    href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${v.lat}&dropoff[longitude]=${v.lon}&dropoff[nickname]=${encodeURIComponent(v.name || "Venue")}`}
+                    target="_blank" rel="noreferrer" className="ed-tile__sleep-card"
+                  >
+                    <div className="ed-tile__sleep-icon" style={{ background: "rgba(0,0,0,0.3)" }}>
+                      <span style={{ fontWeight: 800, fontSize: "0.9rem", letterSpacing: "-0.03em" }}>Ub</span>
+                    </div>
+                    <div>
+                      <div className="ed-tile__sleep-title">Uber</div>
+                      <div className="ed-tile__sleep-sub">Prenota un passaggio</div>
+                    </div>
+                    <ArrowRightIcon size={16} />
+                  </a>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lon}&travelmode=transit`}
+                    target="_blank" rel="noreferrer" className="ed-tile__sleep-card"
+                  >
+                    <div className="ed-tile__sleep-icon" style={{ background: "rgba(66,133,244,0.15)" }}>
+                      <span style={{ fontWeight: 800, fontSize: "0.75rem", color: "#4285f4" }}>BUS</span>
+                    </div>
+                    <div>
+                      <div className="ed-tile__sleep-title">Trasporto pubblico</div>
+                      <div className="ed-tile__sleep-sub">Indicazioni con Google Maps</div>
+                    </div>
+                    <ArrowRightIcon size={16} />
+                  </a>
+                  <a
+                    href={`https://free-now.com`}
+                    target="_blank" rel="noreferrer" className="ed-tile__sleep-card"
+                  >
+                    <div className="ed-tile__sleep-icon" style={{ background: "rgba(255,220,0,0.15)" }}>
+                      <span style={{ fontWeight: 800, fontSize: "0.7rem", color: "#f5c800" }}>FREE</span>
+                    </div>
+                    <div>
+                      <div className="ed-tile__sleep-title">FREE NOW</div>
+                      <div className="ed-tile__sleep-sub">Taxi e NCC</div>
+                    </div>
+                    <ArrowRightIcon size={16} />
+                  </a>
                 </div>
               </div>
             )}
