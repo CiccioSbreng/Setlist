@@ -30,6 +30,14 @@ const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=800&q=80",
 ];
 
+// Aggiungi qui i tuoi file video in frontend/public/
+// Es: hero-bg-1.mp4, hero-bg-2.mp4, hero-bg-3.mp4 ...
+const HERO_VIDEOS = [
+  "/hero-bg-1.mp4",
+  "/hero-bg-2.mp4",
+  "/hero-bg-3.mp4",
+];
+
 const FEATURES = [
   {
     icon: <PinIcon size={22} />,
@@ -62,6 +70,8 @@ function formatDate(d) {
 }
 
 export default function Home() {
+  const [videoIdx, setVideoIdx] = useState(0);
+
   const [form, setForm] = useState({
     city: "",
     keyword: "",
@@ -249,18 +259,17 @@ export default function Home() {
     <>
       {/* ===== HERO ===== */}
       <section className="hero">
-        {/* Video background — metti il file in frontend/public/hero-bg.mp4 */}
+        {/* Video background — metti i file in frontend/public/hero-bg-1.mp4 ecc. */}
         <video
+          key={videoIdx}
           className="hero__video"
           autoPlay
           muted
-          loop
           playsInline
           preload="metadata"
-          poster=""
+          onEnded={() => setVideoIdx((i) => (i + 1) % HERO_VIDEOS.length)}
         >
-          <source src="/hero-bg.mp4" type="video/mp4" />
-          <source src="/hero-bg.webm" type="video/webm" />
+          <source src={HERO_VIDEOS[videoIdx]} type="video/mp4" />
         </video>
         <div className="hero__glow" />
         <div className="wrap hero__inner">
