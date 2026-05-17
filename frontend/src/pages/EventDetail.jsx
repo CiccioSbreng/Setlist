@@ -24,6 +24,8 @@ import {
   SpotifyIcon,
   InstagramIcon,
 } from "../components/Icons";
+import BudgetEstimate from "../components/BudgetEstimate";
+import ConcertChecklist from "../components/ConcertChecklist";
 
 function formatWhen(date, time) {
   if (!date) return { dateLabel: "Data da definire", timeLabel: null };
@@ -91,6 +93,8 @@ export default function EventDetail() {
   const [activeTab, setActiveTab] = useState("evento");
   const [bioExpanded, setBioExpanded] = useState(false);
   const [weather, setWeather] = useState(null);
+  const [parkings, setParkings] = useState([]);
+  const [cityInfo, setCityInfo] = useState(null);
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
@@ -246,6 +250,62 @@ export default function EventDetail() {
     getWeather({ lat, lon, date })
       .then((w) => alive && setWeather(w))
       .catch(() => {});
+    return () => { alive = false; };
+  }, [ev]);
+
+  useEffect(() => {
+    setParkings([]);
+    const lat = ev?.venue?.lat;
+    const lon = ev?.venue?.lon;
+    if (lat == null || lon == null) return;
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const q = `[out:json][timeout:8];(node(around:1200,${lat},${lon})[amenity=parking][name];way(around:1200,${lat},${lon})[amenity=parking][name];);out center 5;`;
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`, { signal: ctrl.signal })
+      .then((r) => r.json())
+      .then((data) => {
+        const items = (data.elements || [])
+          .filter((el) => el.tags?.name)
+          .slice(0, 5)
+          .map((el) => ({
+            id: el.id,
+            name: el.tags.name,
+            lat: el.lat ?? el.center?.lat,
+            lon: el.lon ?? el.center?.lon,
+          }));
+        setParkings(items);
+      })
+      .catch(() => {})
+      .finally(() => clearTimeout(tid));
+    return () => { ctrl.abort(); clearTimeout(tid); };
+  }, [ev]);
+
+  useEffect(() => {
+    setCityInfo(null);
+    const city = ev?.venue?.city;
+    if (!city) return;
+    let alive = true;
+    (async () => {
+      for (const lang of ["it", "en"]) {
+        try {
+          const r = await fetch(
+            `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(city)}`
+          );
+          if (!r.ok) continue;
+          const d = await r.json();
+          if (d.extract && d.type !== "disambiguation") {
+            if (alive)
+              setCityInfo({
+                title: d.title || city,
+                extract: d.extract,
+                url: d.content_urls?.desktop?.page || null,
+                thumb: d.thumbnail?.source || null,
+              });
+            return;
+          }
+        } catch {}
+      }
+    })();
     return () => { alive = false; };
   }, [ev]);
 
@@ -597,6 +657,21 @@ export default function EventDetail() {
                 loading="lazy"
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               />
+              {spotifyArtist.topTracks?.length > 0 && (
+                <ul className="ed-toptracks">
+                  {spotifyArtist.topTracks.map((t, i) => (
+                    <li key={t.id}>
+                      <a href={t.url || spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-toptracks__row">
+                        <span className="ed-toptracks__n">{i + 1}</span>
+                        {t.image && <img src={t.image} alt="" loading="lazy" />}
+                        <span className="ed-toptracks__name">{t.name}</span>
+                        {t.preview && <span className="ed-toptracks__tag">anteprima</span>}
+                        <ArrowRightIcon size={13} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
               {spotifyArtist.externalUrl && (
                 <a href={spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-spotify__open">
                   <SpotifyIcon size={14} />Apri su Spotify<ArrowRightIcon size={14} />
@@ -736,6 +811,31 @@ export default function EventDetail() {
               </div>
             )}
 
+            {/* Card 3b — Parcheggi */}
+            {parkings.length > 0 && (
+              <div className="ed-tile">
+                <div className="ed-tile__head">
+                  <PinIcon size={16} /><span>Dove parcheggiare</span>
+                </div>
+                <ul className="ed-tile__list">
+                  {parkings.map((p) => (
+                    <li key={p.id}>
+                      <a
+                        href={p.lat ? `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ed-tile__row"
+                      >
+                        <PinIcon size={14} />
+                        <span>{p.name}</span>
+                        <ArrowRightIcon size={12} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Card 4 — Dormire */}
             {(bookingUrl || airbnbUrl) && (
               <div className="ed-tile">
@@ -817,6 +917,32 @@ export default function EventDetail() {
               </div>
             )}
 
+          </div>
+
+          {cityInfo && (
+            <div className="ed-card ed-cityinfo">
+              <div className="ed-tile__head">
+                <GlobeIcon size={16} /><span>La città: {cityInfo.title}</span>
+              </div>
+              <div className="ed-cityinfo__body">
+                {cityInfo.thumb && (
+                  <img src={cityInfo.thumb} alt={cityInfo.title} loading="lazy" />
+                )}
+                <div>
+                  <p>{cityInfo.extract}</p>
+                  {cityInfo.url && (
+                    <a href={cityInfo.url} target="_blank" rel="noreferrer" className="ed-cityinfo__more">
+                      Approfondisci su Wikipedia <ArrowRightIcon size={13} />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="ed-plan__grid">
+            <BudgetEstimate ev={ev} />
+            <ConcertChecklist ev={ev} />
           </div>
         </div>
 

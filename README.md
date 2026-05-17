@@ -22,12 +22,13 @@ Piattaforma per scoprire concerti ed eventi live. Cerca per città o artista, gu
 - Ricerca eventi per città, keyword, range di date
 - Dettaglio evento: venue, prezzi, lineup, note
 - Profilo artista: bio Wikipedia, embed Spotify, ultimo video YouTube
-- Mappa interattiva OpenStreetMap + link Google Maps
-- Parchi/aree verdi nei dintorni (Overpass API)
-- Link hotel Booking.com e Airbnb
-- Autenticazione (registrazione / login)
-- Lista preferiti persistita su MongoDB
-- Sfondo gradient mesh animato
+- Profilo artista: bio Wikipedia, embed Spotify, top tracks, ultimo video YouTube
+- Meteo previsto nel giorno del concerto (Open-Meteo, nessuna API key)
+- Info sulla città dell'evento (Wikipedia)
+- Budget stimato e checklist pre-concerto (salvati sul dispositivo)
+- Mappa OpenStreetMap + ristoranti, parcheggi e parchi nei dintorni (Overpass)
+- Link hotel Booking.com e Airbnb, opzioni "Come spostarsi"
+- Autenticazione (registrazione / login), preferiti su MongoDB
 - Pagine legali (Privacy, Termini, Cookie)
 - Responsive desktop + mobile
 
@@ -70,7 +71,7 @@ concertHub/
 ├── backend/
 │   ├── src/
 │   │   ├── server.js
-│   │   ├── routes/          # ticketmaster, auth, favorites, youtube, spotify
+│   │   ├── routes/          # ticketmaster, auth, favorites, youtube, spotify, weather, setlist
 │   │   └── models/          # User, Favorite
 │   └── .env                 # non in repo
 └── frontend/

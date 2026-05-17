@@ -2898,6 +2898,280 @@ input.input[type="date"] {
   border-top: 1px solid var(--border);
 }
 
+/* ---- Top tracks Spotify ---- */
+.ed-toptracks {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ed-toptracks__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text);
+  transition: background 0.15s ease;
+}
+
+.ed-toptracks__row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ed-toptracks__n {
+  width: 18px;
+  text-align: center;
+  color: var(--text-mute);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.ed-toptracks__row img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.ed-toptracks__name {
+  flex: 1;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ed-toptracks__tag {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1ed760;
+  border: 1px solid rgba(30, 215, 96, 0.4);
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+/* ---- Pianifica: budget + checklist ---- */
+.ed-plan__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.ch-budget,
+.ch-list {
+  padding: 16px;
+}
+
+.ch-budget__rows {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ch-budget__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+  color: var(--text-dim);
+}
+
+.ch-budget__row--fixed {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.ch-budget__input {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text);
+}
+
+.ch-budget__input input {
+  width: 78px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 6px 8px;
+  text-align: right;
+}
+
+.ch-budget__input input:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+
+.ch-budget__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-strong);
+  font-size: 0.95rem;
+}
+
+.ch-budget__total strong {
+  font-family: "Sora", sans-serif;
+  font-size: 1.35rem;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ch-budget__hint {
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: var(--text-mute);
+}
+
+.ch-list__count {
+  margin-left: auto;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+}
+
+.ch-list__items {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ch-list__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 6px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: background 0.15s ease;
+}
+
+.ch-list__item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ch-list__item input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ch-list__box {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-strong);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ch-list__item.is-done .ch-list__box {
+  background: var(--grad-brand);
+  border-color: transparent;
+}
+
+.ch-list__item.is-done .ch-list__box::after {
+  content: "✓";
+  color: #1c0900;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.ch-list__item.is-done .ch-list__label {
+  color: var(--text-mute);
+  text-decoration: line-through;
+}
+
+/* ---- Info città ---- */
+.ed-cityinfo {
+  margin-top: 18px;
+  padding: 16px;
+}
+
+.ed-cityinfo__body {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.ed-cityinfo__body img {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ed-cityinfo__body p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.ed-cityinfo__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--brand-soft);
+  text-decoration: none;
+}
+
+/* ---- Genere su EventCard ---- */
+.ev-card__genre {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+  background: rgba(8, 8, 12, 0.7);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+@media (max-width: 640px) {
+  .ed-plan__grid {
+    grid-template-columns: 1fr;
+  }
+  .ed-cityinfo__body {
+    flex-direction: column;
+  }
+  .ed-cityinfo__body img {
+    width: 100%;
+    height: 160px;
+  }
+}
+
 @media (max-width: 640px) {
   .ed-grid4 { grid-template-columns: 1fr; }
 }

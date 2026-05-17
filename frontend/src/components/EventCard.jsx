@@ -124,6 +124,10 @@ export default function EventCard({
             {price}
           </div>
         )}
+
+        {ev.genre && ev.genre !== "Undefined" && (
+          <div className="ev-card__genre">{ev.genre}</div>
+        )}
       </div>
 
       <div className="ev-card__body">
