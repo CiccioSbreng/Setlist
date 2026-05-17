@@ -3040,6 +3040,65 @@ input.input[type="date"] {
   color: var(--text-mute);
 }
 
+/* ── Budget: sezione calcolo viaggio ─────────────────────────────── */
+.ch-budget__trip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.ch-budget__trip-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.ch-budget__trip-field span {
+  white-space: nowrap;
+  min-width: 56px;
+}
+
+.ch-budget__trip-field input {
+  flex: 1;
+  background: var(--card-inner, rgba(255,255,255,.05));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--text);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.ch-budget__trip-field input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-glow, rgba(139,92,246,.25));
+}
+
+.ch-budget__trip-res {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin: 0;
+  padding: 6px 10px;
+  background: rgba(139,92,246,.08);
+  border-radius: 8px;
+  border-left: 3px solid var(--brand);
+}
+
+.ch-budget__trip-res strong {
+  color: var(--text);
+}
+
+.ch-budget__trip-err {
+  font-size: 0.80rem;
+  color: #f87171;
+  margin: 0;
+}
+
 .ch-list__count {
   margin-left: auto;
   color: var(--text-dim);
