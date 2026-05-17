@@ -618,17 +618,18 @@ img {
 }
 
 .hero__stats {
-  display: flex;
-  gap: 28px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 30px;
+  align-items: start;
   margin-top: 20px;
-  flex-wrap: wrap;
   padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .hero__stat .n {
   font-family: "Sora", sans-serif;
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #fff;
   white-space: nowrap;
@@ -3074,8 +3075,8 @@ input.input[type="date"] {
 
   /* Stats hero: 1 colonna */
   .hero__stats {
-    flex-direction: column;
-    gap: 10px;
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   /* Footer: colonne in stack */
