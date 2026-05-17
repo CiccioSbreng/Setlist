@@ -536,8 +536,8 @@ export default function EventDetail() {
                 <div className="ed-tile__head">
                   <PinIcon size={16} /><span>Come arrivare</span>
                   <div className="ed-tile__links">
-                    <a href={gmaps} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Maps</a>
-                    <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Vai</a>
+                    <a href={gmaps} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Vedi su Maps</a>
+                    <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Indicazioni</a>
                   </div>
                 </div>
                 {showMap ? (
