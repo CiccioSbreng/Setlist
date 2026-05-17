@@ -3,9 +3,12 @@
 import { useState } from "react";
 
 const VIDEOS = [
-  "/hero-bg-1.mp4",
-  "/hero-bg-2.mp4",
-  "/hero-bg-3.mp4",
+  "https://res.cloudinary.com/disymrucq/video/upload/v1779008693/hero-bg-1_s9fjwm.mp4",
+  "https://res.cloudinary.com/disymrucq/video/upload/v1779008695/hero-bg-2_apqmbp.mp4",
+  "https://res.cloudinary.com/disymrucq/video/upload/v1779008693/hero-bg-3_qwjvug.mp4",
+  "https://res.cloudinary.com/disymrucq/video/upload/v1779008695/hero-bg-5_ii4mcw.mp4",
+  "https://res.cloudinary.com/disymrucq/video/upload/v1779008694/hero-bg-6_ftjnqy.mp4",
+  "https://res.cloudinary.com/disymrucq/video/upload/v1779008699/hero-bg-7_juctvt.mp4",
 ];
 
 export default function VideoBackground() {
