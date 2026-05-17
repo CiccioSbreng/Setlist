@@ -626,6 +626,36 @@ img {
   margin-top: 2px;
 }
 
+.brand-link {
+  text-decoration: none;
+  transition: filter 0.15s ease, text-shadow 0.15s ease;
+}
+
+.brand-link:hover {
+  filter: brightness(1.12);
+  text-decoration: underline;
+}
+
+.brand-spotify {
+  color: #1ed760;
+}
+
+.brand-spotify:hover {
+  text-shadow: 0 0 16px rgba(30, 215, 96, 0.55);
+}
+
+.brand-youtube {
+  color: #ff3d3d;
+}
+
+.brand-youtube:hover {
+  text-shadow: 0 0 16px rgba(255, 61, 61, 0.55);
+}
+
+.brand-sep {
+  color: var(--text-mute);
+}
+
 /* collage immagini hero */
 .hero__art {
   position: relative;

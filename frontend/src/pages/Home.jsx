@@ -304,7 +304,25 @@ export default function Home() {
                 <div className="l">Eventi da Ticketmaster</div>
               </div>
               <div className="hero__stat">
-                <div className="n">Spotify · YouTube</div>
+                <div className="n">
+                  <a
+                    className="brand-link brand-spotify"
+                    href="https://open.spotify.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Spotify
+                  </a>
+                  <span className="brand-sep"> · </span>
+                  <a
+                    className="brand-link brand-youtube"
+                    href="https://www.youtube.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    YouTube
+                  </a>
+                </div>
                 <div className="l">Anteprime artista</div>
               </div>
               <div className="hero__stat">
