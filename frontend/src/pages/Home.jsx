@@ -11,6 +11,7 @@ import {
   removeFavorite,
 } from "../lib/api";
 import EventCard from "../components/EventCard";
+import EventsMosaicBg from "../components/EventsMosaicBg";
 import DateRangePopover from "../components/DateRangePopover";
 import {
   SearchIcon,
@@ -247,6 +248,7 @@ export default function Home() {
 
   return (
     <>
+      <EventsMosaicBg events={data.events} />
       {/* ===== HERO ===== */}
       <section className="hero">
         <div className="hero__glow" />
