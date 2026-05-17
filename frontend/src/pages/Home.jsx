@@ -260,17 +260,19 @@ export default function Home() {
       {/* ===== HERO ===== */}
       <section className="hero">
         {/* Video background — metti i file in frontend/public/hero-bg-1.mp4 ecc. */}
+        {/* ref callback: workaround per il bug React con l'attributo muted */}
         <video
           key={videoIdx}
           className="hero__video"
+          ref={(el) => { if (el) { el.muted = true; el.play().catch(() => {}); } }}
           autoPlay
-          muted
           playsInline
-          preload="metadata"
+          preload="auto"
           onEnded={() => setVideoIdx((i) => (i + 1) % HERO_VIDEOS.length)}
         >
           <source src={HERO_VIDEOS[videoIdx]} type="video/mp4" />
         </video>
+        <div className="hero__overlay" />
         <div className="hero__glow" />
         <div className="wrap hero__inner">
           <div>
