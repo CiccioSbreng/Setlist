@@ -198,14 +198,18 @@ export default function EventDetail() {
     if (lat == null || lon == null) return;
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 8000);
-    const q = `[out:json][timeout:8];(node(around:1000,${lat},${lon})[amenity~"restaurant|bar|cafe|fast_food|pub"][name];);out 6;`;
+    const q = `[out:json][timeout:10];(node(around:2000,${lat},${lon})[amenity~"restaurant|bar|cafe|fast_food|pub|pizzeria"][name];way(around:2000,${lat},${lon})[amenity~"restaurant|bar|cafe|fast_food|pub|pizzeria"][name];);out center 6;`;
     fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`, { signal: ctrl.signal })
       .then((r) => r.json())
       .then((data) => {
         const items = (data.elements || [])
           .filter((el) => el.tags?.name)
           .slice(0, 6)
-          .map((el) => ({ id: el.id, name: el.tags.name, type: el.tags.amenity, lat: el.lat, lon: el.lon }));
+          .map((el) => {
+            const elLat = el.lat ?? el.center?.lat;
+            const elLon = el.lon ?? el.center?.lon;
+            return { id: el.id, name: el.tags.name, type: el.tags.amenity, lat: elLat, lon: elLon };
+          });
         setRestaurants(items);
       })
       .catch(() => {})
