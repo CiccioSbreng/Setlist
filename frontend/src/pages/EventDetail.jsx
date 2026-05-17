@@ -205,7 +205,7 @@ export default function EventDetail() {
         const items = (data.elements || [])
           .filter((el) => el.tags?.name)
           .slice(0, 6)
-          .map((el) => ({ id: el.id, name: el.tags.name, type: el.tags.amenity }));
+          .map((el) => ({ id: el.id, name: el.tags.name, type: el.tags.amenity, lat: el.lat, lon: el.lon }));
         setRestaurants(items);
       })
       .catch(() => {})
@@ -663,11 +663,17 @@ export default function EventDetail() {
                 <ul className="ed-tile__list">
                   {restaurants.map((r) => (
                     <li key={r.id}>
-                      <div className="ed-tile__row ed-tile__row--static">
+                      <a
+                        href={r.lat ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lon}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ed-tile__row"
+                      >
                         <ForkIcon size={14} />
                         <span>{r.name}</span>
                         <small className="ed-tile__tag">{r.type === "fast_food" ? "fast food" : r.type}</small>
-                      </div>
+                        <ArrowRightIcon size={12} />
+                      </a>
                     </li>
                   ))}
                 </ul>
