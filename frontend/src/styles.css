@@ -2811,6 +2811,72 @@ input.input[type="date"] {
   white-space: nowrap;
 }
 
+/* ── Hotel offers (Amadeus) ──────────────────────────────────────── */
+.ed-hotels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.ed-hotel__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  text-decoration: none;
+  transition: background .15s;
+}
+
+.ed-hotel__row:hover {
+  background: rgba(139,92,246,.12);
+}
+
+.ed-hotel__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ed-hotel__name {
+  font-size: 0.82rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.ed-hotel__stars {
+  font-size: 0.65rem;
+  color: #f59e0b;
+  letter-spacing: 1px;
+}
+
+.ed-hotel__price {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--brand-light, #a78bfa);
+  white-space: nowrap;
+}
+
+.ed-hotel__night {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--text-mute);
+}
+
+.ed-hotels__note {
+  font-size: 0.68rem;
+  color: var(--text-mute);
+  margin: 4px 0 0;
+  padding: 0 4px;
+}
+
 .ed-tile__sleep {
   display: flex;
   flex-direction: column;
