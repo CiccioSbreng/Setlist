@@ -25,6 +25,12 @@ services:
         sync: false
       - key: SETLIST_API_KEY
         sync: false          # opzionale: scaletta probabile (setlist.fm)
+      - key: GOOGLE_MAPS_KEY
+        sync: false          # Distance Matrix: tempo/distanza reali casa→venue
+      - key: AMADEUS_KEY
+        sync: false          # Amadeus hotel search (sandbox)
+      - key: AMADEUS_SECRET
+        sync: false
       - key: CLIENT_ORIGIN
         sync: false          # es: https://concerthub-frontend.onrender.com
 
