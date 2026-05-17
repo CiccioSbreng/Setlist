@@ -22,6 +22,8 @@ import {
   TicketIcon,
   ArrowRightIcon,
   RefreshIcon,
+  SpotifyIcon,
+  YoutubeIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -311,6 +313,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
+                    <SpotifyIcon size={20} />
                     Spotify
                   </a>
                   <span className="brand-sep"> · </span>
@@ -320,6 +323,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
+                    <YoutubeIcon size={20} />
                     YouTube
                   </a>
                 </div>

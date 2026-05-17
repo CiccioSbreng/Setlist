@@ -626,7 +626,22 @@ img {
   margin-top: 2px;
 }
 
+.hero__stat {
+  transition: transform 0.18s ease;
+}
+
+.hero__stat:hover {
+  transform: translateY(-3px);
+}
+
+.hero__stat:hover .l {
+  color: var(--text-dim);
+}
+
 .brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   text-decoration: none;
   transition: filter 0.15s ease, text-shadow 0.15s ease;
 }
