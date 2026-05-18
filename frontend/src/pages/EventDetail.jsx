@@ -4,6 +4,7 @@ import { getEvent, addFavorite, removeFavorite, getFavorites } from "../lib/api"
 import { formatWhen, formatPrice, getDaysLeft } from "../lib/format";
 import { useArtistMedia } from "../hooks/useArtistMedia";
 import { useVenueData } from "../hooks/useVenueData";
+import { useTilt } from "../hooks/useTilt";
 import {
   CalendarIcon, ClockIcon, PinIcon, TicketIcon,
   HeartIcon, ArrowRightIcon, SearchIcon,
@@ -26,6 +27,7 @@ export default function EventDetail() {
 
   const media = useArtistMedia(ev);
   const venue = useVenueData(ev);
+  const heroRef = useTilt({ max: 7 });
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
@@ -134,35 +136,61 @@ export default function EventDetail() {
       <div className="wrap">
         <Link to="/home" className="ed-back">← Tutti gli eventi</Link>
 
-        {/* HERO */}
-        <div className={`ed-hero${!ev.image ? " ed-hero--noimg" : ""}`}>
-          {ev.image && <img className="ed-hero__img" src={ev.image} alt={ev.name} />}
-          <div className="ed-hero__overlay">
-            <div className="ed-hero__inner">
-              <div className="ed__tags">
-                {ev.segment && <span className="tag">{ev.segment}</span>}
-                {ev.genre && <span className="tag">{ev.genre}</span>}
-                {ev.status === "cancelled" && <span className="tag tag--warn">Annullato</span>}
+        {/* HERO 3D */}
+        <div className="ed-stage">
+          <div ref={heroRef} className={`ed-hero${!ev.image ? " ed-hero--noimg" : ""}`}>
+            {ev.image && (
+              <div className="ed-hero__media">
+                <img className="ed-hero__img" src={ev.image} alt={ev.name} />
               </div>
-              <h1 className="ed-hero__title">{ev.name}</h1>
-              {ev.lineup?.length > 1 && <p className="ed-hero__lineup">{ev.lineup.join(" · ")}</p>}
-              <div className="ed-hero__when">
-                <CalendarIcon size={15} /><span>{when.dateLabel}</span>
-                {when.timeLabel && <><span className="ed-hero__sep">·</span><ClockIcon size={15} /><span>Ore {when.timeLabel}</span></>}
-                {daysLeft && <span className="ed-hero__countdown">{daysLeft}</span>}
+            )}
+            <div className="ed-hero__glow" aria-hidden="true" />
+            <div className="ed-hero__overlay">
+              <div className="ed-hero__inner">
+                <div className="ed__tags">
+                  {ev.segment && <span className="tag">{ev.segment}</span>}
+                  {ev.genre && <span className="tag">{ev.genre}</span>}
+                  {ev.status === "cancelled" && <span className="tag tag--warn">Annullato</span>}
+                </div>
+                <h1 className="ed-hero__title">{ev.name}</h1>
+                {ev.lineup?.length > 1 && <p className="ed-hero__lineup">{ev.lineup.join(" · ")}</p>}
+                <div className="ed-hero__when">
+                  <CalendarIcon size={15} /><span>{when.dateLabel}</span>
+                  {when.timeLabel && <><span className="ed-hero__sep">·</span><ClockIcon size={15} /><span>Ore {when.timeLabel}</span></>}
+                  {daysLeft && <span className="ed-hero__countdown">{daysLeft}</span>}
+                </div>
               </div>
             </div>
+            <div className="ed-hero__glare" aria-hidden="true" />
           </div>
         </div>
 
-        {/* TABS */}
-        <div className="ed-tabs">
-          {[["evento","Evento"],["artista","Artista"],["dove","Dove & Come"]].map(([tab, label]) => (
-            <button key={tab} type="button" className={`ed-tabs__btn${activeTab === tab ? " active" : ""}`}
-              onClick={() => { setActiveTab(tab); document.getElementById(`section-${tab}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
-              {label}
+        {/* BARRA: navigazione + azioni primarie */}
+        <div className="ed-bar">
+          <nav className="ed-bar__nav">
+            {[["evento","Evento"],["artista","Artista"],["dove","Dove & Come"]].map(([tab, label]) => (
+              <button key={tab} type="button" className={`ed-bar__tab${activeTab === tab ? " active" : ""}`}
+                onClick={() => { setActiveTab(tab); document.getElementById(`section-${tab}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div className="ed-bar__actions">
+            {ev.url && (
+              <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary">
+                <TicketIcon size={18} />Biglietti<ArrowRightIcon size={18} />
+              </a>
+            )}
+            <button type="button" className={`btn ${isFav ? "btn--fav-active" : "btn--ghost"}`} onClick={handleFav}>
+              <HeartIcon size={18} filled={isFav} />{isFav ? "Nei preferiti" : "Salva"}
             </button>
-          ))}
+            <button type="button" className="btn btn--ghost" onClick={shareEvent}>
+              <ShareIcon size={18} />{shareMsg || "Condividi"}
+            </button>
+            <button type="button" className="btn btn--ghost" onClick={openGoogleCalendar}>
+              <DownloadIcon size={18} />Calendario
+            </button>
+          </div>
         </div>
 
         {/* EVENTO */}
@@ -171,22 +199,6 @@ export default function EventDetail() {
             <div className="ed__meta">
               <div className="ed__row"><PinIcon size={18} /><span>{[v.name, v.address, v.city].filter(Boolean).join(" · ") || "Location da annunciare"}</span></div>
               {price && <div className="ed__row"><TicketIcon size={18} /><span>{price}</span></div>}
-            </div>
-            <div className="ed__actions">
-              {ev.url && (
-                <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary">
-                  <TicketIcon size={18} />Biglietti su Ticketmaster<ArrowRightIcon size={18} />
-                </a>
-              )}
-              <button type="button" className={`btn ${isFav ? "btn--fav-active" : "btn--ghost"}`} onClick={handleFav}>
-                <HeartIcon size={18} filled={isFav} />{isFav ? "Nei preferiti" : "Salva"}
-              </button>
-              <button type="button" className="btn btn--ghost" onClick={shareEvent}>
-                <ShareIcon size={18} />{shareMsg || "Condividi"}
-              </button>
-              <button type="button" className="btn btn--ghost" onClick={openGoogleCalendar}>
-                <DownloadIcon size={18} />Aggiungi al calendario
-              </button>
             </div>
             {favMsg && (
               <div className={`banner ${favMsg.startsWith("Aggiunto") ? "banner--ok" : "banner--error"}`} style={{ marginTop: 16 }}>
