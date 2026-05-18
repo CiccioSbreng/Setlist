@@ -59,7 +59,24 @@ router.get('/artist', async (req, res) => {
       image: artist.images?.[0]?.url || null,
       embedUrl: `https://open.spotify.com/embed/artist/${artist.id}?utm_source=generator&theme=0`,
       externalUrl: artist.external_urls?.spotify || null,
+      topTracks: [],
     };
+
+    try {
+      const { data: tt } = await axios.get(
+        `https://api.spotify.com/v1/artists/${artist.id}/top-tracks`,
+        { params: { market: 'IT' }, headers: { Authorization: `Bearer ${token}` } }
+      );
+      out.topTracks = (tt.tracks || []).slice(0, 5).map((t) => ({
+        id: t.id,
+        name: t.name,
+        preview: t.preview_url || null,
+        url: t.external_urls?.spotify || null,
+        image: t.album?.images?.slice(-1)[0]?.url || null,
+      }));
+    } catch {
+      // top-tracks opzionale: se fallisce, lasciamo l'array vuoto
+    }
 
     artistCache.set(cacheKey, out);
     res.json(out);

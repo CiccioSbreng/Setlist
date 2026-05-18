@@ -34,3 +34,7 @@ frontend/public/*.mp4
 # --- Altro ---
 coverage/
 tmp/
+
+# --- AI tooling (non in repo) ---
+CLAUDE.md
+.claude/

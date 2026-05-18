@@ -23,6 +23,10 @@ services:
         sync: false
       - key: SPOTIFY_CLIENT_SECRET
         sync: false
+      - key: SETLIST_API_KEY
+        sync: false          # opzionale: scaletta probabile (setlist.fm)
+      - key: ORS_API_KEY
+        sync: false          # OpenRouteService: distanza/tempo reali casa→venue (gratuito)
       - key: CLIENT_ORIGIN
         sync: false          # es: https://concerthub-frontend.onrender.com
 
