@@ -60,17 +60,14 @@ async function checkOpenMeteo() {
   )) };
 }
 
-async function checkGoogleMaps(key) {
+async function checkOpenRoute(key) {
   if (!key) return { configured: false };
-  return { configured: true, ...(await probe(async () => {
-    const r = await axios.get('https://maps.googleapis.com/maps/api/distancematrix/json',
-      { params: { origins: 'Roma', destinations: 'Milano', key }, timeout: T });
-    if (r.data?.status === 'REQUEST_DENIED') {
-      const err = new Error('chiave non valida');
-      err.response = { status: 403 };
-      throw err;
-    }
-  })) };
+  return { configured: true, ...(await probe(() =>
+    axios.get('https://api.openrouteservice.org/geocode/search', {
+      params: { api_key: key, text: 'Roma', 'boundary.country': 'IT', size: 1 },
+      timeout: T,
+    })
+  )) };
 }
 
 async function runChecks() {
@@ -81,7 +78,7 @@ async function runChecks() {
     ['YouTube',      checkYouTube(e.YOUTUBE_API_KEY)],
     ['Setlist.fm',   checkSetlist(e.SETLIST_API_KEY)],
     ['Open-Meteo',   checkOpenMeteo()],
-    ['Google Maps',  checkGoogleMaps(e.GOOGLE_MAPS_KEY)],
+    ['OpenRoute',    checkOpenRoute(e.ORS_API_KEY)],
   ];
 
   const settled = await Promise.allSettled(tasks.map(([, p]) => p));

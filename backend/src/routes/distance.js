@@ -1,12 +1,22 @@
 const router = require('express').Router();
 const axios = require('axios');
 
-// Costo medio auto stimato a km (carburante + usura). Indicativo.
-const COST_PER_KM = 0.20;
+const COST_PER_KM = 0.20; // €/km stimato (carburante + usura)
+const BASE = 'https://api.openrouteservice.org';
 
-// Tempo e distanza reali origine -> venue (Google Distance Matrix).
+async function geocode(text, key) {
+  const r = await axios.get(`${BASE}/geocode/search`, {
+    params: { api_key: key, text, 'boundary.country': 'IT', size: 1 },
+    timeout: 6000,
+  });
+  const coords = r.data?.features?.[0]?.geometry?.coordinates;
+  if (!coords) throw new Error('city_not_found');
+  return coords; // [lon, lat]
+}
+
+// GET /api/distance?origin=Bologna&lat=45.46&lon=9.19
 router.get('/', async (req, res) => {
-  const key = process.env.GOOGLE_MAPS_KEY;
+  const key = process.env.ORS_API_KEY;
   if (!key) return res.status(503).json({ error: 'not_configured' });
 
   const { origin, lat, lon } = req.query;
@@ -14,39 +24,40 @@ router.get('/', async (req, res) => {
   if (!lat || !lon) return res.status(400).json({ error: 'lat/lon required' });
 
   try {
-    const r = await axios.get(
-      'https://maps.googleapis.com/maps/api/distancematrix/json',
-      {
-        params: {
-          origins: origin,
-          destinations: `${lat},${lon}`,
-          mode: 'driving',
-          units: 'metric',
-          language: 'it',
-          key,
-        },
-        timeout: 8000,
-      }
-    );
+    const [oLon, oLat] = await geocode(origin, key);
 
-    const el = r.data?.rows?.[0]?.elements?.[0];
-    if (!el || el.status !== 'OK') {
-      return res.json({ status: 'not_found' });
-    }
+    const r = await axios.get(`${BASE}/v2/directions/driving-car`, {
+      params: {
+        api_key: key,
+        start: `${oLon},${oLat}`,
+        end: `${lon},${lat}`,
+      },
+      timeout: 10000,
+    });
 
-    const km = el.distance.value / 1000;
-    const minutes = Math.round(el.duration.value / 60);
-    const costRound = Math.round(km * 2 * COST_PER_KM);
+    const summary = r.data?.features?.[0]?.properties?.summary;
+    if (!summary) return res.json({ status: 'not_found' });
+
+    const km = summary.distance / 1000;
+    const minutes = Math.round(summary.duration / 60);
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    const durationText = h > 0 ? `${h}h ${m}min` : `${m} min`;
+    const distanceText = `${Math.round(km)} km`;
+    const cost = Math.round(km * 2 * COST_PER_KM);
 
     res.json({
       status: 'ok',
       km: Math.round(km),
-      distanceText: el.distance.text,
+      distanceText,
       minutes,
-      durationText: el.duration.text,
-      cost: costRound, // andata + ritorno
+      durationText,
+      cost,
     });
-  } catch {
+  } catch (e) {
+    if (e.message === 'city_not_found') return res.json({ status: 'not_found' });
+    const s = e.response?.status;
+    if (s === 403) return res.status(403).json({ error: 'invalid_key' });
     res.status(502).json({ status: 'error' });
   }
 });
