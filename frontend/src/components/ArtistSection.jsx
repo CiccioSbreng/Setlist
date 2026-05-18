@@ -6,62 +6,92 @@ import {
   ListMusicIcon, MusicIcon, SpotifyIcon, YoutubeIcon,
 } from "./Icons";
 
+function compact(n) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".0", "")}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(".0", "")}K`;
+  return String(n);
+}
+
 export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, ytVideos, setlistData, otherDates }) {
   const [bioExpanded, setBioExpanded] = useState(false);
 
   return (
-    <div id="section-artista" className="ed-section">
+    <div id="section-artista" className="ed-section ed-stack">
       {artist && (
-        <div className="ed-artist">
-          {artist.image && <img className="ed-artist__img" src={artist.image} alt={artist.name} loading="lazy" />}
-          <div className="ed-artist__body">
-            <span className="eyebrow"><MusicIcon size={14} /> Artista</span>
-            <h2>{artist.name}</h2>
-            {artist.genre && <p className="ed-artist__genre">{artist.genre}</p>}
-            {artistBio && (
-              <>
-                <p className={`ed-artist__bio${bioExpanded ? " ed-artist__bio--expanded" : ""}`}>{artistBio}</p>
-                <button type="button" className="ed-artist__bio-toggle" onClick={() => setBioExpanded((v) => !v)}>
-                  {bioExpanded ? "Riduci ▲" : "Leggi di più ▼"}
-                </button>
-              </>
+        <div className="ed-aphero">
+          {artist.image && (
+            <div className="ed-aphero__bg" style={{ backgroundImage: `url(${artist.image})` }} aria-hidden="true" />
+          )}
+          <div className="ed-aphero__inner">
+            {artist.image && (
+              <img className="ed-aphero__photo" src={artist.image} alt={artist.name} loading="lazy" />
             )}
-            <div className="ed-artist__links">
-              {artist.links?.instagram && (
-                <a href={artist.links.instagram} target="_blank" rel="noreferrer" className="ed-artist__link ed-artist__link--ig">
-                  <InstagramIcon size={15} />Instagram
-                </a>
+            <div className="ed-aphero__body">
+              <span className="ed-eyebrow"><MusicIcon size={13} /> Artista</span>
+              <h2 className="ed-aphero__name">{artist.name}</h2>
+              {artist.genre && <p className="ed-aphero__genre">{artist.genre}</p>}
+
+              {spotifyArtist && (spotifyArtist.followers > 0 || spotifyArtist.genres?.length > 0) && (
+                <div className="ed-stats">
+                  {spotifyArtist.followers > 0 && (
+                    <div className="ed-stat">
+                      <b>{compact(spotifyArtist.followers)}</b>
+                      <span>follower Spotify</span>
+                    </div>
+                  )}
+                  {spotifyArtist.genres?.[0] && (
+                    <div className="ed-stat">
+                      <b>{spotifyArtist.genres[0]}</b>
+                      <span>genere</span>
+                    </div>
+                  )}
+                </div>
               )}
-              {artist.links?.homepage && (
-                <a href={artist.links.homepage} target="_blank" rel="noreferrer" className="ed-artist__link">
-                  <GlobeIcon size={15} />Sito ufficiale
-                </a>
+
+              {artistBio && (
+                <>
+                  <p className={`ed-aphero__bio${bioExpanded ? " is-open" : ""}`}>{artistBio}</p>
+                  <button type="button" className="ed-link-btn" onClick={() => setBioExpanded((v) => !v)}>
+                    {bioExpanded ? "Riduci ▲" : "Leggi di più ▼"}
+                  </button>
+                </>
               )}
-              {artist.links?.twitter && (
-                <a href={artist.links.twitter} target="_blank" rel="noreferrer" className="ed-artist__link">Twitter / X</a>
-              )}
-              {artist.links?.facebook && (
-                <a href={artist.links.facebook} target="_blank" rel="noreferrer" className="ed-artist__link">Facebook</a>
-              )}
+
+              <div className="ed-aphero__links">
+                {artist.links?.instagram && (
+                  <a href={artist.links.instagram} target="_blank" rel="noreferrer" className="ed-chip ed-chip--ig">
+                    <InstagramIcon size={15} />Instagram
+                  </a>
+                )}
+                {artist.links?.homepage && (
+                  <a href={artist.links.homepage} target="_blank" rel="noreferrer" className="ed-chip">
+                    <GlobeIcon size={15} />Sito ufficiale
+                  </a>
+                )}
+                {artist.links?.twitter && (
+                  <a href={artist.links.twitter} target="_blank" rel="noreferrer" className="ed-chip">Twitter / X</a>
+                )}
+                {artist.links?.facebook && (
+                  <a href={artist.links.facebook} target="_blank" rel="noreferrer" className="ed-chip">Facebook</a>
+                )}
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {spotifyArtist && (
-        <div className="ed-spotify">
-          <div className="ed-spotify__header">
-            <h3><SpotifyIcon size={16} />Ascolta su Spotify</h3>
-            <div className="ed-spotify__meta">
-              {spotifyArtist.genres?.length > 0 && (
-                <div className="ed-spotify__genres">
-                  {spotifyArtist.genres.map((g) => <span key={g} className="tag tag--sm">{g}</span>)}
-                </div>
-              )}
-              {spotifyArtist.followers > 0 && (
-                <span className="ed-spotify__followers">{spotifyArtist.followers.toLocaleString("it-IT")} follower</span>
-              )}
+        <section className="ed-block">
+          <div className="ed-block__head">
+            <div>
+              <span className="ed-eyebrow ed-eyebrow--sp"><SpotifyIcon size={13} /> Musica</span>
+              <h3 className="ed-block__title">Ascolta {artist?.name || "l'artista"}</h3>
             </div>
+            {spotifyArtist.externalUrl && (
+              <a href={spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--sp">
+                <SpotifyIcon size={14} />Apri su Spotify<ArrowRightIcon size={14} />
+              </a>
+            )}
           </div>
           <iframe
             title="Player Spotify"
@@ -85,37 +115,41 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
               ))}
             </ul>
           )}
-          {spotifyArtist.externalUrl && (
-            <a href={spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-spotify__open">
-              <SpotifyIcon size={14} />Apri su Spotify<ArrowRightIcon size={14} />
-            </a>
-          )}
-        </div>
+        </section>
       )}
 
       {ytVideos.length > 0 && (
-        <div className="ed-yt">
-          <h3><YoutubeIcon size={16} />Ultimo video</h3>
-          <iframe
-            className="ed-yt__embed"
-            src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
-            title={ytVideos[0].title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-          <a href={`https://www.youtube.com/watch?v=${ytVideos[0].id}`} target="_blank" rel="noreferrer" className="ed-yt__open">
-            <YoutubeIcon size={14} />Apri su YouTube<ArrowRightIcon size={14} />
-          </a>
-        </div>
+        <section className="ed-block">
+          <div className="ed-block__head">
+            <div>
+              <span className="ed-eyebrow ed-eyebrow--yt"><YoutubeIcon size={13} /> Video</span>
+              <h3 className="ed-block__title">Ultimo video</h3>
+            </div>
+            <a href={`https://www.youtube.com/watch?v=${ytVideos[0].id}`} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--yt">
+              <YoutubeIcon size={14} />Apri su YouTube<ArrowRightIcon size={14} />
+            </a>
+          </div>
+          <div className="ed-video">
+            <iframe
+              src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
+              title={ytVideos[0].title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </section>
       )}
 
       {setlistData?.songs?.length > 0 && (
-        <div className="ed-setlist">
-          <div className="ed-setlist__head">
-            <h3><ListMusicIcon size={16} />Scaletta probabile</h3>
+        <section className="ed-block">
+          <div className="ed-block__head">
+            <div>
+              <span className="ed-eyebrow"><ListMusicIcon size={13} /> Scaletta</span>
+              <h3 className="ed-block__title">Cosa potrebbe suonare</h3>
+            </div>
             {setlistData.event && (
-              <span className="ed-setlist__meta">
-                da {setlistData.event.venue}{setlistData.event.city ? `, ${setlistData.event.city}` : ""}
+              <span className="ed-block__meta">
+                ultimo live: {setlistData.event.venue}{setlistData.event.city ? `, ${setlistData.event.city}` : ""}
               </span>
             )}
           </div>
@@ -128,12 +162,17 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
               </li>
             ))}
           </ol>
-        </div>
+        </section>
       )}
 
       {otherDates.length > 0 && (
-        <div className="ed-dates">
-          <h2>Prossime date{artist?.name ? ` di ${artist.name}` : ""}</h2>
+        <section className="ed-block">
+          <div className="ed-block__head">
+            <div>
+              <span className="ed-eyebrow"><CalendarIcon size={13} /> Tour</span>
+              <h3 className="ed-block__title">Prossime date{artist?.name ? ` di ${artist.name}` : ""}</h3>
+            </div>
+          </div>
           <ul className="ed-dates__list">
             {otherDates.map((e) => {
               const w = formatWhen(e.date, e.time);
@@ -148,7 +187,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
               );
             })}
           </ul>
-        </div>
+        </section>
       )}
     </div>
   );
