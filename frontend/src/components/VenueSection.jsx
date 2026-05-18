@@ -32,173 +32,186 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
     ? `https://www.airbnb.it/s/${encodeURIComponent(v.city)}/homes${checkin ? `?checkin=${checkin}&checkout=${checkout}` : ""}`
     : null;
 
+  const mapsSearch = (item) =>
+    item.lat
+      ? `https://www.google.com/maps/search/?api=1&query=${item.lat},${item.lon}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name)}`;
+
   return (
-    <div id="section-dove" className="ed-section">
-      <div className="ed-grid4">
+    <div id="section-dove" className="ed-section ed-stack">
 
-        {weather?.status === "ok" && (
-          <div className="ed-tile">
-            <div className="ed-tile__head"><CloudIcon size={16} /><span>Meteo del concerto</span></div>
-            <div className="ed-wx">
-              <div className="ed-wx__main">
-                <span className="ed-wx__icon" aria-hidden="true">{weather.icon}</span>
-                <div>
-                  <div className="ed-wx__temp">{weather.tMax}° <span>/ {weather.tMin}°</span></div>
-                  <div className="ed-wx__desc">{weather.desc}</div>
-                </div>
-              </div>
-              <div className="ed-wx__meta">
-                <span>💧 {weather.precip}% pioggia</span>
-                <span>💨 {weather.wind} km/h</span>
-              </div>
+      {(weather?.status === "ok" || hasGeo) && (
+        <section className="ed-block">
+          <div className="ed-block__head">
+            <div>
+              <span className="ed-eyebrow"><PinIcon size={13} /> Sul posto</span>
+              <h3 className="ed-block__title">Meteo e come arrivare</h3>
             </div>
-          </div>
-        )}
-
-        {hasGeo && (
-          <div className="ed-tile">
-            <div className="ed-tile__head">
-              <PinIcon size={16} /><span>Come arrivare</span>
-              <div className="ed-tile__links">
-                <a href={gdir} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Indicazioni</a>
-              </div>
-            </div>
-            {showMap ? (
-              <iframe title="Mappa del venue" className="ed-tile__map" src={osmSrc} />
-            ) : (
-              <button type="button" className="ed-tile__map-preview" onClick={() => setShowMap(true)}>
-                <PinIcon size={24} />
-                <span>Mostra mappa</span>
-                {(v.address || v.city) && <small>{[v.address, v.city].filter(Boolean).join(" · ")}</small>}
-              </button>
+            {gdir && (
+              <a href={gdir} target="_blank" rel="noreferrer" className="ed-block__cta">
+                Indicazioni<ArrowRightIcon size={14} />
+              </a>
             )}
           </div>
-        )}
 
-        {parks.length > 0 && (
-          <div className="ed-tile">
-            <div className="ed-tile__head"><TreeIcon size={16} /><span>Parchi e verde</span></div>
-            <ul className="ed-tile__list">
-              {parks.map((p) => (
-                <li key={p.id}>
-                  <a href={`https://www.openstreetmap.org/${p.type}/${p.id}`} target="_blank" rel="noreferrer" className="ed-tile__row">
-                    <TreeIcon size={14} /><span>{p.name}</span><ArrowRightIcon size={12} />
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <div className="ed-place">
+            {weather?.status === "ok" && (
+              <div className="ed-wx">
+                <span className="ed-wx__icon" aria-hidden="true">{weather.icon}</span>
+                <div className="ed-wx__body">
+                  <div className="ed-wx__temp">{weather.tMax}° <span>/ {weather.tMin}°</span></div>
+                  <div className="ed-wx__desc">{weather.desc}</div>
+                  <div className="ed-wx__meta">
+                    <span>💧 {weather.precip}% pioggia</span>
+                    <span>💨 {weather.wind} km/h</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {hasGeo && (
+              <div className="ed-mapwrap">
+                {showMap ? (
+                  <iframe title="Mappa del venue" className="ed-mapwrap__frame" src={osmSrc} />
+                ) : (
+                  <button type="button" className="ed-mapwrap__cta" onClick={() => setShowMap(true)}>
+                    <PinIcon size={26} />
+                    <span>Mostra mappa</span>
+                    {(v.address || v.city) && <small>{[v.address, v.city].filter(Boolean).join(" · ")}</small>}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
-        )}
+        </section>
+      )}
 
-        {restaurants.length > 0 && (
-          <div className="ed-tile">
-            <div className="ed-tile__head"><ForkIcon size={16} /><span>Dove mangiare</span></div>
-            <ul className="ed-tile__list">
-              {restaurants.map((r) => (
-                <li key={r.id}>
-                  <a
-                    href={r.lat ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lon}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name)}`}
-                    target="_blank" rel="noreferrer" className="ed-tile__row"
-                  >
-                    <ForkIcon size={14} />
-                    <span>{r.name}</span>
-                    <small className="ed-tile__tag">{r.type === "fast_food" ? "fast food" : r.type}</small>
-                    <ArrowRightIcon size={12} />
-                  </a>
-                </li>
-              ))}
-            </ul>
+      {(parks.length > 0 || restaurants.length > 0 || parkings.length > 0) && (
+        <section className="ed-block">
+          <div className="ed-block__head">
+            <div>
+              <span className="ed-eyebrow"><TreeIcon size={13} /> Dintorni</span>
+              <h3 className="ed-block__title">Cosa c'è intorno al venue</h3>
+            </div>
           </div>
-        )}
-
-        {parkings.length > 0 && (
-          <div className="ed-tile">
-            <div className="ed-tile__head"><PinIcon size={16} /><span>Dove parcheggiare</span></div>
-            <ul className="ed-tile__list">
-              {parkings.map((p) => (
-                <li key={p.id}>
-                  <a
-                    href={p.lat ? `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}`}
-                    target="_blank" rel="noreferrer" className="ed-tile__row"
-                  >
-                    <PinIcon size={14} /><span>{p.name}</span><ArrowRightIcon size={12} />
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <div className="ed-cols">
+            {parks.length > 0 && (
+              <div className="ed-col">
+                <div className="ed-col__head"><TreeIcon size={15} />Parchi e verde</div>
+                <ul className="ed-col__list">
+                  {parks.map((p) => (
+                    <li key={p.id}>
+                      <a href={`https://www.openstreetmap.org/${p.type}/${p.id}`} target="_blank" rel="noreferrer" className="ed-col__row">
+                        <span>{p.name}</span><ArrowRightIcon size={12} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {restaurants.length > 0 && (
+              <div className="ed-col">
+                <div className="ed-col__head"><ForkIcon size={15} />Dove mangiare</div>
+                <ul className="ed-col__list">
+                  {restaurants.map((r) => (
+                    <li key={r.id}>
+                      <a href={mapsSearch(r)} target="_blank" rel="noreferrer" className="ed-col__row">
+                        <span>{r.name}</span>
+                        <small className="ed-col__tag">{r.type === "fast_food" ? "fast food" : r.type}</small>
+                        <ArrowRightIcon size={12} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {parkings.length > 0 && (
+              <div className="ed-col">
+                <div className="ed-col__head"><PinIcon size={15} />Dove parcheggiare</div>
+                <ul className="ed-col__list">
+                  {parkings.map((p) => (
+                    <li key={p.id}>
+                      <a href={mapsSearch(p)} target="_blank" rel="noreferrer" className="ed-col__row">
+                        <span>{p.name}</span><ArrowRightIcon size={12} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
-        )}
+        </section>
+      )}
 
-        {(bookingUrl || airbnbUrl) && (
-          <div className="ed-tile">
-            <div className="ed-tile__head"><BedIcon size={16} /><span>Dove dormire</span></div>
-            <div className="ed-tile__sleep">
-              {bookingUrl && (
-                <a href={bookingUrl} target="_blank" rel="noreferrer" className="ed-tile__sleep-card">
-                  <div className="ed-tile__sleep-icon"><BedIcon size={20} /></div>
-                  <div>
-                    <div className="ed-tile__sleep-title">Booking.com</div>
-                    <div className="ed-tile__sleep-sub">Hotel, B&amp;B e appartamenti</div>
+      {(bookingUrl || airbnbUrl || hasGeo) && (
+        <section className="ed-block">
+          <div className="ed-block__head">
+            <div>
+              <span className="ed-eyebrow"><BedIcon size={13} /> Logistica</span>
+              <h3 className="ed-block__title">Dormi e spostati</h3>
+            </div>
+          </div>
+          <div className="ed-svc">
+            {bookingUrl && (
+              <a href={bookingUrl} target="_blank" rel="noreferrer" className="ed-svc__card">
+                <div className="ed-svc__icon"><BedIcon size={20} /></div>
+                <div className="ed-svc__txt">
+                  <div className="ed-svc__title">Booking.com</div>
+                  <div className="ed-svc__sub">Hotel, B&amp;B e appartamenti</div>
+                </div>
+                <ArrowRightIcon size={16} />
+              </a>
+            )}
+            {airbnbUrl && (
+              <a href={airbnbUrl} target="_blank" rel="noreferrer" className="ed-svc__card">
+                <div className="ed-svc__icon"><GlobeIcon size={20} /></div>
+                <div className="ed-svc__txt">
+                  <div className="ed-svc__title">Airbnb</div>
+                  <div className="ed-svc__sub">Case e stanze a {v.city || "destinazione"}</div>
+                </div>
+                <ArrowRightIcon size={16} />
+              </a>
+            )}
+            {hasGeo && (
+              <>
+                <a href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${v.lat}&dropoff[longitude]=${v.lon}&dropoff[nickname]=${encodeURIComponent(v.name || "Venue")}`} target="_blank" rel="noreferrer" className="ed-svc__card">
+                  <div className="ed-svc__icon ed-svc__icon--dark">Ub</div>
+                  <div className="ed-svc__txt">
+                    <div className="ed-svc__title">Uber</div>
+                    <div className="ed-svc__sub">Prenota un passaggio</div>
                   </div>
                   <ArrowRightIcon size={16} />
                 </a>
-              )}
-              {airbnbUrl && (
-                <a href={airbnbUrl} target="_blank" rel="noreferrer" className="ed-tile__sleep-card">
-                  <div className="ed-tile__sleep-icon"><GlobeIcon size={20} /></div>
-                  <div>
-                    <div className="ed-tile__sleep-title">Airbnb</div>
-                    <div className="ed-tile__sleep-sub">Case e stanze a {v.city || "destinazione"}</div>
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lon}&travelmode=transit`} target="_blank" rel="noreferrer" className="ed-svc__card">
+                  <div className="ed-svc__icon ed-svc__icon--bus">BUS</div>
+                  <div className="ed-svc__txt">
+                    <div className="ed-svc__title">Trasporto pubblico</div>
+                    <div className="ed-svc__sub">Indicazioni con Google Maps</div>
                   </div>
                   <ArrowRightIcon size={16} />
                 </a>
-              )}
-            </div>
+                <a href="https://free-now.com" target="_blank" rel="noreferrer" className="ed-svc__card">
+                  <div className="ed-svc__icon ed-svc__icon--free">FREE</div>
+                  <div className="ed-svc__txt">
+                    <div className="ed-svc__title">FREE NOW</div>
+                    <div className="ed-svc__sub">Taxi e NCC</div>
+                  </div>
+                  <ArrowRightIcon size={16} />
+                </a>
+              </>
+            )}
           </div>
-        )}
-
-        {hasGeo && (
-          <div className="ed-tile">
-            <div className="ed-tile__head"><GlobeIcon size={16} /><span>Come spostarsi</span></div>
-            <div className="ed-tile__sleep">
-              <a href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${v.lat}&dropoff[longitude]=${v.lon}&dropoff[nickname]=${encodeURIComponent(v.name || "Venue")}`} target="_blank" rel="noreferrer" className="ed-tile__sleep-card">
-                <div className="ed-tile__sleep-icon" style={{ background: "rgba(0,0,0,0.3)" }}>
-                  <span style={{ fontWeight: 800, fontSize: "0.9rem", letterSpacing: "-0.03em" }}>Ub</span>
-                </div>
-                <div>
-                  <div className="ed-tile__sleep-title">Uber</div>
-                  <div className="ed-tile__sleep-sub">Prenota un passaggio</div>
-                </div>
-                <ArrowRightIcon size={16} />
-              </a>
-              <a href={`https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lon}&travelmode=transit`} target="_blank" rel="noreferrer" className="ed-tile__sleep-card">
-                <div className="ed-tile__sleep-icon" style={{ background: "rgba(66,133,244,0.15)" }}>
-                  <span style={{ fontWeight: 800, fontSize: "0.75rem", color: "#4285f4" }}>BUS</span>
-                </div>
-                <div>
-                  <div className="ed-tile__sleep-title">Trasporto pubblico</div>
-                  <div className="ed-tile__sleep-sub">Indicazioni con Google Maps</div>
-                </div>
-                <ArrowRightIcon size={16} />
-              </a>
-              <a href="https://free-now.com" target="_blank" rel="noreferrer" className="ed-tile__sleep-card">
-                <div className="ed-tile__sleep-icon" style={{ background: "rgba(255,220,0,0.15)" }}>
-                  <span style={{ fontWeight: 800, fontSize: "0.7rem", color: "#f5c800" }}>FREE</span>
-                </div>
-                <div>
-                  <div className="ed-tile__sleep-title">FREE NOW</div>
-                  <div className="ed-tile__sleep-sub">Taxi e NCC</div>
-                </div>
-                <ArrowRightIcon size={16} />
-              </a>
-            </div>
-          </div>
-        )}
-      </div>
+        </section>
+      )}
 
       {cityInfo && (
-        <div className="ed-card ed-cityinfo">
-          <div className="ed-tile__head"><GlobeIcon size={16} /><span>La città: {cityInfo.title}</span></div>
+        <section className="ed-block">
+          <div className="ed-block__head">
+            <div>
+              <span className="ed-eyebrow"><GlobeIcon size={13} /> La città</span>
+              <h3 className="ed-block__title">{cityInfo.title}</h3>
+            </div>
+          </div>
           <div className="ed-cityinfo__body">
             {cityInfo.thumb && <img src={cityInfo.thumb} alt={cityInfo.title} loading="lazy" />}
             <div>
@@ -210,7 +223,7 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
               )}
             </div>
           </div>
-        </div>
+        </section>
       )}
 
       <div className="ed-plan__grid">
