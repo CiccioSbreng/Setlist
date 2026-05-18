@@ -46,9 +46,9 @@ export default function Footer() {
 
           <div className="footer__col">
             <h4>Legale</h4>
-            <a href="#privacy">Privacy</a>
-            <a href="#terms">Termini</a>
-            <a href="#cookie">Cookie</a>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/termini">Termini</Link>
+            <Link to="/cookie">Cookie</Link>
           </div>
         </div>
       </div>
@@ -57,7 +57,7 @@ export default function Footer() {
         <div className="footer__bar">
           <span>© {year} ConcertHub · Tutti i diritti riservati</span>
           <span>
-            Creato da <span className="hl">Ciccio Sbreng</span>
+            Designed &amp; developed by <span className="hl">Fabio Annoni</span>
           </span>
         </div>
       </div>

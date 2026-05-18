@@ -38,6 +38,53 @@ export async function searchEvents({ city, keyword, size = 12, page = 0, start, 
   return res.json();
 }
 
+// ---- TICKETMASTER: dettaglio singolo evento ----
+export async function getEvent(id) {
+  const res = await fetch(
+    `${BASE}/api/ticketmaster/events/${encodeURIComponent(id)}`
+  );
+
+  if (res.status === 404) {
+    // Distingue il vero "evento inesistente" (JSON dal nostro backend)
+    // da un 404 di rotta assente (backend non aggiornato / URL errato).
+    const body = await res.json().catch(() => null);
+    if (body && body.error === "Evento non trovato") {
+      throw new Error("NOT_FOUND");
+    }
+    throw new Error("ENDPOINT_MISSING");
+  }
+
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return res.json();
+}
+
+// ---- SPOTIFY: artista per nome ----
+export async function getSpotifyArtist(name) {
+  const res = await fetch(
+    `${BASE}/api/spotify/artist?name=${encodeURIComponent(name)}`
+  );
+  if (!res.ok) throw new Error(`Spotify API ${res.status}`);
+  return res.json();
+}
+
+// ---- YOUTUBE: ultimi video del canale artista ----
+export async function getYoutubeVideos(name) {
+  const res = await fetch(
+    `${BASE}/api/youtube/channel-videos?name=${encodeURIComponent(name)}`
+  );
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return res.json();
+}
+
+// ---- TICKETMASTER: prossime date di un artista ----
+export async function getArtistEvents(id) {
+  const res = await fetch(
+    `${BASE}/api/ticketmaster/artists/${encodeURIComponent(id)}/events`
+  );
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return res.json();
+}
+
 // ---- AUTH: login / registrazione ----
 
 // POST /api/auth/login
@@ -112,6 +159,53 @@ export async function addFavorite(event) {
   });
 
   if (!res.ok) throw new Error('Errore salvataggio preferito');
+  return res.json();
+}
+
+// ---- PROFILO UTENTE ----
+export async function getProfile() {
+  const token = getToken();
+  const res = await fetch(`${BASE}/api/auth/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Errore caricamento profilo');
+  return res.json();
+}
+
+export async function updateProfile(data) {
+  const token = getToken();
+  const res = await fetch(`${BASE}/api/auth/profile`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Errore aggiornamento profilo');
+  return res.json();
+}
+
+export async function updatePassword(currentPassword, newPassword) {
+  const token = getToken();
+  const res = await fetch(`${BASE}/api/auth/password`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || 'Errore aggiornamento password');
+  return data;
+}
+
+// ---- WEATHER: meteo attuale al venue ----
+export async function getWeather({ lat, lon }) {
+  const res = await fetch(`${BASE}/api/weather?${qs({ lat, lon })}`);
+  if (!res.ok) throw new Error(`Weather ${res.status}`);
+  return res.json();
+}
+
+// ---- SETLIST: ultima scaletta dell'artista ----
+export async function getSetlist(artist) {
+  const res = await fetch(`${BASE}/api/setlist?artist=${encodeURIComponent(artist)}`);
+  if (!res.ok) throw new Error(`Setlist ${res.status}`);
   return res.json();
 }
 

@@ -28,6 +28,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# --- Video (troppo grandi per git) ---
+frontend/public/*.mp4
+
 # --- Altro ---
 coverage/
 tmp/

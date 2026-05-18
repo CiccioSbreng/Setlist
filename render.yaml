@@ -1,0 +1,42 @@
+services:
+  # ── Backend: Node/Express API ──────────────────────────────────────────────
+  - type: web
+    name: concerthub-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false          # imposta nel dashboard Render
+      - key: JWT_SECRET
+        sync: false
+      - key: TICKETMASTER_API_KEY
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: SPOTIFY_CLIENT_ID
+        sync: false
+      - key: SPOTIFY_CLIENT_SECRET
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false          # es: https://concerthub-frontend.onrender.com
+
+  # ── Frontend: React/Vite Static Site ──────────────────────────────────────
+  - type: web
+    name: concerthub-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false          # es: https://concerthub-backend.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

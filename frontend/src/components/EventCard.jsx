@@ -1,5 +1,6 @@
 // frontend/src/components/EventCard.jsx
 
+import { Link } from "react-router-dom";
 import {
   CalendarIcon,
   ClockIcon,
@@ -13,6 +14,17 @@ const MONTHS = [
   "GEN", "FEB", "MAR", "APR", "MAG", "GIU",
   "LUG", "AGO", "SET", "OTT", "NOV", "DIC",
 ];
+
+function getDaysLeft(date, time) {
+  if (!date) return null;
+  const d = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
+  if (Number.isNaN(d.getTime()) || d - new Date() < 0) return null;
+  const days = Math.floor((d - new Date()) / 86400000);
+  if (days === 0) return "Oggi!";
+  if (days === 1) return "Domani!";
+  if (days < 30) return `Tra ${days} giorni`;
+  return null;
+}
 
 // Estrae { day, month, dateLabel, timeLabel } in modo robusto dai dati Ticketmaster.
 function parseWhen(date, time) {
@@ -47,10 +59,22 @@ function formatPrice(min, max, currency) {
   return `da ${fmt(min ?? max)}`;
 }
 
-export default function EventCard({ ev, onAddFavorite, onRemove }) {
+export default function EventCard({
+  ev,
+  onAddFavorite,
+  onRemove,
+  onToggleFavorite,
+  favorited = false,
+}) {
   const when = parseWhen(ev.date, ev.time);
   const price = formatPrice(ev.priceMin, ev.priceMax, ev.currency);
-  const isFav = typeof onRemove === "function";
+  const detailId = ev.eventId || ev.id;
+  const daysLeft = getDaysLeft(ev.date, ev.time);
+
+  const favAction = onRemove || onToggleFavorite || onAddFavorite;
+  // cuore acceso (rosso) se è nei preferiti: sempre nella pagina Preferiti,
+  // oppure quando l'evento risulta salvato in home.
+  const active = typeof onRemove === "function" ? true : Boolean(favorited);
 
   return (
     <article className="ev-card appear">
@@ -75,20 +99,21 @@ export default function EventCard({ ev, onAddFavorite, onRemove }) {
           </div>
         )}
 
-        {(onAddFavorite || onRemove) && (
+        {favAction && (
           <div className="ev-card__fav">
             <button
               type="button"
-              className={"icon-btn icon-btn--fav" + (isFav ? " is-on" : "")}
-              onClick={isFav ? onRemove : onAddFavorite}
+              className={"icon-btn icon-btn--fav" + (active ? " is-on" : "")}
+              onClick={favAction}
               title={
-                isFav ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
+                active ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
               }
               aria-label={
-                isFav ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
+                active ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
               }
+              aria-pressed={active}
             >
-              <HeartIcon size={19} filled={isFav} />
+              <HeartIcon size={19} filled={active} />
             </button>
           </div>
         )}
@@ -102,7 +127,15 @@ export default function EventCard({ ev, onAddFavorite, onRemove }) {
       </div>
 
       <div className="ev-card__body">
-        <h3 className="ev-card__title">{ev.name || "Evento senza titolo"}</h3>
+        <h3 className="ev-card__title">
+          {detailId ? (
+            <Link to={`/event/${detailId}`} className="ev-card__titlelink">
+              {ev.name || "Evento senza titolo"}
+            </Link>
+          ) : (
+            ev.name || "Evento senza titolo"
+          )}
+        </h3>
 
         <div className="ev-card__meta">
           <div className="meta-row">
@@ -127,23 +160,26 @@ export default function EventCard({ ev, onAddFavorite, onRemove }) {
         </div>
 
         <div className="ev-card__foot">
+          <div className="ev-card__foot-left">
+            {daysLeft && <span className="ev-card__countdown">{daysLeft}</span>}
+            {detailId && (
+              <Link to={`/event/${detailId}`} className="ev-card__detail-link">
+                Scopri evento →
+              </Link>
+            )}
+          </div>
           {ev.url ? (
             <a
               href={ev.url}
               target="_blank"
               rel="noreferrer"
-              className="btn btn--primary btn--block btn--sm"
+              className="btn btn--primary btn--sm"
             >
               <TicketIcon size={18} />
               Biglietti
             </a>
           ) : (
-            <span
-              className="btn btn--outline btn--block btn--sm"
-              aria-disabled="true"
-            >
-              Biglietti non disponibili
-            </span>
+            <span className="ev-card__no-ticket">Biglietti non disponibili</span>
           )}
         </div>
       </div>

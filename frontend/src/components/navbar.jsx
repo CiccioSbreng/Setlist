@@ -59,13 +59,19 @@ export default function Navbar() {
               Accedi
             </NavLink>
           ) : (
-            <button
-              type="button"
-              className="btn btn--ghost btn--sm nav__cta"
-              onClick={handleLogout}
-            >
-              Esci
-            </button>
+            <>
+              <NavLink to="/profile" className={linkClass}>
+                <UserIcon size={18} />
+                Profilo
+              </NavLink>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm nav__cta"
+                onClick={handleLogout}
+              >
+                Esci
+              </button>
+            </>
           )}
         </div>
 
@@ -108,13 +114,19 @@ export default function Navbar() {
               Accedi
             </NavLink>
           ) : (
-            <button
-              type="button"
-              className="btn btn--ghost btn--block"
-              onClick={handleLogout}
-            >
-              Esci
-            </button>
+            <>
+              <NavLink to="/profile" className={linkClass} onClick={() => setOpen(false)}>
+                <UserIcon size={18} />
+                Il mio profilo
+              </NavLink>
+              <button
+                type="button"
+                className="btn btn--ghost btn--block"
+                onClick={handleLogout}
+              >
+                Esci
+              </button>
+            </>
           )}
         </div>
       </div>

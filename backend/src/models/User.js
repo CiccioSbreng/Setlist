@@ -14,6 +14,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    displayName: { type: String, default: '' },
+    bio: { type: String, default: '', maxlength: 200 },
+    avatar: { type: String, default: '' },
   },
   {
     timestamps: true,
@@ -25,6 +28,9 @@ userSchema.methods.toSafeObject = function () {
   return {
     id: this._id,
     email: this.email,
+    displayName: this.displayName,
+    bio: this.bio,
+    avatar: this.avatar,
   };
 };
 

@@ -142,3 +142,76 @@ export const RefreshIcon = (p) => (
     <path d="M20 12a8 8 0 0 1-13.7 5.6L4 16M4 20v-4h4" />
   </Svg>
 );
+
+export const TreeIcon = (p) => (
+  <Svg {...p}>
+    <path d="M12 3 4.5 13H9v8h6v-8h4.5L12 3Z" />
+  </Svg>
+);
+
+export const ForkIcon = (p) => (
+  <Svg {...p}>
+    <path d="M3 2v7c0 1.1.9 2 2 2h1v11h2V11h1a2 2 0 0 0 2-2V2h-2v5H7V2H5v5H4V2H3Z" />
+    <path d="M19 2c-1.66 0-3 2.24-3 5 0 2.34 1.09 4.31 2.6 4.86L18 22h2l-.4-10.14C21.09 11.31 22 9.34 22 7c0-2.76-1.34-5-3-5Z" />
+  </Svg>
+);
+
+export const BedIcon = (p) => (
+  <Svg {...p}>
+    <rect x="2" y="9" width="20" height="12" rx="2" />
+    <path d="M2 14h20" />
+    <path d="M2 9V6.5A2.5 2.5 0 0 1 4.5 4h15A2.5 2.5 0 0 1 22 6.5V9" />
+    <path d="M7 9V7a1 1 0 0 1 2 0v2" />
+  </Svg>
+);
+
+export const YoutubeIcon = (p) => (
+  <Svg {...p}>
+    <rect x="2.5" y="5.5" width="19" height="13" rx="3.5" />
+    <path d="M10 9.5l5.5 2.5L10 14.5V9.5Z" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+export const SpotifyIcon = (p) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M8 10.5q4-1.5 8 .5" />
+    <path d="M8 13q3-1.2 7 .5" />
+    <path d="M8.5 15.5q2.5-.8 5.5.5" />
+  </Svg>
+);
+
+export const ShareIcon = (p) => (
+  <Svg {...p}>
+    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+  </Svg>
+);
+
+export const DownloadIcon = (p) => (
+  <Svg {...p}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+  </Svg>
+);
+
+export const CloudIcon = (p) => (
+  <Svg {...p}>
+    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+  </Svg>
+);
+
+export const ListMusicIcon = (p) => (
+  <Svg {...p}>
+    <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0"/>
+    <path d="M3 6h12M3 12h10M3 18h6"/>
+  </Svg>
+);
+
+export const InstagramIcon = (p) => (
+  <Svg {...p}>
+    <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="16.8" cy="7.2" r=".9" fill="currentColor" stroke="none" />
+  </Svg>
+);
