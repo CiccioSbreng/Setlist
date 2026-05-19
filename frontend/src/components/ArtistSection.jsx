@@ -99,23 +99,8 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
             src={spotifyArtist.embedUrl}
             loading="lazy"
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            style={{ height: 152, minHeight: 152, maxHeight: 152, display: "block", width: "100%" }}
+            style={{ height: 352, minHeight: 352, display: "block", width: "100%" }}
           />
-          {spotifyArtist.topTracks?.length > 0 && (
-            <ul className="ed-toptracks">
-              {spotifyArtist.topTracks.map((t, i) => (
-                <li key={t.id}>
-                  <a href={t.url || spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-toptracks__row">
-                    <span className="ed-toptracks__n">{i + 1}</span>
-                    {t.image && <img src={t.image} alt="" loading="lazy" />}
-                    <span className="ed-toptracks__name">{t.name}</span>
-                    {t.preview && <span className="ed-toptracks__tag">anteprima</span>}
-                    <ArrowRightIcon size={13} />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
         </section>
       )}
 
