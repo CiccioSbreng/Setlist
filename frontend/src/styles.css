@@ -1954,7 +1954,6 @@ input.input[type="date"] {
   border-radius: var(--r-xl);
   overflow: hidden;
   background: var(--surface-2);
-  transform-style: preserve-3d;
   transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
               box-shadow 0.5s ease;
@@ -1968,8 +1967,7 @@ input.input[type="date"] {
 .ed-hero__media {
   position: absolute;
   inset: 0;
-  transform: translateZ(-40px) scale(1.12);
-  transform-style: preserve-3d;
+  transform: scale(1.08);
 }
 .ed-hero__img {
   width: 100%;
@@ -1986,7 +1984,6 @@ input.input[type="date"] {
   background: var(--grad-aurora);
   filter: blur(90px);
   opacity: 0.45;
-  transform: translateZ(10px);
   pointer-events: none;
 }
 .ed-hero--noimg .ed-hero__glow { opacity: 0.6; }
@@ -2006,7 +2003,6 @@ input.input[type="date"] {
 }
 .ed-hero__inner {
   width: 100%;
-  transform: translateZ(55px);
 }
 .ed-hero__title {
   font-size: clamp(1.6rem, 4.2vw, 2.6rem);
