@@ -2405,17 +2405,12 @@ input.input[type="date"] {
 }
 .ed-spotify__frame {
   width: 100%;
-  height: 352px;
+  height: 152px;
   border: 0;
   border-radius: 12px;
   display: block;
 }
 
-@media (max-width: 820px) {
-  .ed-spotify__frame {
-    height: 152px;
-  }
-}
 .ed-spotify__open {
   display: inline-flex;
   align-items: center;
