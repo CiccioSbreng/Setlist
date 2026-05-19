@@ -53,7 +53,7 @@ export default function App() {
             pointerEvents: "none",
           }}
         >
-          BUILD NUOVA · 19/05 player 152px
+BUILD DIAG · 19/05 b2
         </div>
       </div>
     </BrowserRouter>
