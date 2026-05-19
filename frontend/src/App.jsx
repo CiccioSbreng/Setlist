@@ -37,24 +37,6 @@ export default function App() {
         </main>
 
         <Footer />
-
-        <div
-          style={{
-            position: "fixed",
-            bottom: 8,
-            right: 8,
-            zIndex: 99999,
-            background: "#ff2d55",
-            color: "#fff",
-            font: "700 12px/1.2 system-ui, sans-serif",
-            padding: "6px 10px",
-            borderRadius: 8,
-            boxShadow: "0 2px 8px rgba(0,0,0,.5)",
-            pointerEvents: "none",
-          }}
-        >
-BUILD DIAG · 19/05 b2
-        </div>
       </div>
     </BrowserRouter>
   );

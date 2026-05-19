@@ -81,10 +81,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
       )}
 
       {spotifyArtist && (
-        <section className="ed-block" style={{ outline: "3px solid red" }}>
-          <div style={{ background: "#ff0", color: "#000", font: "700 13px monospace", padding: "6px 8px", wordBreak: "break-all" }}>
-            DBG tracks={String(spotifyArtist.topTracks?.length ?? "undef")} | embed={String(spotifyArtist.embedUrl).slice(0, 45)}
-          </div>
+        <section className="ed-block">
           <div className="ed-block__head">
             <div>
               <span className="ed-eyebrow ed-eyebrow--sp"><SpotifyIcon size={13} /> Musica</span>
@@ -102,10 +99,10 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
             src={spotifyArtist.embedUrl}
             loading="lazy"
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            style={{ outline: "4px solid lime" }}
+            style={{ height: 152, minHeight: 152, maxHeight: 152, display: "block", width: "100%" }}
           />
           {spotifyArtist.topTracks?.length > 0 && (
-            <ul className="ed-toptracks" style={{ outline: "4px solid cyan" }}>
+            <ul className="ed-toptracks">
               {spotifyArtist.topTracks.map((t, i) => (
                 <li key={t.id}>
                   <a href={t.url || spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-toptracks__row">
