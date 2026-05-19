@@ -99,6 +99,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
             src={spotifyArtist.embedUrl}
             loading="lazy"
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            style={{ height: 152, minHeight: 152, maxHeight: 152, display: "block", width: "100%" }}
           />
           {spotifyArtist.topTracks?.length > 0 && (
             <ul className="ed-toptracks">
