@@ -93,7 +93,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
               </a>
             )}
           </div>
-          <div className="ed-video">
+          <div className="ed-video" style={{ maxHeight: 400 }}>
             <iframe
               title="Player Spotify"
               src={spotifyArtist.embedUrl}
