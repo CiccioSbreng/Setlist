@@ -62,23 +62,31 @@ router.get('/artist', async (req, res) => {
       topTracks: [],
     };
 
-    try {
-      const { data: tt } = await axios.get(
-        `https://api.spotify.com/v1/artists/${artist.id}/top-tracks`,
-        { params: { market: 'IT' }, headers: { Authorization: `Bearer ${token}` } }
-      );
-      out.topTracks = (tt.tracks || []).slice(0, 5).map((t) => ({
-        id: t.id,
-        name: t.name,
-        preview: t.preview_url || null,
-        url: t.external_urls?.spotify || null,
-        image: t.album?.images?.slice(-1)[0]?.url || null,
-      }));
-    } catch {
-      // top-tracks opzionale: se fallisce, lasciamo l'array vuoto
+    for (const market of ['IT', 'US']) {
+      try {
+        const { data: tt } = await axios.get(
+          `https://api.spotify.com/v1/artists/${artist.id}/top-tracks`,
+          { params: { market }, headers: { Authorization: `Bearer ${token}` }, timeout: 8000 }
+        );
+        out.topTracks = (tt.tracks || []).slice(0, 5).map((t) => ({
+          id: t.id,
+          name: t.name,
+          preview: t.preview_url || null,
+          url: t.external_urls?.spotify || null,
+          image: t.album?.images?.slice(-1)[0]?.url || null,
+        }));
+        if (out.topTracks.length > 0) break;
+      } catch (e) {
+        console.error(
+          `[spotify] top-tracks fallito (${artist.name}, market=${market}): ` +
+          `status=${e.response?.status} ${JSON.stringify(e.response?.data || e.message)}`
+        );
+      }
     }
 
-    artistCache.set(cacheKey, out);
+    // Cache solo le risposte complete: un fallimento transitorio
+    // delle top-tracks non deve restare bloccato per un'ora.
+    if (out.topTracks.length > 0) artistCache.set(cacheKey, out);
     res.json(out);
   } catch (err) {
     const status = err.response?.status || 500;
