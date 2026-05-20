@@ -18,7 +18,6 @@ import {
   MusicIcon,
   HeartIcon,
   SparkIcon,
-  GlobeIcon,
   TicketIcon,
   ArrowRightIcon,
   RefreshIcon,
@@ -216,8 +215,7 @@ export default function Home() {
 
       setData({ ...res, events: uniqueEvents });
       setForm((f) => ({ ...f, page: res.page ?? page }));
-    } catch (e) {
-      console.error(e);
+    } catch {
       setError(
         "Non siamo riusciti a caricare gli eventi in questo momento. Riprova tra poco."
       );
