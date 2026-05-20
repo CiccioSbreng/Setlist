@@ -92,8 +92,16 @@ export default function EventDetail() {
     const v = ev.venue || {};
     const dt = ev.date ? ev.date.replace(/[-:]/g, "").replace("T", "") : "";
     const dtStr = dt ? dt.slice(0, 8) + "T" + (ev.time ? ev.time.replace(":", "") + "00" : "200000") : "";
+    let dtEnd = "";
+    if (dtStr) {
+      const y = +dtStr.slice(0, 4), mo = +dtStr.slice(4, 6) - 1, d = +dtStr.slice(6, 8);
+      const h = +dtStr.slice(9, 11), mi = +dtStr.slice(11, 13);
+      const end = new Date(y, mo, d, h + 3, mi);
+      const pad = (n) => String(n).padStart(2, "0");
+      dtEnd = `${end.getFullYear()}${pad(end.getMonth() + 1)}${pad(end.getDate())}T${pad(end.getHours())}${pad(end.getMinutes())}00`;
+    }
     const loc = [v.name, v.address, v.city].filter(Boolean).join(", ");
-    const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//ConcertHub//IT","BEGIN:VEVENT", dtStr ? `DTSTART:${dtStr}` : "", `SUMMARY:${(ev.name || "").replace(/[,;\\]/g, " ")}`, `LOCATION:${loc.replace(/[,;\\]/g, " ")}`, `URL:${ev.url || ""}`, "END:VEVENT","END:VCALENDAR"].filter(Boolean).join("\r\n");
+    const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//ConcertHub//IT","BEGIN:VEVENT", dtStr ? `DTSTART:${dtStr}` : "", dtEnd ? `DTEND:${dtEnd}` : "", `SUMMARY:${(ev.name || "").replace(/[,;\\]/g, " ")}`, `LOCATION:${loc.replace(/[,;\\]/g, " ")}`, `URL:${ev.url || ""}`, "END:VEVENT","END:VCALENDAR"].filter(Boolean).join("\r\n");
     const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
     const a = document.createElement("a"); a.href = url; a.download = `${(ev.name || "evento").replace(/[^a-z0-9]/gi, "_")}.ics`; a.click();
     URL.revokeObjectURL(url);
