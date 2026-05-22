@@ -3,7 +3,6 @@ import {
   ArrowRightIcon, BedIcon, CloudIcon, ForkIcon,
   GlobeIcon, PinIcon, TreeIcon,
 } from "./Icons";
-import BudgetEstimate from "./BudgetEstimate";
 import ConcertChecklist from "./ConcertChecklist";
 
 export default function VenueSection({ ev, weather, parks, restaurants, parkings, cityInfo }) {
@@ -226,10 +225,7 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
         </section>
       )}
 
-      <div className="ed-plan__grid">
-        <BudgetEstimate ev={ev} />
-        <ConcertChecklist ev={ev} />
-      </div>
+      <ConcertChecklist ev={ev} />
     </div>
   );
 }
