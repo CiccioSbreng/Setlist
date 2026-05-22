@@ -12,6 +12,7 @@ import {
 } from "../components/Icons";
 import ArtistSection from "../components/ArtistSection";
 import VenueSection  from "../components/VenueSection";
+import Countdown     from "../components/Countdown";
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -24,7 +25,6 @@ export default function EventDetail() {
   const [favMsg,   setFavMsg]   = useState("");
   const [shareMsg, setShareMsg] = useState("");
   const [activeTab, setActiveTab] = useState("evento");
-  const [countdown, setCountdown] = useState(null);
 
   const media = useArtistMedia(ev);
   const venue = useVenueData(ev);
@@ -46,23 +46,6 @@ export default function EventDetail() {
       .finally(() => alive && setLoading(false));
     return () => { alive = false; };
   }, [id]);
-
-  useEffect(() => {
-    if (!ev?.date) return;
-    function tick() {
-      const target = new Date(ev.date.includes("T") ? ev.date : `${ev.date}T${ev.time || "20:00:00"}`);
-      const diff = target - Date.now();
-      if (diff <= 0) { setCountdown(null); return; }
-      setCountdown({
-        days:    Math.floor(diff / 86400000),
-        hours:   Math.floor((diff % 86400000) / 3600000),
-        minutes: Math.floor((diff % 3600000)  / 60000),
-      });
-    }
-    tick();
-    const timer = setInterval(tick, 60000);
-    return () => clearInterval(timer);
-  }, [ev]);
 
   useEffect(() => {
     if (!localStorage.getItem("token") || !id) return;
@@ -226,20 +209,7 @@ export default function EventDetail() {
               <div className="ed__row"><PinIcon size={18} /><span>{[v.name, v.address, v.city].filter(Boolean).join(" · ") || "Location da annunciare"}</span></div>
               {price && <div className="ed__row"><TicketIcon size={18} /><span>{price}</span></div>}
             </div>
-            {countdown && (
-              <div className="ed-countdown">
-                {[
-                  { val: countdown.days,    label: "giorni" },
-                  { val: countdown.hours,   label: "ore"    },
-                  { val: countdown.minutes, label: "min"    },
-                ].map(({ val, label }) => (
-                  <div key={label} className="ed-countdown__item">
-                    <span className="ed-countdown__num">{val}</span>
-                    <span className="ed-countdown__lbl">{label}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            <Countdown date={ev.date} time={ev.time} />
 
             {favMsg && (
               <div className={`banner ${favMsg.startsWith("Aggiunto") ? "banner--ok" : "banner--error"}`} style={{ marginTop: 16 }}>
