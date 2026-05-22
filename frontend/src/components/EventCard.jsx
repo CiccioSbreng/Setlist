@@ -18,12 +18,13 @@ const MONTHS = [
 function getDaysLeft(date, time) {
   if (!date) return null;
   const d = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
-  if (Number.isNaN(d.getTime()) || d - new Date() < 0) return null;
-  const days = Math.floor((d - new Date()) / 86400000);
+  if (Number.isNaN(d.getTime()) || d - Date.now() < 0) return null;
+  const days = Math.floor((d - Date.now()) / 86400000);
   if (days === 0) return "Oggi!";
   if (days === 1) return "Domani!";
   if (days < 30) return `Tra ${days} giorni`;
-  return null;
+  const months = Math.floor(days / 30);
+  return `Tra ${months} ${months === 1 ? "mese" : "mesi"}`;
 }
 
 // Estrae { day, month, dateLabel, timeLabel } in modo robusto dai dati Ticketmaster.
