@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getEvent, addFavorite, removeFavorite, getFavorites } from "../lib/api";
 import { formatWhen, formatPrice, getDaysLeft } from "../lib/format";
@@ -12,7 +12,6 @@ import {
 } from "../components/Icons";
 import ArtistSection from "../components/ArtistSection";
 import VenueSection  from "../components/VenueSection";
-import Countdown     from "../components/Countdown";
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -26,11 +25,33 @@ export default function EventDetail() {
   const [shareMsg, setShareMsg] = useState("");
   const [activeTab, setActiveTab] = useState("evento");
 
+  const [cdLabel, setCdLabel] = useState(null);
+  const cdRef = useRef(null);
+
   const media = useArtistMedia(ev);
   const venue = useVenueData(ev);
   const heroRef = useTilt({ max: 7 });
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
+
+  useEffect(() => {
+    if (!ev?.date) return;
+    const target = new Date(ev.date.includes("T") ? ev.date : `${ev.date}T${ev.time || "20:00:00"}`);
+    if (isNaN(target)) return;
+    function tick() {
+      const diff = target - Date.now();
+      if (diff <= 0) { setCdLabel(null); return; }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      const pad = (n) => String(n).padStart(2, "0");
+      setCdLabel(d > 0 ? `${d}g ${pad(h)}h ${pad(m)}m` : `${pad(h)}h ${pad(m)}m ${pad(s)}s`);
+    }
+    tick();
+    cdRef.current = setInterval(tick, 1000);
+    return () => clearInterval(cdRef.current);
+  }, [ev?.date, ev?.time]);
 
   useEffect(() => {
     let alive = true;
@@ -166,7 +187,7 @@ export default function EventDetail() {
                 <div className="ed-hero__when">
                   <CalendarIcon size={15} /><span>{when.dateLabel}</span>
                   {when.timeLabel && <><span className="ed-hero__sep">·</span><ClockIcon size={15} /><span>Ore {when.timeLabel}</span></>}
-                  {daysLeft && <span className="ed-hero__countdown">{daysLeft}</span>}
+                  {cdLabel && <span className="ed-hero__countdown">⏱ {cdLabel}</span>}
                 </div>
               </div>
             </div>
@@ -209,8 +230,6 @@ export default function EventDetail() {
               <div className="ed__row"><PinIcon size={18} /><span>{[v.name, v.address, v.city].filter(Boolean).join(" · ") || "Location da annunciare"}</span></div>
               {price && <div className="ed__row"><TicketIcon size={18} /><span>{price}</span></div>}
             </div>
-            <Countdown date={ev.date} time={ev.time} />
-
             {favMsg && (
               <div className={`banner ${favMsg.startsWith("Aggiunto") ? "banner--ok" : "banner--error"}`} style={{ marginTop: 16 }}>
                 {favMsg}
