@@ -4370,20 +4370,13 @@ input.input[type="date"] {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  align-items: stretch;
+  align-items: start;
 }
-/* Entrambi i blocchi crescono uguale, il video riempie lo spazio */
-.ed-media-duo .ed-block {
-  display: flex;
-  flex-direction: column;
-}
+/* Altezza fissa uguale per entrambi i player nel duo */
 .ed-media-duo .ed-video {
-  flex: 1;
-  min-height: 240px;
   aspect-ratio: unset;
+  height: 340px;
 }
-
-/* Spotify embed: nessuna regola extra, usa il flex del parent */
 .ed-video--sp { aspect-ratio: unset; }
 
 /* ── Block themed — accent line + gradient tint ── */
@@ -4476,7 +4469,7 @@ input.input[type="date"] {
   .ed-block .ed-cityinfo__body img { width: 100%; height: 200px; }
   .ed-plan__grid { grid-template-columns: 1fr; }
   .ed-media-duo { grid-template-columns: 1fr; }
-  .ed-media-duo .ed-video { min-height: 220px; aspect-ratio: 16/9; flex: unset; }
+  .ed-media-duo .ed-video { height: auto; aspect-ratio: 16/9; }
 }
 
 /* ── Countdown ─────────────────────────────────────────────────────── */
