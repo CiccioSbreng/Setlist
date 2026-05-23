@@ -4370,28 +4370,53 @@ input.input[type="date"] {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
-/* Altezza fissa garantita su entrambe le card */
+/* entrambi i blocchi: stessa altezza fissa, colonna flex */
 .ed-media-duo .ed-block {
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  height: 500px;
+  height: 440px;
 }
-/* Player riempie tutto lo spazio rimasto dopo l'header */
+/* YouTube: il div .ed-video si allunga a riempire lo spazio residuo */
 .ed-media-duo .ed-video {
   flex: 1;
   min-height: 0;
   aspect-ratio: unset;
+  height: 0;
+}
+/* Spotify: il wrapper si allunga, l'iframe riempie tutto */
+.ed-sp__wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  border-radius: var(--r-lg);
+  padding: 3px;
+  background: linear-gradient(135deg, rgba(30,215,96,0.7), rgba(30,215,96,0.2), rgba(124,92,255,0.4));
+  box-shadow: 0 0 40px rgba(30,215,96,0.25), 0 0 80px rgba(30,215,96,0.1);
+}
+.ed-sp__wrap::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #1ed760, rgba(30,215,96,0.3), #7c5cff);
+  z-index: 0;
+  opacity: 0.5;
+  filter: blur(8px);
 }
 .ed-sp__frame {
-  flex: 1;
   display: block;
   width: 100%;
+  flex: 1;
   min-height: 0;
-  border: 1px solid rgba(30,215,96,0.2);
+  height: 0;
+  border: 0;
   border-radius: var(--r-lg);
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Block themed — accent line + gradient tint ── */
