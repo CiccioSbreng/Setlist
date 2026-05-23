@@ -39,7 +39,7 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
     <div id="section-dove" className="ed-section ed-stack">
 
       {(weather?.status === "ok" || hasGeo) && (
-        <section className="ed-block">
+        <section className="ed-block ed-block--venue">
           <div className="ed-block__head">
             <div>
               <span className="ed-eyebrow"><PinIcon size={13} /> Sul posto</span>
@@ -85,7 +85,7 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
       )}
 
       {(parks.length > 0 || restaurants.length > 0 || parkings.length > 0) && (
-        <section className="ed-block">
+        <section className="ed-block ed-block--dintorni">
           <div className="ed-block__head">
             <div>
               <span className="ed-eyebrow"><TreeIcon size={13} /> Dintorni</span>
@@ -142,7 +142,7 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
       )}
 
       {(bookingUrl || airbnbUrl || hasGeo) && (
-        <section className="ed-block">
+        <section className="ed-block ed-block--logistica">
           <div className="ed-block__head">
             <div>
               <span className="ed-eyebrow"><BedIcon size={13} /> Logistica</span>
@@ -151,7 +151,7 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
           </div>
           <div className="ed-svc">
             {bookingUrl && (
-              <a href={bookingUrl} target="_blank" rel="noreferrer" className="ed-svc__card">
+              <a href={bookingUrl} target="_blank" rel="noreferrer" className="ed-svc__card" data-brand="booking">
                 <div className="ed-svc__icon"><BedIcon size={20} /></div>
                 <div className="ed-svc__txt">
                   <div className="ed-svc__title">Booking.com</div>
@@ -161,7 +161,7 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
               </a>
             )}
             {airbnbUrl && (
-              <a href={airbnbUrl} target="_blank" rel="noreferrer" className="ed-svc__card">
+              <a href={airbnbUrl} target="_blank" rel="noreferrer" className="ed-svc__card" data-brand="airbnb">
                 <div className="ed-svc__icon"><GlobeIcon size={20} /></div>
                 <div className="ed-svc__txt">
                   <div className="ed-svc__title">Airbnb</div>
@@ -172,24 +172,24 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
             )}
             {hasGeo && (
               <>
-                <a href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${v.lat}&dropoff[longitude]=${v.lon}&dropoff[nickname]=${encodeURIComponent(v.name || "Venue")}`} target="_blank" rel="noreferrer" className="ed-svc__card">
-                  <div className="ed-svc__icon ed-svc__icon--dark">Ub</div>
+                <a href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${v.lat}&dropoff[longitude]=${v.lon}&dropoff[nickname]=${encodeURIComponent(v.name || "Venue")}`} target="_blank" rel="noreferrer" className="ed-svc__card" data-brand="uber">
+                  <div className="ed-svc__icon">Ub</div>
                   <div className="ed-svc__txt">
                     <div className="ed-svc__title">Uber</div>
                     <div className="ed-svc__sub">Prenota un passaggio</div>
                   </div>
                   <ArrowRightIcon size={16} />
                 </a>
-                <a href={`https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lon}&travelmode=transit`} target="_blank" rel="noreferrer" className="ed-svc__card">
-                  <div className="ed-svc__icon ed-svc__icon--bus">BUS</div>
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lon}&travelmode=transit`} target="_blank" rel="noreferrer" className="ed-svc__card" data-brand="bus">
+                  <div className="ed-svc__icon">BUS</div>
                   <div className="ed-svc__txt">
                     <div className="ed-svc__title">Trasporto pubblico</div>
                     <div className="ed-svc__sub">Indicazioni con Google Maps</div>
                   </div>
                   <ArrowRightIcon size={16} />
                 </a>
-                <a href="https://free-now.com" target="_blank" rel="noreferrer" className="ed-svc__card">
-                  <div className="ed-svc__icon ed-svc__icon--free">FREE</div>
+                <a href="https://free-now.com" target="_blank" rel="noreferrer" className="ed-svc__card" data-brand="free">
+                  <div className="ed-svc__icon">FREE</div>
                   <div className="ed-svc__txt">
                     <div className="ed-svc__title">FREE NOW</div>
                     <div className="ed-svc__sub">Taxi e NCC</div>

@@ -89,51 +89,55 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
         </div>
       )}
 
-      {spotifyArtist && (
-        <section className="ed-block">
-          <div className="ed-block__head">
-            <div>
-              <span className="ed-eyebrow ed-eyebrow--sp"><SpotifyIcon size={13} /> Musica</span>
-              <h3 className="ed-block__title">Ascolta {artist?.name || "l'artista"}</h3>
-            </div>
-            {spotifyArtist.externalUrl && (
-              <a href={spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--sp">
-                <SpotifyIcon size={14} />Apri su Spotify<ArrowRightIcon size={14} />
-              </a>
-            )}
-          </div>
-          <div className="ed-video" style={{ maxHeight: 400 }}>
-            <iframe
-              title="Player Spotify"
-              src={spotifyArtist.embedUrl}
-              loading="lazy"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
-            />
-          </div>
-        </section>
-      )}
+      {(spotifyArtist || ytVideos.length > 0) && (
+        <div className="ed-media-duo">
+          {spotifyArtist && (
+            <section className="ed-block ed-block--sp">
+              <div className="ed-block__head">
+                <div>
+                  <span className="ed-eyebrow ed-eyebrow--sp"><SpotifyIcon size={13} /> Musica</span>
+                  <h3 className="ed-block__title">Ascolta {artist?.name || "l'artista"}</h3>
+                </div>
+                {spotifyArtist.externalUrl && (
+                  <a href={spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--sp">
+                    <SpotifyIcon size={14} />Apri su Spotify<ArrowRightIcon size={14} />
+                  </a>
+                )}
+              </div>
+              <div className="ed-video ed-video--sp">
+                <iframe
+                  title="Player Spotify"
+                  src={spotifyArtist.embedUrl}
+                  loading="lazy"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+                />
+              </div>
+            </section>
+          )}
 
-      {ytVideos.length > 0 && (
-        <section className="ed-block">
-          <div className="ed-block__head">
-            <div>
-              <span className="ed-eyebrow ed-eyebrow--yt"><YoutubeIcon size={13} /> Video</span>
-              <h3 className="ed-block__title">Ultimo video</h3>
-            </div>
-            <a href={`https://www.youtube.com/watch?v=${ytVideos[0].id}`} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--yt">
-              <YoutubeIcon size={14} />Apri su YouTube<ArrowRightIcon size={14} />
-            </a>
-          </div>
-          <div className="ed-video">
-            <iframe
-              src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
-              title={ytVideos[0].title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </section>
+          {ytVideos.length > 0 && (
+            <section className="ed-block ed-block--yt">
+              <div className="ed-block__head">
+                <div>
+                  <span className="ed-eyebrow ed-eyebrow--yt"><YoutubeIcon size={13} /> Video</span>
+                  <h3 className="ed-block__title">Ultimo video</h3>
+                </div>
+                <a href={`https://www.youtube.com/watch?v=${ytVideos[0].id}`} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--yt">
+                  <YoutubeIcon size={14} />Apri su YouTube<ArrowRightIcon size={14} />
+                </a>
+              </div>
+              <div className="ed-video">
+                <iframe
+                  src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
+                  title={ytVideos[0].title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </section>
+          )}
+        </div>
       )}
 
       {setlistData?.songs?.length > 0 && (
