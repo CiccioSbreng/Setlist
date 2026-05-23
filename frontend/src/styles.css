@@ -3395,6 +3395,45 @@ input.input[type="date"] {
   flex-shrink: 0;
 }
 
+.ev-card__countdown-badge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.77rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--brand-soft);
+  background: rgba(10, 8, 12, 0.78);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 138, 0, 0.45);
+  border-radius: var(--r-pill);
+  padding: 4px 10px;
+}
+
+.ev-card__live-badge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.77rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #ff5555;
+  background: rgba(10, 8, 12, 0.78);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 85, 85, 0.45);
+  border-radius: var(--r-pill);
+  padding: 4px 10px;
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+
 .ev-card__cancelled-badge {
   position: absolute;
   left: 12px;

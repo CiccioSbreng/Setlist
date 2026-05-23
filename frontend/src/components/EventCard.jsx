@@ -164,13 +164,6 @@ export default function EventCard({
           </div>
         )}
 
-        {price && (
-          <div className="ev-card__price">
-            <TicketIcon size={15} />
-            {price}
-          </div>
-        )}
-
         {ev.genre && ev.genre !== "Undefined" && (
           <div className="ev-card__genre">{ev.genre}</div>
         )}
@@ -179,6 +172,15 @@ export default function EventCard({
           <div className="ev-card__cancelled-badge">Annullato</div>
         ) : ev.soldOut ? (
           <div className="ev-card__soldout-badge">Sold Out</div>
+        ) : cdLabel === "started" ? (
+          <div className="ev-card__live-badge">🔴 In corso</div>
+        ) : cdLabel ? (
+          <div className="ev-card__countdown-badge">⏱ {cdLabel}</div>
+        ) : price ? (
+          <div className="ev-card__price">
+            <TicketIcon size={15} />
+            {price}
+          </div>
         ) : null}
 
       </div>
@@ -218,13 +220,6 @@ export default function EventCard({
 
         <div className="ev-card__foot">
           <div className="ev-card__foot-left">
-            {ev.status !== "cancelled" && !ev.soldOut && (
-              cdLabel === "started"
-                ? <span className="ev-card__live">🔴 In corso</span>
-                : cdLabel
-                  ? <span className="ev-card__countdown">⏱ {cdLabel}</span>
-                  : null
-            )}
             {detailId && (
               <Link to={`/event/${detailId}`} className="ev-card__detail-link">
                 Scopri evento →
