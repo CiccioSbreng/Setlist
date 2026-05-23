@@ -4368,19 +4368,19 @@ input.input[type="date"] {
 /* ── Spotify + YouTube affiancati ── */
 .ed-media-duo {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 3fr 2fr;
   gap: 20px;
   align-items: stretch;
 }
 .ed-media-duo .ed-block {
   display: flex;
   flex-direction: column;
+  height: 480px;
 }
-/* YouTube: stessa altezza del player Spotify (232px), niente aspect-ratio */
+/* YouTube: riempie lo spazio rimasto nella card */
 .ed-media-duo .ed-video {
   flex: 1;
-  min-height: 232px;
-  max-height: 232px;
+  min-height: 0;
   aspect-ratio: unset;
 }
 /* Spotify: box flex:1 come il video YouTube, iframe height:100% */
