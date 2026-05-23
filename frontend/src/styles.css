@@ -1569,9 +1569,14 @@ input.input[type="date"] {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-top: 18px;
-  padding-top: 16px;
+  margin-top: auto;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
+}
+.ev-card__foot .btn {
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  flex-shrink: 0;
 }
 .ev-card__foot-left {
   display: flex;
