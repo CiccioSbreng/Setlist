@@ -4372,12 +4372,16 @@ input.input[type="date"] {
   gap: 20px;
   align-items: start;
 }
-/* Altezza fissa uguale per entrambi i player nel duo */
-.ed-media-duo .ed-video {
-  aspect-ratio: unset;
-  height: 340px;
+
+/* Iframe Spotify diretto — si adatta al suo contenuto senza spazio nero */
+.ed-sp__frame {
+  display: block;
+  width: 100%;
+  height: 232px;
+  border: 0;
+  border-radius: var(--r-lg);
+  border: 1px solid rgba(30,215,96,0.2);
 }
-.ed-video--sp { aspect-ratio: unset; }
 
 /* ── Block themed — accent line + gradient tint ── */
 .ed-block { position: relative; overflow: hidden; }
@@ -4469,7 +4473,6 @@ input.input[type="date"] {
   .ed-block .ed-cityinfo__body img { width: 100%; height: 200px; }
   .ed-plan__grid { grid-template-columns: 1fr; }
   .ed-media-duo { grid-template-columns: 1fr; }
-  .ed-media-duo .ed-video { height: auto; aspect-ratio: 16/9; }
 }
 
 /* ── Countdown ─────────────────────────────────────────────────────── */
