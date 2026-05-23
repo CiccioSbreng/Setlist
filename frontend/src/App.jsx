@@ -15,6 +15,7 @@ import GradientBackground from "./components/GradientBackground";
 import VideoBackground from "./components/VideoBackground";
 import { PageTransition } from "./components/Motion";
 import BottomNav from "./components/BottomNav";
+import SpotlightCursor from "./components/SpotlightCursor";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -40,6 +41,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app-shell">
+        <SpotlightCursor />
         <VideoBackground />
         <GradientBackground />
         <Navbar />
