@@ -4370,15 +4370,16 @@ input.input[type="date"] {
   display: grid;
   grid-template-columns: 3fr 2fr;
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 .ed-media-duo .ed-block {
   display: flex;
   flex-direction: column;
 }
-/* YouTube: 352px come Spotify */
+/* YouTube: flex:1 riempie tutto lo spazio rimasto dopo l'header */
 .ed-media-duo .ed-video {
-  height: 352px;
+  flex: 1;
+  min-height: 0;
   aspect-ratio: unset;
 }
 /* Spotify: box esattamente 352px, iframe dichiarato anche come HTML attr */
