@@ -4383,8 +4383,10 @@ input.input[type="date"] {
   max-height: 232px;
   aspect-ratio: unset;
 }
-/* Spotify: iframe a dimensione naturale, glow sul box wrapper */
+/* Spotify: box flex:1 come il video YouTube, iframe height:100% */
 .ed-sp__box {
+  flex: 1;
+  min-height: 0;
   border-radius: var(--r-lg);
   overflow: hidden;
   border: 3px solid rgba(30,215,96,0.55);
@@ -4396,7 +4398,7 @@ input.input[type="date"] {
 .ed-sp__frame {
   display: block;
   width: 100%;
-  height: 232px;
+  height: 100%;
   border: 0;
 }
 
