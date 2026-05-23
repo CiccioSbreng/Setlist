@@ -175,6 +175,10 @@ export default function EventCard({
           <div className="ev-card__genre">{ev.genre}</div>
         )}
 
+        {ev.soldOut && (
+          <div className="ev-card__soldout-badge">Sold Out</div>
+        )}
+
       </div>
 
       <div className="ev-card__body">

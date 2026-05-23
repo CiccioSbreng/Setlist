@@ -1538,7 +1538,7 @@ input.input[type="date"] {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #d0d2e0;
+  color: #e8eaf4;
   font-size: 0.9rem;
 }
 
@@ -1596,7 +1596,7 @@ input.input[type="date"] {
 }
 .ev-card__detail-link {
   font-size: 0.8rem;
-  color: #c8cad8;
+  color: #dfe1ef;
   text-decoration: none;
   transition: color 0.15s;
 }
@@ -3313,6 +3313,10 @@ input.input[type="date"] {
 /* SOLD OUT — banner in diagonale sull'immagine */
 /* Sold out — badge compatto in basso a sinistra nella card */
 .ev-card__soldout-badge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -3321,8 +3325,9 @@ input.input[type="date"] {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #ff4444;
-  background: rgba(255, 68, 68, 0.12);
-  border: 1px solid rgba(255, 68, 68, 0.35);
+  background: rgba(10, 8, 12, 0.78);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 68, 68, 0.5);
   border-radius: var(--r-pill);
   padding: 4px 10px 4px 8px;
 }
@@ -3911,7 +3916,7 @@ input.input[type="date"] {
 
 .ed-setlist__meta {
   font-size: 0.75rem;
-  color: var(--text-dim);
+  color: #9ba0b8;
 }
 
 .ed-setlist__list {
@@ -3935,7 +3940,7 @@ input.input[type="date"] {
 .ed-setlist__num {
   width: 20px;
   text-align: right;
-  color: var(--text-dim);
+  color: #9ba0b8;
   font-size: 0.75rem;
   flex-shrink: 0;
 }
@@ -4460,20 +4465,25 @@ input.input[type="date"] {
 .ed-svc__icon--free { background: rgba(245,200,0,0.16); color: #f5c800; font-size: 0.65rem; }
 .ed-svc__txt { flex: 1; min-width: 0; }
 .ed-svc__title { font-size: 0.92rem; font-weight: 700; color: #fff; }
-.ed-svc__sub { font-size: 0.78rem; color: var(--text-mute); margin-top: 2px; }
+.ed-svc__sub { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
 .ed-svc__card > svg:last-child { color: var(--text-mute); flex-shrink: 0; }
 
-/* ── Brand hover per ogni servizio ── */
-.ed-svc__card[data-brand="booking"]:hover { border-color: rgba(0,90,200,0.45); background: rgba(0,90,200,0.06); }
-.ed-svc__card[data-brand="booking"] .ed-svc__icon { background: rgba(0,90,200,0.18); color: #5599e8; }
-.ed-svc__card[data-brand="airbnb"]:hover  { border-color: rgba(255,90,95,0.45);  background: rgba(255,90,95,0.06); }
-.ed-svc__card[data-brand="airbnb"] .ed-svc__icon  { background: rgba(255,90,95,0.18);  color: #ff7b7f; }
-.ed-svc__card[data-brand="uber"]:hover    { border-color: rgba(200,200,200,0.28); background: rgba(255,255,255,0.04); }
-.ed-svc__card[data-brand="uber"] .ed-svc__icon    { background: rgba(255,255,255,0.1);  color: #fff; }
-.ed-svc__card[data-brand="bus"]:hover     { border-color: rgba(66,133,244,0.45);  background: rgba(66,133,244,0.06); }
-.ed-svc__card[data-brand="bus"] .ed-svc__icon     { background: rgba(66,133,244,0.18);  color: #4285f4; font-size: 0.7rem; }
-.ed-svc__card[data-brand="free"]:hover    { border-color: rgba(245,200,0,0.45);   background: rgba(245,200,0,0.06); }
-.ed-svc__card[data-brand="free"] .ed-svc__icon    { background: rgba(245,200,0,0.15);   color: #f5c800; font-size: 0.65rem; }
+/* ── Brand colors per ogni servizio (visibili di default) ── */
+.ed-svc__card[data-brand="booking"] { border-color: rgba(0,90,200,0.30); background: rgba(0,90,200,0.05); }
+.ed-svc__card[data-brand="booking"]:hover { border-color: rgba(0,90,200,0.55); background: rgba(0,90,200,0.10); }
+.ed-svc__card[data-brand="booking"] .ed-svc__icon { background: rgba(0,90,200,0.22); color: #5599e8; }
+.ed-svc__card[data-brand="airbnb"]  { border-color: rgba(255,90,95,0.28);  background: rgba(255,90,95,0.05); }
+.ed-svc__card[data-brand="airbnb"]:hover  { border-color: rgba(255,90,95,0.55);  background: rgba(255,90,95,0.10); }
+.ed-svc__card[data-brand="airbnb"] .ed-svc__icon  { background: rgba(255,90,95,0.22);  color: #ff7b7f; }
+.ed-svc__card[data-brand="uber"]    { border-color: rgba(200,200,200,0.18); background: rgba(255,255,255,0.03); }
+.ed-svc__card[data-brand="uber"]:hover    { border-color: rgba(200,200,200,0.38); background: rgba(255,255,255,0.07); }
+.ed-svc__card[data-brand="uber"] .ed-svc__icon    { background: rgba(255,255,255,0.12);  color: #fff; }
+.ed-svc__card[data-brand="bus"]     { border-color: rgba(66,133,244,0.28);  background: rgba(66,133,244,0.05); }
+.ed-svc__card[data-brand="bus"]:hover     { border-color: rgba(66,133,244,0.55);  background: rgba(66,133,244,0.10); }
+.ed-svc__card[data-brand="bus"] .ed-svc__icon     { background: rgba(66,133,244,0.22);  color: #4285f4; font-size: 0.7rem; }
+.ed-svc__card[data-brand="free"]    { border-color: rgba(245,200,0,0.28);   background: rgba(245,200,0,0.04); }
+.ed-svc__card[data-brand="free"]:hover    { border-color: rgba(245,200,0,0.55);   background: rgba(245,200,0,0.09); }
+.ed-svc__card[data-brand="free"] .ed-svc__icon    { background: rgba(245,200,0,0.18);   color: #f5c800; font-size: 0.65rem; }
 
 /* ── Spotify + YouTube affiancati ── */
 .ed-media-duo {
@@ -4548,18 +4558,24 @@ input.input[type="date"] {
 }
 
 .ed-block--sp {
-  background: linear-gradient(160deg, rgba(30,215,96,0.08) 0%, var(--surface-2) 60%, var(--surface) 100%);
-  border-color: rgba(30,215,96,0.22);
+  background: linear-gradient(160deg, rgba(30,215,96,0.11) 0%, var(--surface-2) 55%, var(--surface) 100%);
+  border-color: rgba(30,215,96,0.32);
+  box-shadow: 0 0 0 1px rgba(30,215,96,0.07), inset 0 0 40px rgba(30,215,96,0.04);
 }
-.ed-block--sp::before { background: linear-gradient(90deg, transparent, rgba(30,215,96,0.7), transparent); }
-.ed-block--sp .ed-video { border-color: rgba(30,215,96,0.2); box-shadow: 0 6px 28px rgba(30,215,96,0.1); }
+.ed-block--sp::before { background: linear-gradient(90deg, transparent, rgba(30,215,96,0.85), transparent); }
+.ed-block--sp .ed-video { border-color: rgba(30,215,96,0.3); box-shadow: 0 6px 28px rgba(30,215,96,0.12); }
+.ed-block--sp .ed-block__title { color: #3ddd7a; }
+.ed-block--sp .ed-eyebrow { color: rgba(30,215,96,0.8); }
 
 .ed-block--yt {
-  background: linear-gradient(160deg, rgba(255,77,77,0.07) 0%, var(--surface-2) 60%, var(--surface) 100%);
-  border-color: rgba(255,77,77,0.2);
+  background: linear-gradient(160deg, rgba(255,60,60,0.11) 0%, var(--surface-2) 55%, var(--surface) 100%);
+  border-color: rgba(255,60,60,0.32);
+  box-shadow: 0 0 0 1px rgba(255,60,60,0.08), inset 0 0 40px rgba(255,60,60,0.04);
 }
-.ed-block--yt::before { background: linear-gradient(90deg, transparent, rgba(255,77,77,0.7), transparent); }
-.ed-block--yt .ed-video { border-color: rgba(255,77,77,0.2); box-shadow: 0 6px 28px rgba(255,77,77,0.1); }
+.ed-block--yt::before { background: linear-gradient(90deg, transparent, rgba(255,60,60,0.85), transparent); }
+.ed-block--yt .ed-video { border-color: rgba(255,60,60,0.3); box-shadow: 0 6px 28px rgba(255,60,60,0.15); }
+.ed-block--yt .ed-block__title { color: #ff7070; }
+.ed-block--yt .ed-eyebrow { color: rgba(255,100,100,0.8); }
 
 .ed-block--venue {
   background: linear-gradient(160deg, rgba(124,92,255,0.08) 0%, var(--surface-2) 60%, var(--surface) 100%);
@@ -4576,16 +4592,22 @@ input.input[type="date"] {
 }
 
 .ed-block--logistica {
-  background: linear-gradient(160deg, rgba(255,138,0,0.07) 0%, var(--surface-2) 60%, var(--surface) 100%);
-  border-color: rgba(255,138,0,0.2);
+  background: linear-gradient(160deg, rgba(255,138,0,0.10) 0%, var(--surface-2) 55%, var(--surface) 100%);
+  border-color: rgba(255,138,0,0.30);
+  box-shadow: 0 0 0 1px rgba(255,138,0,0.06), inset 0 0 40px rgba(255,138,0,0.04);
 }
-.ed-block--logistica::before { background: linear-gradient(90deg, transparent, rgba(255,138,0,0.65), transparent); }
+.ed-block--logistica::before { background: linear-gradient(90deg, transparent, rgba(255,138,0,0.8), transparent); }
+.ed-block--logistica .ed-block__title { color: #ffaa40; }
+.ed-block--logistica .ed-eyebrow { color: rgba(255,160,60,0.85); }
 
 .ed-block--dintorni {
-  background: linear-gradient(160deg, rgba(100,200,120,0.06) 0%, var(--surface-2) 60%, var(--surface) 100%);
-  border-color: rgba(100,200,120,0.16);
+  background: linear-gradient(160deg, rgba(80,200,110,0.09) 0%, var(--surface-2) 55%, var(--surface) 100%);
+  border-color: rgba(80,200,110,0.26);
+  box-shadow: 0 0 0 1px rgba(80,200,110,0.05), inset 0 0 40px rgba(80,200,110,0.03);
 }
-.ed-block--dintorni::before { background: linear-gradient(90deg, transparent, rgba(100,200,120,0.6), transparent); }
+.ed-block--dintorni::before { background: linear-gradient(90deg, transparent, rgba(80,200,110,0.8), transparent); }
+.ed-block--dintorni .ed-block__title { color: #5acc7a; }
+.ed-block--dintorni .ed-eyebrow { color: rgba(80,200,110,0.8); }
 
 /* Setlist — viola accent */
 .ed-block--setlist {
