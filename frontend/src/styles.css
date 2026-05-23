@@ -4139,9 +4139,31 @@ input.input[type="date"] {
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .ed-chip:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: #fff; }
-.ed-chip--ig:hover { color: #ff5fa2; border-color: rgba(225,48,108,0.55); background: rgba(225,48,108,0.12); }
-.ed-chip--x:hover  { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.35); }
-.ed-chip--fb:hover { color: #6ea9ff; border-color: rgba(24,119,242,0.55); background: rgba(24,119,242,0.12); }
+
+/* Instagram — gradient ufficiale viola→rosa→arancio */
+.ed-chip--ig {
+  color: #e1306c;
+  border-color: rgba(225,48,108,0.35);
+  background: rgba(225,48,108,0.08);
+}
+.ed-chip--ig:hover { color: #ff5fa2; border-color: rgba(225,48,108,0.6); background: rgba(225,48,108,0.15); }
+.ed-chip--ig svg { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); border-radius: 4px; }
+
+/* X (Twitter) — nero con bordo bianco sottile */
+.ed-chip--x {
+  color: #e7e9ea;
+  border-color: rgba(255,255,255,0.28);
+  background: rgba(0,0,0,0.3);
+}
+.ed-chip--x:hover { color: #fff; border-color: rgba(255,255,255,0.55); background: rgba(0,0,0,0.45); }
+
+/* Facebook — blu ufficiale #1877F2 */
+.ed-chip--fb {
+  color: #6ea9ff;
+  border-color: rgba(24,119,242,0.38);
+  background: rgba(24,119,242,0.1);
+}
+.ed-chip--fb:hover { color: #90bfff; border-color: rgba(24,119,242,0.6); background: rgba(24,119,242,0.18); }
 
 /* ── Spotify dentro il blocco ── */
 /* L'embed artista Spotify a piena altezza mostra la sua tracklist

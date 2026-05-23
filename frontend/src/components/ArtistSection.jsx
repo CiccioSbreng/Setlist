@@ -155,7 +155,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
       )}
 
       {setlistData?.songs?.length > 0 && (
-        <section className="ed-block">
+        <section className="ed-block ed-block--setlist">
           <div className="ed-block__head">
             <div>
               <span className="ed-eyebrow"><ListMusicIcon size={13} /> Scaletta</span>
@@ -180,7 +180,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
       )}
 
       {otherDates.length > 0 && (
-        <section className="ed-block">
+        <section className="ed-block ed-block--dates">
           <div className="ed-block__head">
             <div>
               <span className="ed-eyebrow"><CalendarIcon size={13} /> Tour</span>
