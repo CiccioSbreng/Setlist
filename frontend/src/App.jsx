@@ -1,6 +1,7 @@
 // frontend/src/App.jsx
 
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Toaster } from "sonner";
 import Home from "./pages/Home";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
@@ -12,6 +13,27 @@ import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/Profile";
 import GradientBackground from "./components/GradientBackground";
 import VideoBackground from "./components/VideoBackground";
+import { PageTransition } from "./components/Motion";
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <PageTransition>
+      <Routes location={location}>
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/event/:id" element={<EventDetail />} />
+        <Route path="/privacy" element={<Legal doc="privacy" />} />
+        <Route path="/termini" element={<Legal doc="termini" />} />
+        <Route path="/cookie" element={<Legal doc="cookie" />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </PageTransition>
+  );
+}
 
 export default function App() {
   return (
@@ -22,21 +44,11 @@ export default function App() {
         <Navbar />
 
         <main className="app-main">
-          <Routes>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/event/:id" element={<EventDetail />} />
-            <Route path="/privacy" element={<Legal doc="privacy" />} />
-            <Route path="/termini" element={<Legal doc="termini" />} />
-            <Route path="/cookie" element={<Legal doc="cookie" />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AnimatedRoutes />
         </main>
 
         <Footer />
+        <Toaster theme="dark" position="bottom-right" richColors closeButton />
       </div>
     </BrowserRouter>
   );
