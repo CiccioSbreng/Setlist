@@ -109,6 +109,8 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
                   className="ed-sp__frame"
                   title="Player Spotify"
                   src={spotifyArtist.embedUrl}
+                  width="100%"
+                  height="352"
                   loading="lazy"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 />
