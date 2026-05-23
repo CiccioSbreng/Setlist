@@ -40,8 +40,14 @@ export function useVenueData(ev) {
       .then((d) => setParks((d.elements || []).filter((e) => e.tags?.name).slice(0, 5).map((e) => ({ id: e.id, type: e.type, name: e.tags.name }))))
       .catch(() => {});
 
-    q(`[out:json][timeout:10];(node(around:2000,${lat},${lon})[amenity~"restaurant|bar|cafe|fast_food|pub|pizzeria"][name];way(around:2000,${lat},${lon})[amenity~"restaurant|bar|cafe|fast_food|pub|pizzeria"][name];);out center 6;`)
-      .then((d) => setRestaurants((d.elements || []).filter((e) => e.tags?.name).slice(0, 6).map((e) => ({ id: e.id, name: e.tags.name, type: e.tags.amenity, lat: e.lat ?? e.center?.lat, lon: e.lon ?? e.center?.lon }))))
+    const CHAIN_RE = /autogrill|mcdonald|burger king|kfc|subway|starbucks|old wild west|roadhouse|spizzico|grill and chill/i;
+    q(`[out:json][timeout:10];(node(around:1500,${lat},${lon})[amenity~"restaurant|pizzeria|pub|bar"][name][!"brand"];way(around:1500,${lat},${lon})[amenity~"restaurant|pizzeria|pub|bar"][name][!"brand"];);out center 8;`)
+      .then((d) => setRestaurants(
+        (d.elements || [])
+          .filter((e) => e.tags?.name && !CHAIN_RE.test(e.tags.name))
+          .slice(0, 6)
+          .map((e) => ({ id: e.id, name: e.tags.name, type: e.tags.amenity, lat: e.lat ?? e.center?.lat, lon: e.lon ?? e.center?.lon }))
+      ))
       .catch(() => {});
 
     q(`[out:json][timeout:8];(node(around:1200,${lat},${lon})[amenity=parking][name];way(around:1200,${lat},${lon})[amenity=parking][name];);out center 5;`)
