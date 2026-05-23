@@ -4467,3 +4467,81 @@ input.input[type="date"] {
   .countdown__num { animation: none; }
   .countdown--soon .countdown__cell::before { animation: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DESIGN TOKENS v2 — additivi, non sostituiscono i precedenti
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  /* Spacing */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px;
+
+  /* Type scale fluida */
+  --fs-xs:   clamp(0.72rem, 0.7rem + 0.1vw,  0.78rem);
+  --fs-sm:   clamp(0.82rem, 0.8rem + 0.15vw, 0.9rem);
+  --fs-md:   1rem;
+  --fs-lg:   clamp(1.05rem, 1rem + 0.4vw,    1.2rem);
+  --fs-xl:   clamp(1.3rem,  1.1rem + 1vw,    1.6rem);
+  --fs-2xl:  clamp(1.7rem,  1.3rem + 1.6vw,  2.2rem);
+  --fs-3xl:  clamp(2.2rem,  1.6rem + 2.6vw,  3.4rem);
+  --fs-hero: clamp(2.4rem,  1.8rem + 3.4vw,  5rem);
+
+  /* Motion */
+  --ease-snap:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-cinema: cubic-bezier(0.2, 0.9, 0.3, 1);
+  --dur-snap:    200ms;
+  --dur-medium:  280ms;
+  --dur-cinema:  520ms;
+
+  /* Glass v2 */
+  --glass:        rgba(255, 255, 255, 0.04);
+  --glass-strong: rgba(255, 255, 255, 0.08);
+  --glass-blur:   saturate(140%) blur(18px);
+}
+
+.surface-raised {
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-md);
+}
+.surface-floating {
+  background: var(--glass-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+}
+
+.img-cinema { position: relative; overflow: hidden; }
+.img-cinema::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(8, 8, 12, 0.85) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.img-cinema > * { position: relative; }
+.img-cinema > .ev-card__body,
+.img-cinema > .ev-card__date,
+.img-cinema > .ev-card__fav,
+.img-cinema > .ev-card__price,
+.img-cinema > .ev-card__genre { z-index: 2; }
+
+.press { transition: transform var(--dur-snap) var(--ease-snap); }
+.press:active { transform: scale(0.97); }
+
+/* Stagger items: il movimento è gestito da framer-motion,
+   qui solo garantiamo che il transform 3D non venga clippato */
+.cinematic-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press, .cinematic-card { transform: none !important; }
+}

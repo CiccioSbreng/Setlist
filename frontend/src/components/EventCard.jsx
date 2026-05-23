@@ -1,6 +1,7 @@
 // frontend/src/components/EventCard.jsx
 
 import { Link } from "react-router-dom";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import {
   CalendarIcon,
   ClockIcon,
@@ -60,6 +61,8 @@ function formatPrice(min, max, currency) {
   return `da ${fmt(min ?? max)}`;
 }
 
+const SPRING = { stiffness: 220, damping: 26, mass: 0.6 };
+
 export default function EventCard({
   ev,
   onAddFavorite,
@@ -77,8 +80,31 @@ export default function EventCard({
   // oppure quando l'evento risulta salvato in home.
   const active = typeof onRemove === "function" ? true : Boolean(favorited);
 
+  // Parallax 3D al passaggio mouse — tilt morbido via spring
+  const mx = useSpring(useMotionValue(0.5), SPRING);
+  const my = useSpring(useMotionValue(0.5), SPRING);
+  const rotateX = useTransform(my, [0, 1], [6, -6]);
+  const rotateY = useTransform(mx, [0, 1], [-6, 6]);
+
+  function handleMove(e) {
+    const r = e.currentTarget.getBoundingClientRect();
+    mx.set((e.clientX - r.left) / r.width);
+    my.set((e.clientY - r.top) / r.height);
+  }
+  function handleLeave() {
+    mx.set(0.5);
+    my.set(0.5);
+  }
+
   return (
-    <article className="ev-card appear">
+    <motion.article
+      className="ev-card press cinematic-card appear"
+      style={{ rotateX, rotateY, transformPerspective: 1000 }}
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.28, ease: [0.2, 0.9, 0.3, 1] }}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+    >
       <div className="ev-card__media">
         {ev.image ? (
           <img
@@ -188,6 +214,6 @@ export default function EventCard({
           )}
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
