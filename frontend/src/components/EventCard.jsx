@@ -18,7 +18,11 @@ const MONTHS = [
 
 const pad = (n) => String(n).padStart(2, "0");
 
-const STARTED_WINDOW_MS = 5 * 60 * 60 * 1000; // mostra "Iniziato" per 5h dopo lo start
+function isToday(date) {
+  const d = new Date(date.includes("T") ? date : `${date}T12:00:00`);
+  const n = new Date();
+  return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
+}
 
 function useCardCountdown(date, time) {
   const [label, setLabel] = useState(null);
@@ -27,11 +31,17 @@ function useCardCountdown(date, time) {
     if (!date) return;
     const target = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
     if (isNaN(target)) return;
+
+    if (target <= Date.now() && isToday(date)) {
+      setLabel("started");
+      return;
+    }
+
     function tick() {
       const diff = target - Date.now();
       if (diff <= 0) {
         clearInterval(ref.current);
-        setLabel(diff > -STARTED_WINDOW_MS ? "started" : null);
+        setLabel(isToday(date) ? "started" : null);
         return;
       }
       const d = Math.floor(diff / 86400000);

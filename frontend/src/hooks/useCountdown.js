@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from "react";
 
 const pad = (n) => String(n).padStart(2, "0");
 
+function isToday(date) {
+  const d = new Date(date.includes("T") ? date : `${date}T12:00:00`);
+  const n = new Date();
+  return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
+}
+
 export function useCountdown(date, time) {
   const [label, setLabel] = useState(null);
   const ref = useRef(null);
@@ -11,12 +17,16 @@ export function useCountdown(date, time) {
     const target = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
     if (isNaN(target)) return;
 
-    const STARTED_WINDOW = 5 * 60 * 60 * 1000;
+    if (target <= Date.now() && isToday(date)) {
+      setLabel("🔴 Iniziato");
+      return;
+    }
+
     function tick() {
       const diff = target - Date.now();
       if (diff <= 0) {
         clearInterval(ref.current);
-        setLabel(diff > -STARTED_WINDOW ? "🔴 Iniziato" : null);
+        setLabel(isToday(date) ? "🔴 Iniziato" : null);
         return;
       }
       const d = Math.floor(diff / 86400000);
