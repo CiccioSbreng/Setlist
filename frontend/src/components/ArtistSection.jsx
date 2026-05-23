@@ -104,7 +104,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
                   </a>
                 )}
               </div>
-              <div className="ed-sp__wrap">
+              <div className="ed-sp__box">
                 <iframe
                   className="ed-sp__frame"
                   title="Player Spotify"
