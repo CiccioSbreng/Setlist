@@ -4370,24 +4370,26 @@ input.input[type="date"] {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  align-items: stretch;
+  align-items: start;
 }
-/* Entrambe le card crescono uguali e usano flex-column */
+/* Altezza fissa garantita su entrambe le card */
 .ed-media-duo .ed-block {
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  height: 500px;
 }
-/* YouTube e Spotify crescono a riempire lo spazio rimasto */
+/* Player riempie tutto lo spazio rimasto dopo l'header */
 .ed-media-duo .ed-video {
   flex: 1;
-  min-height: 220px;
+  min-height: 0;
   aspect-ratio: unset;
 }
 .ed-sp__frame {
   flex: 1;
   display: block;
   width: 100%;
-  min-height: 220px;
+  min-height: 0;
   border: 1px solid rgba(30,215,96,0.2);
   border-radius: var(--r-lg);
 }
