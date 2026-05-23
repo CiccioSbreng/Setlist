@@ -3313,11 +3313,26 @@ input.input[type="date"] {
 /* SOLD OUT — banner in diagonale sull'immagine */
 /* Sold out — badge compatto in basso a sinistra nella card */
 .ev-card__soldout-badge {
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  color: #ff4444;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.12);
+  border: 1px solid rgba(255, 68, 68, 0.35);
+  border-radius: var(--r-pill);
+  padding: 4px 10px 4px 8px;
+}
+.ev-card__soldout-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff4444;
+  flex-shrink: 0;
 }
 
 @media (max-width: 640px) {
