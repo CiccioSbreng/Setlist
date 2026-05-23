@@ -4450,7 +4450,9 @@ input.input[type="date"] {
 .ed-block--yt::before,
 .ed-block--venue::before,
 .ed-block--logistica::before,
-.ed-block--dintorni::before {
+.ed-block--dintorni::before,
+.ed-block--setlist::before,
+.ed-block--dates::before {
   content: '';
   position: absolute;
   top: 0; left: 15%; right: 15%;
@@ -4498,6 +4500,20 @@ input.input[type="date"] {
   border-color: rgba(100,200,120,0.16);
 }
 .ed-block--dintorni::before { background: linear-gradient(90deg, transparent, rgba(100,200,120,0.6), transparent); }
+
+/* Setlist — viola accent */
+.ed-block--setlist {
+  background: linear-gradient(160deg, rgba(160,100,255,0.07) 0%, var(--surface-2) 60%, var(--surface) 100%);
+  border-color: rgba(160,100,255,0.2);
+}
+.ed-block--setlist::before { background: linear-gradient(90deg, transparent, rgba(160,100,255,0.65), transparent); }
+
+/* Prossime date — arancio/ambra accent */
+.ed-block--dates {
+  background: linear-gradient(160deg, rgba(255,165,0,0.07) 0%, var(--surface-2) 60%, var(--surface) 100%);
+  border-color: rgba(255,165,0,0.2);
+}
+.ed-block--dates::before { background: linear-gradient(90deg, transparent, rgba(255,165,0,0.65), transparent); }
 
 /* ── City info dentro blocco ── */
 .ed-block .ed-cityinfo__body { display: flex; gap: 20px; }
