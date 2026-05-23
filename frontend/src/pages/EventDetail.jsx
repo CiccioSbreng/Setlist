@@ -78,7 +78,7 @@ export default function EventDetail() {
   const { isFav, toggle: toggleFav } = useEventFavorite(id, ev);
   const cdLabel = useCountdown(ev?.date, ev?.time);
   const heroRef = useTilt({ max: 7 });
-  const barAnchorRef = useRef(null);
+  const stageRef = useRef(null);
   const [barFloating, setBarFloating] = useState(false);
 
   // VenueSection: monta solo quando il sentinella entra nel viewport
@@ -95,14 +95,21 @@ export default function EventDetail() {
   }, [ev]);
 
   useEffect(() => {
-    const anchor = barAnchorRef.current;
-    if (!anchor) return;
-    const obs = new IntersectionObserver(
-      ([e]) => setBarFloating(!e.isIntersecting),
-      { threshold: 0, rootMargin: "-68px 0px 0px 0px" }
-    );
-    obs.observe(anchor);
-    return () => obs.disconnect();
+    if (!ev) return;
+    const stage = stageRef.current;
+    if (!stage) return;
+    const check = () => {
+      if (window.innerWidth <= 860) { setBarFloating(false); return; }
+      const rect = stage.getBoundingClientRect();
+      setBarFloating(rect.bottom < 72);
+    };
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check, { passive: true });
+    check();
+    return () => {
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    };
   }, [ev]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
@@ -153,7 +160,7 @@ export default function EventDetail() {
         <Link to="/home" className="ed-back">← Tutti gli eventi</Link>
 
         {/* ── HERO 3D ── */}
-        <div className="ed-stage">
+        <div ref={stageRef} className="ed-stage">
           <div ref={heroRef} className={`ed-hero${!ev.image ? " ed-hero--noimg" : ""}`}>
             {ev.image && (
               <div className="ed-hero__media">
@@ -191,7 +198,6 @@ export default function EventDetail() {
         </div>
 
         {/* ── BARRA: navigazione + azioni ── */}
-        <div ref={barAnchorRef} style={{ height: 0 }} aria-hidden="true" />
         <div className={`ed-bar${barFloating ? " is-floating" : ""}`}>
           <nav className="ed-bar__nav" aria-label="Sezioni evento">
             {[["evento","Evento"],["artista","Artista"],["dove","Dove & Come"]].map(([tab, label]) => (
