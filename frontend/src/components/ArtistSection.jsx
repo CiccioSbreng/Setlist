@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { formatWhen } from "../lib/format";
 import {
-  ArrowRightIcon, CalendarIcon, GlobeIcon, InstagramIcon,
-  ListMusicIcon, MusicIcon, SpotifyIcon, YoutubeIcon,
+  ArrowRightIcon, CalendarIcon, FacebookIcon, GlobeIcon, InstagramIcon,
+  ListMusicIcon, MusicIcon, SpotifyIcon, XIcon, YoutubeIcon,
 } from "./Icons";
 
 function compact(n) {
@@ -58,22 +58,31 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
               )}
 
               <div className="ed-aphero__links">
-                {artist.links?.instagram && (
-                  <a href={artist.links.instagram} target="_blank" rel="noreferrer" className="ed-chip ed-chip--ig">
-                    <InstagramIcon size={15} />Instagram
-                  </a>
-                )}
-                {artist.links?.homepage && (
-                  <a href={artist.links.homepage} target="_blank" rel="noreferrer" className="ed-chip">
-                    <GlobeIcon size={15} />Sito ufficiale
-                  </a>
-                )}
-                {artist.links?.twitter && (
-                  <a href={artist.links.twitter} target="_blank" rel="noreferrer" className="ed-chip">Twitter / X</a>
-                )}
-                {artist.links?.facebook && (
-                  <a href={artist.links.facebook} target="_blank" rel="noreferrer" className="ed-chip">Facebook</a>
-                )}
+                {(() => {
+                  const n = encodeURIComponent(artist.name);
+                  const ig  = artist.links?.instagram  || `https://www.instagram.com/explore/search/keyword/?q=${n}`;
+                  const tw  = artist.links?.twitter    || `https://x.com/search?q=${n}&f=user`;
+                  const fb  = artist.links?.facebook   || `https://www.facebook.com/search/top?q=${n}`;
+                  const web = artist.links?.homepage;
+                  return (
+                    <>
+                      <a href={ig} target="_blank" rel="noreferrer" className="ed-chip ed-chip--ig">
+                        <InstagramIcon size={15} />Instagram
+                      </a>
+                      <a href={tw} target="_blank" rel="noreferrer" className="ed-chip ed-chip--x">
+                        <XIcon size={15} />X
+                      </a>
+                      <a href={fb} target="_blank" rel="noreferrer" className="ed-chip ed-chip--fb">
+                        <FacebookIcon size={15} />Facebook
+                      </a>
+                      {web && (
+                        <a href={web} target="_blank" rel="noreferrer" className="ed-chip">
+                          <GlobeIcon size={15} />Sito ufficiale
+                        </a>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>
