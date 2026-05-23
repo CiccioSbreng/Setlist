@@ -4372,6 +4372,17 @@ input.input[type="date"] {
   gap: 20px;
   align-items: stretch;
 }
+/* header su una riga sola: bottone non va a capo, i due player si allineano */
+.ed-media-duo .ed-block__head {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.ed-media-duo .ed-block__cta {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
 .ed-media-duo .ed-block {
   display: flex;
   flex-direction: column;
@@ -4382,9 +4393,9 @@ input.input[type="date"] {
   min-height: 0;
   aspect-ratio: unset;
 }
-/* Spotify: box esattamente 352px, iframe dichiarato anche come HTML attr */
+/* Spotify: 450px per mostrare più tracce */
 .ed-sp__box {
-  height: 352px;
+  height: 450px;
   border-radius: var(--r-lg);
   overflow: hidden;
   border: 3px solid rgba(30,215,96,0.55);
@@ -4396,7 +4407,7 @@ input.input[type="date"] {
 .ed-sp__frame {
   display: block;
   width: 100%;
-  height: 352px;
+  height: 450px;
   border: 0;
 }
 

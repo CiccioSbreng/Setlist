@@ -110,7 +110,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
                   title="Player Spotify"
                   src={spotifyArtist.embedUrl}
                   width="100%"
-                  height="352"
+                  height="450"
                   loading="lazy"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 />
