@@ -78,6 +78,8 @@ export default function EventDetail() {
   const { isFav, toggle: toggleFav } = useEventFavorite(id, ev);
   const cdLabel = useCountdown(ev?.date, ev?.time);
   const heroRef = useTilt({ max: 7 });
+  const barAnchorRef = useRef(null);
+  const [barFloating, setBarFloating] = useState(false);
 
   // VenueSection: monta solo quando il sentinella entra nel viewport
   const [venueVisible, setVenueVisible] = useState(false);
@@ -89,6 +91,17 @@ export default function EventDetail() {
       { rootMargin: "300px" }
     );
     obs.observe(venueSentinelRef.current);
+    return () => obs.disconnect();
+  }, [ev]);
+
+  useEffect(() => {
+    const anchor = barAnchorRef.current;
+    if (!anchor) return;
+    const obs = new IntersectionObserver(
+      ([e]) => setBarFloating(!e.isIntersecting),
+      { threshold: 0, rootMargin: "-68px 0px 0px 0px" }
+    );
+    obs.observe(anchor);
     return () => obs.disconnect();
   }, [ev]);
 
@@ -178,7 +191,8 @@ export default function EventDetail() {
         </div>
 
         {/* ── BARRA: navigazione + azioni ── */}
-        <div className="ed-bar">
+        <div ref={barAnchorRef} style={{ height: 0 }} aria-hidden="true" />
+        <div className={`ed-bar${barFloating ? " is-floating" : ""}`}>
           <nav className="ed-bar__nav" aria-label="Sezioni evento">
             {[["evento","Evento"],["artista","Artista"],["dove","Dove & Come"]].map(([tab, label]) => (
               <button
