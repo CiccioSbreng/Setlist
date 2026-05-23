@@ -1,5 +1,6 @@
 // frontend/src/components/EventCard.jsx
 
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import {
@@ -16,16 +17,31 @@ const MONTHS = [
   "LUG", "AGO", "SET", "OTT", "NOV", "DIC",
 ];
 
-function getDaysLeft(date, time) {
-  if (!date) return null;
-  const d = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
-  if (Number.isNaN(d.getTime()) || d - Date.now() < 0) return null;
-  const days = Math.floor((d - Date.now()) / 86400000);
-  if (days === 0) return "Oggi!";
-  if (days === 1) return "Domani!";
-  if (days < 30) return `Tra ${days} giorni`;
-  const months = Math.floor(days / 30);
-  return `Tra ${months} ${months === 1 ? "mese" : "mesi"}`;
+const pad = (n) => String(n).padStart(2, "0");
+
+function useCardCountdown(date, time) {
+  const [label, setLabel] = useState(null);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!date) return;
+    const target = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
+    if (isNaN(target)) return;
+    function tick() {
+      const diff = target - Date.now();
+      if (diff <= 0) { setLabel(null); return; }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      if (d > 0)      setLabel(`${d}g ${pad(h)}h ${pad(m)}m`);
+      else if (h > 0) setLabel(`${pad(h)}h ${pad(m)}m ${pad(s)}s`);
+      else            setLabel(`${pad(m)}m ${pad(s)}s`);
+    }
+    tick();
+    ref.current = setInterval(tick, 1000);
+    return () => clearInterval(ref.current);
+  }, [date, time]);
+  return label;
 }
 
 // Estrae { day, month, dateLabel, timeLabel } in modo robusto dai dati Ticketmaster.
@@ -61,7 +77,7 @@ function formatPrice(min, max, currency) {
   return `da ${fmt(min ?? max)}`;
 }
 
-const SPRING = { stiffness: 220, damping: 26, mass: 0.6 };
+const SPRING = { stiffness: 160, damping: 28, mass: 0.8 };
 
 export default function EventCard({
   ev,
@@ -73,18 +89,16 @@ export default function EventCard({
   const when = parseWhen(ev.date, ev.time);
   const price = formatPrice(ev.priceMin, ev.priceMax, ev.currency);
   const detailId = ev.eventId || ev.id;
-  const daysLeft = getDaysLeft(ev.date, ev.time);
+  const cdLabel = useCardCountdown(ev.date, ev.time);
 
   const favAction = onRemove || onToggleFavorite || onAddFavorite;
-  // cuore acceso (rosso) se è nei preferiti: sempre nella pagina Preferiti,
-  // oppure quando l'evento risulta salvato in home.
   const active = typeof onRemove === "function" ? true : Boolean(favorited);
 
-  // Parallax 3D al passaggio mouse — tilt morbido via spring
+  // Parallax 3D — spring più morbida per evitare jitter
   const mx = useSpring(useMotionValue(0.5), SPRING);
   const my = useSpring(useMotionValue(0.5), SPRING);
-  const rotateX = useTransform(my, [0, 1], [6, -6]);
-  const rotateY = useTransform(mx, [0, 1], [-6, 6]);
+  const rotateX = useTransform(my, [0, 1], [5, -5]);
+  const rotateY = useTransform(mx, [0, 1], [-5, 5]);
 
   function handleMove(e) {
     const r = e.currentTarget.getBoundingClientRect();
@@ -192,7 +206,7 @@ export default function EventCard({
 
         <div className="ev-card__foot">
           <div className="ev-card__foot-left">
-            {daysLeft && <span className="ev-card__countdown">{daysLeft}</span>}
+            {cdLabel && <span className="ev-card__countdown">⏱ {cdLabel}</span>}
             {detailId && (
               <Link to={`/event/${detailId}`} className="ev-card__detail-link">
                 Scopri evento →
