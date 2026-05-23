@@ -4124,6 +4124,8 @@ input.input[type="date"] {
 }
 .ed-chip:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: #fff; }
 .ed-chip--ig:hover { color: #ff5fa2; border-color: rgba(225,48,108,0.55); background: rgba(225,48,108,0.12); }
+.ed-chip--x:hover  { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.35); }
+.ed-chip--fb:hover { color: #6ea9ff; border-color: rgba(24,119,242,0.55); background: rgba(24,119,242,0.12); }
 
 /* ── Spotify dentro il blocco ── */
 /* L'embed artista Spotify a piena altezza mostra la sua tracklist
