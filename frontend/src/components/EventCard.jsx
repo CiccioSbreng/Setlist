@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import {
   CalendarIcon,
   ClockIcon,
@@ -44,7 +43,6 @@ function useCardCountdown(date, time) {
   return label;
 }
 
-// Estrae { day, month, dateLabel, timeLabel } in modo robusto dai dati Ticketmaster.
 function parseWhen(date, time) {
   if (!date) return null;
   const hasTime = typeof date === "string" && date.includes("T");
@@ -77,7 +75,20 @@ function formatPrice(min, max, currency) {
   return `da ${fmt(min ?? max)}`;
 }
 
-const SPRING = { stiffness: 160, damping: 28, mass: 0.8 };
+function handleMove(e) {
+  const r = e.currentTarget.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width - 0.5;
+  const y = (e.clientY - r.top) / r.height - 0.5;
+  e.currentTarget.style.setProperty("--rx", `${(-y * 8).toFixed(2)}deg`);
+  e.currentTarget.style.setProperty("--ry", `${(x * 8).toFixed(2)}deg`);
+  e.currentTarget.style.setProperty("--lift", "-7px");
+}
+
+function handleLeave(e) {
+  e.currentTarget.style.setProperty("--rx", "0deg");
+  e.currentTarget.style.setProperty("--ry", "0deg");
+  e.currentTarget.style.setProperty("--lift", "0px");
+}
 
 export default function EventCard({
   ev,
@@ -94,28 +105,9 @@ export default function EventCard({
   const favAction = onRemove || onToggleFavorite || onAddFavorite;
   const active = typeof onRemove === "function" ? true : Boolean(favorited);
 
-  // Parallax 3D — spring più morbida per evitare jitter
-  const mx = useSpring(useMotionValue(0.5), SPRING);
-  const my = useSpring(useMotionValue(0.5), SPRING);
-  const rotateX = useTransform(my, [0, 1], [5, -5]);
-  const rotateY = useTransform(mx, [0, 1], [-5, 5]);
-
-  function handleMove(e) {
-    const r = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width);
-    my.set((e.clientY - r.top) / r.height);
-  }
-  function handleLeave() {
-    mx.set(0.5);
-    my.set(0.5);
-  }
-
   return (
-    <motion.article
+    <article
       className="ev-card press cinematic-card appear"
-      style={{ rotateX, rotateY, transformPerspective: 1000 }}
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.28, ease: [0.2, 0.9, 0.3, 1] }}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
     >
@@ -146,12 +138,8 @@ export default function EventCard({
               type="button"
               className={"icon-btn icon-btn--fav" + (active ? " is-on" : "")}
               onClick={favAction}
-              title={
-                active ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
-              }
-              aria-label={
-                active ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
-              }
+              title={active ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+              aria-label={active ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
               aria-pressed={active}
             >
               <HeartIcon size={19} filled={active} />
@@ -228,6 +216,6 @@ export default function EventCard({
           )}
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
