@@ -4368,7 +4368,7 @@ input.input[type="date"] {
 /* ── Spotify + YouTube affiancati ── */
 .ed-media-duo {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
   align-items: stretch;
 }
