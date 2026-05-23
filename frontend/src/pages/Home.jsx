@@ -27,6 +27,12 @@ import {
   YoutubeIcon,
 } from "../components/Icons";
 
+const HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=800&q=80",
+];
+
 const FEATURES = [
   {
     icon: <PinIcon size={22} />,
@@ -324,20 +330,16 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Scena stage 3D — nessuna immagine esterna */}
-          <div className="hero__stage" aria-hidden="true">
-            <div className="stage__beams">
-              <span className="beam b1" />
-              <span className="beam b2" />
-              <span className="beam b3" />
-              <span className="beam b4" />
-              <span className="beam b5" />
+          <div className="hero__art" aria-hidden="true">
+            <div className="hero__card c1">
+              <img src={HERO_IMAGES[0]} alt="" />
             </div>
-            <div className="stage__floor" />
-            <div className="stage__orb" />
-            <div className="stage__ring r1" />
-            <div className="stage__ring r2" />
-            <div className="stage__ring r3" />
+            <div className="hero__card c2">
+              <img src={HERO_IMAGES[1]} alt="" />
+            </div>
+            <div className="hero__card c3">
+              <img src={HERO_IMAGES[2]} alt="" />
+            </div>
           </div>
         </div>
       </section>
