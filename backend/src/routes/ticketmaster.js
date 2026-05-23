@@ -70,6 +70,18 @@ function mapVenue(v){
   }
 }
 
+function isSoldOut(ev) {
+  if (ev.dates?.status?.code === 'offsale') return true
+  if (ev.availability?.soldOut === true) return true
+  const saleEnd = ev.sales?.public?.endDateTime
+  const eventStart = ev.dates?.start?.dateTime || ev.dates?.start?.localDate
+  if (saleEnd && eventStart) {
+    const now = Date.now()
+    if (new Date(saleEnd).getTime() < now && new Date(eventStart).getTime() > now) return true
+  }
+  return false
+}
+
 async function tmRequest(params) {
   const { data } = await axios.get(`${TM_BASE}/events.json`, { params })
   const events = (data?._embedded?.events || []).map(ev => {
@@ -86,7 +98,7 @@ async function tmRequest(params) {
       address: v?.address?.line1 || null,
       genre: ev.classifications?.[0]?.genre?.name || null,
       status: ev.dates?.status?.code || null,
-      soldOut: ev.dates?.status?.code === 'offsale' || ev.availability?.soldOut === true,
+      soldOut: isSoldOut(ev),
       priceMin: ev.priceRanges?.[0]?.min ?? null,
       priceMax: ev.priceRanges?.[0]?.max ?? null,
       currency: ev.priceRanges?.[0]?.currency || null,
@@ -111,7 +123,7 @@ function mapDetail(ev){
     date: ev.dates?.start?.dateTime || ev.dates?.start?.localDate || null,
     time: ev.dates?.start?.localTime || null,
     status: ev.dates?.status?.code || null,
-    soldOut: ev.dates?.status?.code === 'offsale' || ev.availability?.soldOut === true,
+    soldOut: isSoldOut(ev),
     venue: mapVenue(ev._embedded?.venues?.[0]),
     segment: c?.segment?.name || null,
     genre: c?.genre?.name || null,
