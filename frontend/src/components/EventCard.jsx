@@ -175,9 +175,11 @@ export default function EventCard({
           <div className="ev-card__genre">{ev.genre}</div>
         )}
 
-        {ev.soldOut && (
+        {ev.status === "cancelled" ? (
+          <div className="ev-card__cancelled-badge">Annullato</div>
+        ) : ev.soldOut ? (
           <div className="ev-card__soldout-badge">Sold Out</div>
-        )}
+        ) : null}
 
       </div>
 
@@ -216,7 +218,7 @@ export default function EventCard({
 
         <div className="ev-card__foot">
           <div className="ev-card__foot-left">
-            {!ev.soldOut && (
+            {ev.status !== "cancelled" && !ev.soldOut && (
               cdLabel === "started"
                 ? <span className="ev-card__live">🔴 In corso</span>
                 : cdLabel
@@ -229,7 +231,15 @@ export default function EventCard({
               </Link>
             )}
           </div>
-          {ev.soldOut ? null : ev.url ? (
+          {ev.status === "cancelled" ? (
+            <button type="button" className="btn btn--sm ev-card__cancelled-btn" disabled>
+              Annullato
+            </button>
+          ) : ev.soldOut ? (
+            <button type="button" className="btn btn--sm ev-card__soldout-btn" disabled>
+              Sold Out
+            </button>
+          ) : ev.url ? (
             <a
               href={ev.url}
               target="_blank"
