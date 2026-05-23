@@ -28,7 +28,11 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
             )}
             <div className="ed-aphero__body">
               <span className="ed-eyebrow"><MusicIcon size={13} /> Artista</span>
-              <h2 className="ed-aphero__name">{artist.name}</h2>
+              <h2 className="ed-aphero__name">
+                {artist.id
+                  ? <Link to={`/artist/${artist.id}`} className="ed-aphero__namelink">{artist.name}</Link>
+                  : artist.name}
+              </h2>
               {artist.genre && <p className="ed-aphero__genre">{artist.genre}</p>}
 
               {spotifyArtist && (spotifyArtist.followers > 0 || spotifyArtist.genres?.length > 0) && (

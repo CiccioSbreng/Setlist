@@ -8,6 +8,7 @@ import Footer from "./components/footer";
 import LoginPage from "./pages/login";
 import FavoritesPage from "./pages/Favorites";
 import EventDetail from "./pages/EventDetail";
+import ArtistPage  from "./pages/ArtistPage";
 import Legal from "./pages/Legal";
 import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/Profile";
@@ -26,7 +27,8 @@ function AnimatedRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/event/:id" element={<EventDetail />} />
+        <Route path="/event/:id"   element={<EventDetail />} />
+        <Route path="/artist/:id" element={<ArtistPage />} />
         <Route path="/privacy" element={<Legal doc="privacy" />} />
         <Route path="/termini" element={<Legal doc="termini" />} />
         <Route path="/cookie" element={<Legal doc="cookie" />} />

@@ -4104,6 +4104,58 @@ input.input[type="date"] {
   margin-top: 18px;
 }
 
+/* ── ArtistPage: hero più grande ── */
+.ed-aphero--page {
+  min-height: 260px;
+}
+.ed-aphero__photo--lg {
+  width: 200px;
+  height: 200px;
+  border-radius: 28px;
+}
+.ed-aphero__namelink {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.ed-aphero__namelink:hover { opacity: 0.75; }
+
+/* ── Bio nel blocco ── */
+.ed-bio__text {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.72);
+  margin: 0;
+}
+.ed-bio__toggle {
+  margin-top: 14px;
+  background: none;
+  border: none;
+  color: var(--brand);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+.ed-bio__toggle:hover { opacity: 0.8; }
+
+/* ── Date row estesa con prezzo ── */
+.ed-dates__row--full {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  align-items: center;
+}
+.ed-dates__where { display: flex; align-items: center; gap: 6px; }
+.ed-dates__price {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: var(--brand-soft);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* ── Stat pills ── */
 .ed-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .ed-stat {
@@ -4544,6 +4596,9 @@ input.input[type="date"] {
   .ed-block { padding: 22px 18px; }
   .ed-aphero__inner { flex-direction: column; align-items: flex-start; gap: 20px; padding: 24px; }
   .ed-aphero__photo { width: 110px; height: 110px; }
+  .ed-aphero__photo--lg { width: 130px; height: 130px; }
+  .ed-dates__row--full { grid-template-columns: 1fr auto; gap: 10px; }
+  .ed-dates__where, .ed-dates__price { display: none; }
   .ed-place { grid-template-columns: 1fr; }
   .ed-block .ed-cityinfo__body { flex-direction: column; }
   .ed-block .ed-cityinfo__body img { width: 100%; height: 200px; }
