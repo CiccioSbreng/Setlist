@@ -114,10 +114,11 @@ export default function EventCard({
       <div className="ev-card__media">
         {ev.image ? (
           <img
-            className="ev-card__img"
+            className="ev-card__img blur-up"
             src={ev.image}
             alt={ev.name || "Evento"}
             loading="lazy"
+            onLoad={(e) => e.target.classList.remove("blur-up")}
           />
         ) : (
           <div className="ev-card__noimg">

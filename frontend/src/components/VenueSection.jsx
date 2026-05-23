@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useVenueData } from "../hooks/useVenueData";
 import {
   ArrowRightIcon, BedIcon, CloudIcon, ForkIcon,
   GlobeIcon, PinIcon, TreeIcon,
 } from "./Icons";
 
-export default function VenueSection({ ev, weather, weatherLoading, parks, restaurants, parkings, cityInfo }) {
+export default function VenueSection({ ev }) {
+  const { weather, weatherLoading, parks, restaurants, parkings, cityInfo } = useVenueData(ev);
   const [showMap, setShowMap] = useState(false);
 
   const v      = ev.venue || {};

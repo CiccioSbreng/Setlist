@@ -3,7 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import { getEvent, addFavorite, removeFavorite, getFavorites } from "../lib/api";
 import { formatWhen, formatPrice, getDaysLeft } from "../lib/format";
 import { useArtistMedia } from "../hooks/useArtistMedia";
-import { useVenueData } from "../hooks/useVenueData";
 import { useTilt } from "../hooks/useTilt";
 import {
   CalendarIcon, ClockIcon, PinIcon, TicketIcon,
@@ -29,8 +28,19 @@ export default function EventDetail() {
   const cdRef = useRef(null);
 
   const media = useArtistMedia(ev);
-  const venue = useVenueData(ev);
   const heroRef = useTilt({ max: 7 });
+
+  const [venueVisible, setVenueVisible] = useState(false);
+  const venueSentinelRef = useRef(null);
+  useEffect(() => {
+    if (!ev || !venueSentinelRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVenueVisible(true); obs.disconnect(); } },
+      { rootMargin: "300px" }
+    );
+    obs.observe(venueSentinelRef.current);
+    return () => obs.disconnect();
+  }, [ev]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
@@ -247,8 +257,10 @@ export default function EventDetail() {
         {/* ARTISTA */}
         <ArtistSection ev={ev} artist={artist} {...media} />
 
-        {/* DOVE & COME */}
-        <VenueSection ev={ev} {...venue} />
+        {/* DOVE & COME — lazy: monta solo quando la sezione è vicina al viewport */}
+        <div ref={venueSentinelRef}>
+          {venueVisible && <VenueSection ev={ev} />}
+        </div>
       </div>
 
       {/* STICKY CTA — solo mobile */}

@@ -1,30 +1,11 @@
-// frontend/src/pages/Home.jsx
-
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
-import {
-  searchEvents,
-  toUtcStart,
-  toUtcEnd,
-  addFavorite,
-  getFavorites,
-  removeFavorite,
-} from "../lib/api";
+import { useHomeSearch } from "../hooks/useHomeSearch";
 import EventCard from "../components/EventCard";
 import DateRangePopover from "../components/DateRangePopover";
 import { Stagger, StaggerItem } from "../components/Motion";
 import {
-  SearchIcon,
-  PinIcon,
-  MusicIcon,
-  HeartIcon,
-  SparkIcon,
-  TicketIcon,
-  ArrowRightIcon,
-  RefreshIcon,
-  SpotifyIcon,
-  YoutubeIcon,
+  SearchIcon, PinIcon, MusicIcon, HeartIcon, SparkIcon,
+  TicketIcon, ArrowRightIcon, RefreshIcon, SpotifyIcon, YoutubeIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -34,227 +15,21 @@ const HERO_IMAGES = [
 ];
 
 const FEATURES = [
-  {
-    icon: <PinIcon size={22} />,
-    title: "Concerti nella tua città",
-    text: "Filtra per città e scopri in pochi secondi tutti gli show vicino a te.",
-  },
-  {
-    icon: <MusicIcon size={22} />,
-    title: "Artisti, date e venue",
-    text: "Cerca per artista o genere e trova date, orari e location aggiornati.",
-  },
-  {
-    icon: <HeartIcon size={22} />,
-    title: "Salva i tuoi preferiti",
-    text: "Crea la tua lista personale e tieni d'occhio gli eventi che non vuoi perdere.",
-  },
-  {
-    icon: <SparkIcon size={22} />,
-    title: "Esperienza personalizzata",
-    text: "Un'interfaccia veloce e pulita, pensata per chi ama la musica live.",
-  },
+  { icon: <PinIcon size={22} />, title: "Concerti nella tua città", text: "Filtra per città e scopri in pochi secondi tutti gli show vicino a te." },
+  { icon: <MusicIcon size={22} />, title: "Artisti, date e venue", text: "Cerca per artista o genere e trova date, orari e location aggiornati." },
+  { icon: <HeartIcon size={22} />, title: "Salva i tuoi preferiti", text: "Crea la tua lista personale e tieni d'occhio gli eventi che non vuoi perdere." },
+  { icon: <SparkIcon size={22} />, title: "Esperienza personalizzata", text: "Un'interfaccia veloce e pulita, pensata per chi ama la musica live." },
 ];
 
-// "YYYY-MM-DD" in orario locale (niente shift da UTC)
-function formatDate(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
 export default function Home() {
-  const [form, setForm] = useState({
-    city: "",
-    keyword: "",
-    start: "",
-    end: "",
-    size: 12,
-    page: 0,
-  });
-
-  const [data, setData] = useState({
-    events: [],
-    totalPages: 1,
-    page: 0,
-    totalElements: 0,
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [citySugg, setCitySugg] = useState([]);
-  const [showCitySugg, setShowCitySugg] = useState(false);
-  const [quickRange, setQuickRange] = useState(null);
-  // eventId Ticketmaster -> _id del preferito (per toggle e cuore acceso)
-  const [favMap, setFavMap] = useState({});
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    getFavorites()
-      .then((list) => {
-        const m = {};
-        for (const f of list) m[f.eventId] = f._id;
-        setFavMap(m);
-      })
-      .catch(() => {});
-  }, []);
-
-  async function toggleFavorite(ev) {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("Per salvare un evento devi prima accedere o registrarti.");
-      return;
-    }
-
-    const favId = favMap[ev.id];
-    if (favId) {
-      try {
-        await removeFavorite(favId);
-        setFavMap((m) => {
-          const next = { ...m };
-          delete next[ev.id];
-          return next;
-        });
-        toast(`"${ev.name}" rimosso dai preferiti`);
-      } catch (e) {
-        toast.error(e.message || "Non è stato possibile rimuovere il preferito.");
-      }
-      return;
-    }
-
-    try {
-      const created = await addFavorite({
-        eventId: ev.id,
-        name: ev.name,
-        image: ev.image,
-        date: ev.date,
-        venue: ev.venue,
-        city: ev.city,
-        url: ev.url,
-      });
-      setFavMap((m) => ({ ...m, [ev.id]: created._id }));
-      toast.success(`"${ev.name}" aggiunto ai preferiti`);
-    } catch (e) {
-      toast.error(e.message || "Non è stato possibile salvare il preferito.");
-    }
-  }
-
-  function update(p) {
-    setForm((f) => ({ ...f, ...p }));
-  }
-
-  function applyQuickRange(id) {
-    const now = new Date();
-    let startDate = null;
-    let endDate = null;
-
-    if (id === "today") {
-      startDate = now;
-      endDate = now;
-    } else if (id === "week") {
-      const day = now.getDay();
-      const diffToMonday = (day + 6) % 7;
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - diffToMonday);
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
-      startDate = monday;
-      endDate = sunday;
-    } else if (id === "month") {
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    }
-
-    if (!startDate || !endDate) return;
-
-    setQuickRange(id);
-    setForm((f) => ({
-      ...f,
-      start: formatDate(startDate),
-      end: formatDate(endDate),
-      page: 0,
-    }));
-  }
-
-  function clearDates() {
-    setQuickRange(null);
-    const cleared = { ...form, start: "", end: "", page: 0 };
-    setForm(cleared);
-    runSearch(0, cleared);
-  }
-
-  async function runSearch(page = 0, overrideForm) {
-    setLoading(true);
-    setError("");
-
-    const usedForm = overrideForm ?? { ...form, page };
-
-    try {
-      const res = await searchEvents({
-        city: usedForm.city,
-        keyword: usedForm.keyword,
-        size: usedForm.size,
-        page,
-        start: toUtcStart(usedForm.start),
-        end: toUtcEnd(usedForm.end),
-      });
-
-      const seen = new Set();
-      const uniqueEvents = [];
-      for (const ev of res.events || []) {
-        if (!seen.has(ev.id)) {
-          seen.add(ev.id);
-          uniqueEvents.push(ev);
-        }
-      }
-
-      setData({ ...res, events: uniqueEvents });
-      setForm((f) => ({ ...f, page: res.page ?? page }));
-    } catch {
-      setError(
-        "Non siamo riusciti a caricare gli eventi in questo momento. Riprova tra poco."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    runSearch(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const city = form.city.trim();
-    if (city.length < 2) { setCitySugg([]); return; }
-    const tid = setTimeout(() => {
-      searchEvents({ city, size: 6 })
-        .then((res) => {
-          const cities = [...new Set((res.events || []).map((e) => e.city).filter(Boolean))].slice(0, 5);
-          setCitySugg(cities);
-        })
-        .catch(() => {});
-    }, 300);
-    return () => clearTimeout(tid);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.city]);
-
-  function scrollToSearch() {
-    document
-      .getElementById("ricerca")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  async function goToPage(p) {
-    await runSearch(p);
-    document.getElementById("risultati")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  const hasResults = data.events?.length > 0;
-  const hasActiveFilters = Boolean(form.start || form.end || quickRange);
-  const isShowcase =
-    !form.city && !form.keyword && !form.start && !form.end && !quickRange;
+  const {
+    form, update, data, loading, error,
+    citySugg, showCitySugg, setShowCitySugg,
+    quickRange, applyQuickRange, clearDates,
+    runSearch, goToPage, scrollToSearch,
+    favMap, toggleFavorite,
+    hasResults, hasActiveFilters, isShowcase,
+  } = useHomeSearch();
 
   return (
     <>
@@ -281,13 +56,8 @@ export default function Home() {
             </p>
 
             <div className="hero__actions">
-              <button
-                type="button"
-                className="btn btn--primary"
-                onClick={scrollToSearch}
-              >
-                <SearchIcon size={18} />
-                Cerca eventi
+              <button type="button" className="btn btn--primary" onClick={scrollToSearch}>
+                <SearchIcon size={18} />Cerca eventi
               </button>
               <Link to="/favorites" className="btn btn--ghost">
                 <HeartIcon size={18} />I miei preferiti
@@ -301,24 +71,12 @@ export default function Home() {
               </div>
               <div className="hero__stat">
                 <div className="n">
-                  <a
-                    className="brand-link brand-spotify"
-                    href="https://open.spotify.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <SpotifyIcon size={15} />
-                    Spotify
+                  <a className="brand-link brand-spotify" href="https://open.spotify.com" target="_blank" rel="noopener noreferrer">
+                    <SpotifyIcon size={15} />Spotify
                   </a>
                   <span className="brand-sep"> · </span>
-                  <a
-                    className="brand-link brand-youtube"
-                    href="https://www.youtube.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <YoutubeIcon size={15} />
-                    YouTube
+                  <a className="brand-link brand-youtube" href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
+                    <YoutubeIcon size={15} />YouTube
                   </a>
                 </div>
                 <div className="l">Anteprime artista</div>
@@ -331,15 +89,9 @@ export default function Home() {
           </div>
 
           <div className="hero__art" aria-hidden="true">
-            <div className="hero__card c1">
-              <img src={HERO_IMAGES[0]} alt="" />
-            </div>
-            <div className="hero__card c2">
-              <img src={HERO_IMAGES[1]} alt="" />
-            </div>
-            <div className="hero__card c3">
-              <img src={HERO_IMAGES[2]} alt="" />
-            </div>
+            <div className="hero__card c1"><img src={HERO_IMAGES[0]} alt="" /></div>
+            <div className="hero__card c2"><img src={HERO_IMAGES[1]} alt="" /></div>
+            <div className="hero__card c3"><img src={HERO_IMAGES[2]} alt="" /></div>
           </div>
         </div>
       </section>
@@ -349,19 +101,10 @@ export default function Home() {
         <div className="wrap">
           <div className="section-head">
             <h2>Scopri concerti nella tua città</h2>
-            <p>
-              Affina la ricerca per città, artista o periodo. I risultati si
-              aggiornano in tempo reale.
-            </p>
+            <p>Affina la ricerca per città, artista o periodo. I risultati si aggiornano in tempo reale.</p>
           </div>
 
-          <form
-            className="searchbar"
-            onSubmit={(e) => {
-              e.preventDefault();
-              runSearch(0);
-            }}
-          >
+          <form className="searchbar" onSubmit={(e) => { e.preventDefault(); runSearch(0); }}>
             <div className="sb-bar">
               <label className="sb-seg sb-seg--autocomplete" htmlFor="city">
                 <PinIcon size={20} className="sb-seg__ic" />
@@ -402,72 +145,39 @@ export default function Home() {
               </label>
 
               <button type="submit" className="sb-go">
-                <SearchIcon size={18} />
-                <span>Cerca</span>
+                <SearchIcon size={18} /><span>Cerca</span>
               </button>
             </div>
 
             <div className="sb-tools">
               <div className="chips" role="group" aria-label="Quando">
-                {[
-                  { id: "today", label: "Oggi" },
-                  { id: "week", label: "Questa settimana" },
-                  { id: "month", label: "Questo mese" },
-                ].map((q) => (
-                  <button
-                    key={q.id}
-                    type="button"
-                    className={
-                      "chip" + (quickRange === q.id ? " is-active" : "")
-                    }
-                    onClick={() => applyQuickRange(q.id)}
-                  >
+                {[{ id: "today", label: "Oggi" }, { id: "week", label: "Questa settimana" }, { id: "month", label: "Questo mese" }].map((q) => (
+                  <button key={q.id} type="button" className={"chip" + (quickRange === q.id ? " is-active" : "")} onClick={() => applyQuickRange(q.id)}>
                     {q.label}
                   </button>
                 ))}
-
                 <DateRangePopover
                   start={form.start}
                   end={form.end}
-                  onChange={({ start, end }) => {
-                    setQuickRange(null);
-                    update({ start, end });
-                  }}
-                  onClear={() => {
-                    setQuickRange(null);
-                    update({ start: "", end: "" });
-                  }}
+                  onChange={({ start, end }) => { update({ start, end }); }}
+                  onClear={() => update({ start: "", end: "" })}
                 />
               </div>
-
               {hasActiveFilters && (
-                <button
-                  type="button"
-                  className="sb-reset"
-                  onClick={clearDates}
-                >
-                  <RefreshIcon size={15} />
-                  Azzera
+                <button type="button" className="sb-reset" onClick={clearDates}>
+                  <RefreshIcon size={15} />Azzera
                 </button>
               )}
             </div>
           </form>
 
-          {/* messaggi */}
-          {error && (
-            <div className="banner banner--error" style={{ marginTop: 24 }}>
-              {error}
-            </div>
-          )}
+          {error && <div className="banner banner--error" style={{ marginTop: 24 }}>{error}</div>}
 
-          {/* risultati */}
           <div id="risultati" style={{ marginTop: 36 }}>
             {!loading && hasResults && (
               <div className="results-bar">
                 <h2>{isShowcase ? "Prossimi concerti in Italia" : "Eventi trovati"}</h2>
-                <span className="count">
-                  {data.totalElements ?? data.events.length} risultati
-                </span>
+                <span className="count">{data.totalElements ?? data.events.length} risultati</span>
               </div>
             )}
 
@@ -478,10 +188,7 @@ export default function Home() {
                     <div className="sk sk--media" />
                     <div className="sk sk--line w70" />
                     <div className="sk sk--line w45" />
-                    <div
-                      className="sk sk--line"
-                      style={{ marginBottom: 18 }}
-                    />
+                    <div className="sk sk--line" style={{ marginBottom: 18 }} />
                   </div>
                 ))}
               </div>
@@ -489,9 +196,7 @@ export default function Home() {
 
             {!loading && !error && !hasResults && (
               <div className="state">
-                <div className="state__icon">
-                  <SearchIcon size={30} />
-                </div>
+                <div className="state__icon"><SearchIcon size={30} /></div>
                 {(form.city || form.keyword || form.start || form.end) ? (
                   <>
                     <h3>Nessun evento trovato</h3>
@@ -513,11 +218,7 @@ export default function Home() {
               <Stagger className="events-grid" key={data.page}>
                 {data.events.map((ev) => (
                   <StaggerItem key={ev.id}>
-                    <EventCard
-                      ev={ev}
-                      favorited={Boolean(favMap[ev.id])}
-                      onToggleFavorite={() => toggleFavorite(ev)}
-                    />
+                    <EventCard ev={ev} favorited={Boolean(favMap[ev.id])} onToggleFavorite={() => toggleFavorite(ev)} />
                   </StaggerItem>
                 ))}
               </Stagger>
@@ -525,23 +226,11 @@ export default function Home() {
 
             {!loading && hasResults && data.totalPages > 1 && (
               <div className="pager">
-                <button
-                  type="button"
-                  className="btn btn--outline btn--sm"
-                  disabled={form.page <= 0}
-                  onClick={() => goToPage(form.page - 1)}
-                >
+                <button type="button" className="btn btn--outline btn--sm" disabled={form.page <= 0} onClick={() => goToPage(form.page - 1)}>
                   ← Precedente
                 </button>
-                <span className="pager__info">
-                  Pagina {form.page + 1} di {data.totalPages || 1}
-                </span>
-                <button
-                  type="button"
-                  className="btn btn--outline btn--sm"
-                  disabled={form.page + 1 >= (data.totalPages || 1)}
-                  onClick={() => goToPage(form.page + 1)}
-                >
+                <span className="pager__info">Pagina {form.page + 1} di {data.totalPages || 1}</span>
+                <button type="button" className="btn btn--outline btn--sm" disabled={form.page + 1 >= (data.totalPages || 1)} onClick={() => goToPage(form.page + 1)}>
                   Successiva →
                 </button>
               </div>
@@ -555,12 +244,8 @@ export default function Home() {
         <div className="wrap">
           <div className="section-head">
             <h2>Perché usare ConcertHub</h2>
-            <p>
-              Tutto quello che ti serve per non perderti più un concerto, in un
-              unico posto.
-            </p>
+            <p>Tutto quello che ti serve per non perderti più un concerto, in un unico posto.</p>
           </div>
-
           <div className="features">
             {FEATURES.map((f) => (
               <div className="feature" key={f.title}>
@@ -579,15 +264,10 @@ export default function Home() {
           <div className="cta-band">
             <div className="cta-band__text">
               <h2>Crea il tuo account e salva i tuoi eventi</h2>
-              <p>
-                Registrati gratuitamente per costruire la tua lista di concerti
-                preferiti e ritrovarli su qualsiasi dispositivo.
-              </p>
+              <p>Registrati gratuitamente per costruire la tua lista di concerti preferiti e ritrovarli su qualsiasi dispositivo.</p>
             </div>
             <Link to="/login" className="btn btn--primary">
-              <TicketIcon size={18} />
-              Inizia ora
-              <ArrowRightIcon size={18} />
+              <TicketIcon size={18} />Inizia ora<ArrowRightIcon size={18} />
             </Link>
           </div>
         </div>

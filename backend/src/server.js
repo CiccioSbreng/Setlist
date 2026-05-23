@@ -47,6 +47,15 @@ app.use(cors({
 
 app.use('/api/', rateLimit({ windowMs: 60_000, max: 60 }));
 
+// Blocca le route che richiedono DB se Mongoose non è connesso
+const DB_ROUTES = ['/api/auth', '/api/favorites'];
+app.use((req, res, next) => {
+  if (DB_ROUTES.some((r) => req.path.startsWith(r)) && mongoose.connection.readyState !== 1) {
+    return res.status(503).json({ message: 'Database non disponibile. Riprova tra poco.' });
+  }
+  next();
+});
+
 app.use('/api/ticketmaster', ticketmasterRouter);
 app.use('/api/auth',         authRouter);
 app.use('/api/favorites',    favoritesRouter);

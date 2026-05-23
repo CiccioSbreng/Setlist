@@ -1,0 +1,19 @@
+{
+  "name": "ConcertHub",
+  "short_name": "ConcertHub",
+  "description": "Scopri concerti ed eventi live nella tua città",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08080c",
+  "theme_color": "#ff8a00",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["music", "entertainment"],
+  "lang": "it"
+}

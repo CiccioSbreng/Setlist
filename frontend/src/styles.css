@@ -4791,3 +4791,111 @@ input.input[type="date"] {
     bottom: 140px !important;
   }
 }
+
+/* ===================== CSS TRANSITIONS (framer-motion removed) ===================== */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter { animation: page-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+
+@keyframes stagger-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stagger-item {
+  animation: stagger-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter, .stagger-item { animation: none !important; }
+}
+
+/* ===================== BLUR-UP (progressive image loading) ===================== */
+.blur-up {
+  filter: blur(8px) scale(1.04);
+  transition: filter 0.4s ease, transform 0.4s ease;
+}
+
+/* ===================== SPOTIFY MOBILE ===================== */
+@media (max-width: 640px) {
+  .ed-sp__box  { height: 340px; }
+  .ed-sp__frame { height: 340px; }
+}
+
+/* ===================== NAVBAR — DARK PREMIUM ===================== */
+.nav { position: relative; }
+.nav::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--brand) 30%, var(--coral) 70%, transparent 100%);
+  opacity: 0.4;
+  pointer-events: none;
+}
+.nav-link.is-active {
+  color: #fff;
+  background: rgba(255, 138, 0, 0.1);
+  border-color: rgba(255, 138, 0, 0.28);
+}
+
+/* ===================== FOOTER — DARK PREMIUM ===================== */
+.footer {
+  position: relative;
+  background: linear-gradient(180deg, rgba(8, 8, 14, 0) 0%, rgba(6, 6, 9, 0.96) 100%);
+}
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--brand) 30%, var(--coral) 70%, transparent 100%);
+  opacity: 0.35;
+}
+.footer__col a {
+  transition: color 0.16s ease, padding-left 0.14s ease;
+}
+.footer__col a:hover {
+  color: var(--brand-soft);
+  padding-left: 5px;
+}
+.footer__col h4 {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ===================== LEGAL — DARK PREMIUM ===================== */
+.legal {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 36px 40px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.35);
+}
+.legal__title {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.legal__block {
+  border-top: 1px solid var(--border);
+  padding-top: 22px;
+}
+.legal__block h2::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 15px;
+  background: var(--grad-brand);
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+@media (max-width: 640px) {
+  .legal { padding: 22px 18px; }
+}
