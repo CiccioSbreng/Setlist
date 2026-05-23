@@ -4372,26 +4372,43 @@ input.input[type="date"] {
   gap: 20px;
   align-items: start;
 }
-/* Altezza fissa garantita su entrambe le card */
 .ed-media-duo .ed-block {
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  height: 500px;
 }
-/* Player riempie tutto lo spazio rimasto dopo l'header */
+/* YouTube: aspect-ratio normale */
 .ed-media-duo .ed-video {
-  flex: 1;
-  min-height: 0;
-  aspect-ratio: unset;
+  aspect-ratio: 16/9;
 }
+/* Spotify: iframe a dimensione naturale */
 .ed-sp__frame {
-  flex: 1;
   display: block;
   width: 100%;
-  min-height: 0;
-  border: 1px solid rgba(30,215,96,0.2);
+  height: 232px;
+  border: 0;
   border-radius: var(--r-lg);
+}
+/* Area intorno al player Spotify: glow verde + gradiente */
+.ed-sp__wrap {
+  position: relative;
+  border-radius: var(--r-lg);
+  padding: 3px;
+  background: linear-gradient(135deg, rgba(30,215,96,0.7), rgba(30,215,96,0.2), rgba(124,92,255,0.4));
+  box-shadow: 0 0 40px rgba(30,215,96,0.25), 0 0 80px rgba(30,215,96,0.1);
+}
+.ed-sp__wrap::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #1ed760, rgba(30,215,96,0.3), #7c5cff);
+  z-index: 0;
+  opacity: 0.5;
+  filter: blur(8px);
+}
+.ed-sp__frame {
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Block themed — accent line + gradient tint ── */
