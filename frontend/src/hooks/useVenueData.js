@@ -6,11 +6,12 @@ function overpass(query, signal) {
 }
 
 export function useVenueData(ev) {
-  const [weather,     setWeather]     = useState(null);
-  const [parks,       setParks]       = useState([]);
-  const [restaurants, setRestaurants] = useState([]);
-  const [parkings,    setParkings]    = useState([]);
-  const [cityInfo,    setCityInfo]    = useState(null);
+  const [weather,        setWeather]        = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [parks,          setParks]          = useState([]);
+  const [restaurants,    setRestaurants]    = useState([]);
+  const [parkings,       setParkings]       = useState([]);
+  const [cityInfo,       setCityInfo]       = useState(null);
 
   const lat  = ev?.venue?.lat;
   const lon  = ev?.venue?.lon;
@@ -19,10 +20,14 @@ export function useVenueData(ev) {
 
   useEffect(() => {
     setWeather(null);
+    setWeatherLoading(false);
     if (lat == null || lon == null || !date) return;
-    let alive = true;
-    getWeather({ lat, lon, date }).then((w) => { if (alive) setWeather(w); }).catch(() => {});
-    return () => { alive = false; };
+    const ctrl = new AbortController();
+    setWeatherLoading(true);
+    getWeather({ lat, lon, date }, ctrl.signal)
+      .then((w) => { setWeather(w); setWeatherLoading(false); })
+      .catch((e) => { if (e.name !== "AbortError") setWeatherLoading(false); });
+    return () => ctrl.abort();
   }, [lat, lon, date]);
 
   useEffect(() => {
@@ -66,5 +71,5 @@ export function useVenueData(ev) {
     return () => { alive = false; };
   }, [city]);
 
-  return { weather, parks, restaurants, parkings, cityInfo };
+  return { weather, weatherLoading, parks, restaurants, parkings, cityInfo };
 }

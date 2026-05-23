@@ -4,7 +4,7 @@ import {
   GlobeIcon, PinIcon, TreeIcon,
 } from "./Icons";
 
-export default function VenueSection({ ev, weather, parks, restaurants, parkings, cityInfo }) {
+export default function VenueSection({ ev, weather, weatherLoading, parks, restaurants, parkings, cityInfo }) {
   const [showMap, setShowMap] = useState(false);
 
   const v      = ev.venue || {};
@@ -53,6 +53,9 @@ export default function VenueSection({ ev, weather, parks, restaurants, parkings
           </div>
 
           <div className="ed-place">
+            {weatherLoading && !weather && (
+              <div className="sk" style={{ height: 80, borderRadius: 12 }} />
+            )}
             {weather?.status === "ok" && (
               <div className="ed-wx">
                 <span className="ed-wx__icon" aria-hidden="true">{weather.icon}</span>

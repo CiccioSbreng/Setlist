@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { getArtistEvents, getYoutubeVideos, getSpotifyArtist, getSetlist } from "../lib/api";
 
 export function useArtistMedia(ev) {
-  const [otherDates, setOtherDates] = useState([]);
-  const [ytVideos, setYtVideos] = useState([]);
-  const [spotifyArtist, setSpotifyArtist] = useState(null);
-  const [artistBio, setArtistBio] = useState("");
-  const [setlistData, setSetlistData] = useState(null);
+  const [otherDates,     setOtherDates]     = useState([]);
+  const [ytVideos,       setYtVideos]       = useState([]);
+  const [spotifyArtist,  setSpotifyArtist]  = useState(null);
+  const [artistBio,      setArtistBio]      = useState("");
+  const [setlistData,    setSetlistData]    = useState(null);
+  const [spotifyLoading, setSpotifyLoading] = useState(false);
+  const [ytLoading,      setYtLoading]      = useState(false);
 
   const artistId   = ev?.artists?.[0]?.id;
   const artistName = ev?.artists?.[0]?.name;
@@ -14,39 +16,51 @@ export function useArtistMedia(ev) {
 
   useEffect(() => {
     if (!artistId) return;
-    let alive = true;
-    getArtistEvents(artistId)
+    const ctrl = new AbortController();
+    getArtistEvents(artistId, ctrl.signal)
       .then((res) => {
-        if (alive) setOtherDates((res.events || []).filter((e) => e.id !== eventId).slice(0, 6));
+        setOtherDates((res.events || []).filter((e) => e.id !== eventId).slice(0, 6));
       })
       .catch(() => {});
-    return () => { alive = false; };
+    return () => ctrl.abort();
   }, [artistId, eventId]);
 
   useEffect(() => {
     if (!artistName) return;
-    let alive = true;
+    const ctrl = new AbortController();
+    const { signal } = ctrl;
 
-    getYoutubeVideos(artistName).then((d) => { if (alive) setYtVideos(d.videos || []); }).catch(() => {});
-    getSpotifyArtist(artistName).then((d) => { if (alive) setSpotifyArtist(d); }).catch(() => {});
-    getSetlist(artistName).then((d) => { if (alive) setSetlistData(d); }).catch(() => {});
+    setSpotifyLoading(true);
+    setYtLoading(true);
+
+    getYoutubeVideos(artistName, signal)
+      .then((d) => { setYtVideos(d.videos || []); setYtLoading(false); })
+      .catch((e) => { if (e.name !== "AbortError") setYtLoading(false); });
+
+    getSpotifyArtist(artistName, signal)
+      .then((d) => { setSpotifyArtist(d); setSpotifyLoading(false); })
+      .catch((e) => { if (e.name !== "AbortError") setSpotifyLoading(false); });
+
+    getSetlist(artistName, signal)
+      .then((d) => { setSetlistData(d); })
+      .catch(() => {});
 
     (async () => {
       for (const lang of ["it", "en"]) {
         try {
           const url = `https://${lang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&redirects=1&titles=${encodeURIComponent(artistName)}&format=json&origin=*`;
-          const r = await fetch(url);
+          const r = await fetch(url, { signal });
           if (!r.ok) continue;
           const d = await r.json();
           const pages = Object.values(d.query?.pages || {});
           const page = pages.find((p) => p.extract && !p.missing);
-          if (page?.extract) { if (alive) setArtistBio(page.extract.trim()); return; }
+          if (page?.extract) { setArtistBio(page.extract.trim()); return; }
         } catch {}
       }
     })();
 
-    return () => { alive = false; };
+    return () => ctrl.abort();
   }, [artistName]);
 
-  return { otherDates, ytVideos, spotifyArtist, artistBio, setlistData };
+  return { otherDates, ytVideos, spotifyArtist, artistBio, setlistData, spotifyLoading, ytLoading };
 }
