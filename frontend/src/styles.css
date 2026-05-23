@@ -4545,3 +4545,117 @@ input.input[type="date"] {
 @media (prefers-reduced-motion: reduce) {
   .press, .cinematic-card { transform: none !important; }
 }
+
+/* ===================== BOTTOM NAV (mobile) ===================== */
+
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  /* padding-bottom su app-main per non coprire contenuto */
+  .app-main {
+    padding-bottom: 68px;
+  }
+
+  /* nasconde il burger: la bottom nav gestisce la navigazione */
+  .nav__burger {
+    display: none !important;
+  }
+  .nav__mobile {
+    display: none !important;
+  }
+
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    height: 62px;
+    background: rgba(8, 8, 12, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .bottom-nav__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color var(--dur-snap) var(--ease-snap);
+    border: none;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .bottom-nav__item svg {
+    transition: transform var(--dur-snap) var(--ease-snap);
+  }
+
+  .bottom-nav__item.is-active {
+    color: var(--brand);
+  }
+
+  .bottom-nav__item.is-active svg {
+    filter: drop-shadow(0 0 6px var(--brand));
+  }
+
+  .bottom-nav__item:active svg {
+    transform: scale(0.88);
+  }
+}
+
+/* ===================== STICKY CTA BIGLIETTI (EventDetail mobile) ===================== */
+
+.ed-sticky-cta {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .ed-sticky-cta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: fixed;
+    bottom: 62px; /* altezza bottom-nav */
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 10px 16px;
+    background: rgba(8, 8, 12, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+  }
+
+  .ed-sticky-cta__tickets {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .ed-sticky-cta__fav {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: var(--r-lg);
+  }
+
+  /* alza il toaster sopra bottom-nav + sticky-cta */
+  [data-sonner-toaster] {
+    bottom: 140px !important;
+  }
+}

@@ -60,16 +60,6 @@ async function checkOpenMeteo() {
   )) };
 }
 
-async function checkOpenRoute(key) {
-  if (!key) return { configured: false };
-  return { configured: true, ...(await probe(() =>
-    axios.get('https://api.openrouteservice.org/geocode/search', {
-      params: { api_key: key, text: 'Roma', 'boundary.country': 'IT', size: 1 },
-      timeout: T,
-    })
-  )) };
-}
-
 async function runChecks() {
   const e = process.env;
   const tasks = [
@@ -78,7 +68,6 @@ async function runChecks() {
     ['YouTube',      checkYouTube(e.YOUTUBE_API_KEY)],
     ['Setlist.fm',   checkSetlist(e.SETLIST_API_KEY)],
     ['Open-Meteo',   checkOpenMeteo()],
-    ['OpenRoute',    checkOpenRoute(e.ORS_API_KEY)],
   ];
 
   const settled = await Promise.allSettled(tasks.map(([, p]) => p));
