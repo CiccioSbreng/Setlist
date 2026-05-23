@@ -1403,7 +1403,6 @@ input.input[type="date"] {
 }
 
 .ev-card:hover {
-  transform: translateY(-8px);
   border-color: rgba(255, 138, 0, 0.3);
   box-shadow:
     0 24px 64px rgba(0, 0, 0, 0.55),
