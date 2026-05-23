@@ -1538,7 +1538,7 @@ input.input[type="date"] {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--text-dim);
+  color: #d0d2e0;
   font-size: 0.9rem;
 }
 
@@ -1596,7 +1596,7 @@ input.input[type="date"] {
 }
 .ev-card__detail-link {
   font-size: 0.8rem;
-  color: var(--text-dim);
+  color: #c8cad8;
   text-decoration: none;
   transition: color 0.15s;
 }
@@ -2746,7 +2746,7 @@ input.input[type="date"] {
 /* ===== CARD: no ticket ===== */
 .ev-card__no-ticket {
   font-size: 0.8rem;
-  color: var(--text-mute);
+  color: #9a9cb0;
   text-align: center;
   padding: 8px 0;
 }
