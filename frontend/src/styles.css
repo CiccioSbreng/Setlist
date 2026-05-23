@@ -1583,6 +1583,17 @@ input.input[type="date"] {
   color: var(--brand);
   letter-spacing: 0.02em;
 }
+.ev-card__live {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ff4d4d;
+  letter-spacing: 0.04em;
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
 .ev-card__detail-link {
   font-size: 0.8rem;
   color: var(--text-dim);
@@ -3297,6 +3308,44 @@ input.input[type="date"] {
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 999px;
+}
+
+/* SOLD OUT — banner in diagonale sull'immagine */
+.ev-card__soldout {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+.ev-card__soldout::after {
+  content: "SOLD OUT";
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: #fff;
+  background: rgba(220, 30, 30, 0.88);
+  padding: 10px 32px;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(220, 30, 30, 0.5);
+  transform: rotate(-8deg);
+}
+
+/* Sold out nel footer — sostituisce il tasto biglietti */
+.ev-card__soldout-cta {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #ff5555;
+  border: 1.5px solid rgba(220, 30, 30, 0.5);
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  text-transform: uppercase;
 }
 
 @media (max-width: 640px) {

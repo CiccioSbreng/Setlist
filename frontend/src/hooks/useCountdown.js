@@ -11,9 +11,14 @@ export function useCountdown(date, time) {
     const target = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
     if (isNaN(target)) return;
 
+    const STARTED_WINDOW = 5 * 60 * 60 * 1000;
     function tick() {
       const diff = target - Date.now();
-      if (diff <= 0) { setLabel(null); return; }
+      if (diff <= 0) {
+        clearInterval(ref.current);
+        setLabel(diff > -STARTED_WINDOW ? "🔴 Iniziato" : null);
+        return;
+      }
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);

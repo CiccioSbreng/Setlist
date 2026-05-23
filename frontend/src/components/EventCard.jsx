@@ -18,6 +18,8 @@ const MONTHS = [
 
 const pad = (n) => String(n).padStart(2, "0");
 
+const STARTED_WINDOW_MS = 5 * 60 * 60 * 1000; // mostra "Iniziato" per 5h dopo lo start
+
 function useCardCountdown(date, time) {
   const [label, setLabel] = useState(null);
   const ref = useRef(null);
@@ -27,7 +29,11 @@ function useCardCountdown(date, time) {
     if (isNaN(target)) return;
     function tick() {
       const diff = target - Date.now();
-      if (diff <= 0) { setLabel(null); return; }
+      if (diff <= 0) {
+        clearInterval(ref.current);
+        setLabel(diff > -STARTED_WINDOW_MS ? "started" : null);
+        return;
+      }
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
@@ -158,6 +164,10 @@ export default function EventCard({
         {ev.genre && ev.genre !== "Undefined" && (
           <div className="ev-card__genre">{ev.genre}</div>
         )}
+
+        {ev.soldOut && (
+          <div className="ev-card__soldout">SOLD OUT</div>
+        )}
       </div>
 
       <div className="ev-card__body">
@@ -195,14 +205,21 @@ export default function EventCard({
 
         <div className="ev-card__foot">
           <div className="ev-card__foot-left">
-            {cdLabel && <span className="ev-card__countdown">⏱ {cdLabel}</span>}
+            {cdLabel === "started"
+              ? <span className="ev-card__live">🔴 In corso</span>
+              : cdLabel
+                ? <span className="ev-card__countdown">⏱ {cdLabel}</span>
+                : null
+            }
             {detailId && (
               <Link to={`/event/${detailId}`} className="ev-card__detail-link">
                 Scopri evento →
               </Link>
             )}
           </div>
-          {ev.url ? (
+          {ev.soldOut ? (
+            <span className="ev-card__soldout-cta">Sold Out</span>
+          ) : ev.url ? (
             <a
               href={ev.url}
               target="_blank"
