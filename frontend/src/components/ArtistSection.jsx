@@ -104,13 +104,15 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
                   </a>
                 )}
               </div>
-              <iframe
-                className="ed-sp__frame"
-                title="Player Spotify"
-                src={spotifyArtist.embedUrl}
-                loading="lazy"
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              />
+              <div className="ed-sp__box">
+                <iframe
+                  className="ed-sp__frame"
+                  title="Player Spotify"
+                  src={spotifyArtist.embedUrl}
+                  loading="lazy"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                />
+              </div>
             </section>
           )}
 
