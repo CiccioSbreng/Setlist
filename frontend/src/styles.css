@@ -4370,15 +4370,18 @@ input.input[type="date"] {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 .ed-media-duo .ed-block {
   display: flex;
   flex-direction: column;
 }
-/* YouTube: aspect-ratio naturale 16/9 */
+/* YouTube: stessa altezza del player Spotify (232px), niente aspect-ratio */
 .ed-media-duo .ed-video {
-  aspect-ratio: 16/9;
+  flex: 1;
+  min-height: 232px;
+  max-height: 232px;
+  aspect-ratio: unset;
 }
 /* Spotify: iframe a dimensione naturale, glow sul box wrapper */
 .ed-sp__box {
