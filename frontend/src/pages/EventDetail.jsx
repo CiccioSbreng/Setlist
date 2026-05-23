@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getEvent, addFavorite, removeFavorite, getFavorites } from "../lib/api";
 import { formatWhen, formatPrice, getDaysLeft } from "../lib/format";
 import { useArtistMedia } from "../hooks/useArtistMedia";
-import { useVenueData } from "../hooks/useVenueData";
 import { useTilt } from "../hooks/useTilt";
 import {
   CalendarIcon, ClockIcon, PinIcon, TicketIcon,
@@ -24,13 +23,45 @@ export default function EventDetail() {
   const [favMsg,   setFavMsg]   = useState("");
   const [shareMsg, setShareMsg] = useState("");
   const [activeTab, setActiveTab] = useState("evento");
-  const [countdown, setCountdown] = useState(null);
+
+  const [cdLabel, setCdLabel] = useState(null);
+  const cdRef = useRef(null);
 
   const media = useArtistMedia(ev);
-  const venue = useVenueData(ev);
   const heroRef = useTilt({ max: 7 });
 
+  const [venueVisible, setVenueVisible] = useState(false);
+  const venueSentinelRef = useRef(null);
+  useEffect(() => {
+    if (!ev || !venueSentinelRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVenueVisible(true); obs.disconnect(); } },
+      { rootMargin: "300px" }
+    );
+    obs.observe(venueSentinelRef.current);
+    return () => obs.disconnect();
+  }, [ev]);
+
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
+
+  useEffect(() => {
+    if (!ev?.date) return;
+    const target = new Date(ev.date.includes("T") ? ev.date : `${ev.date}T${ev.time || "20:00:00"}`);
+    if (isNaN(target)) return;
+    function tick() {
+      const diff = target - Date.now();
+      if (diff <= 0) { setCdLabel(null); return; }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      const pad = (n) => String(n).padStart(2, "0");
+      setCdLabel(d > 0 ? `${d}g ${pad(h)}h ${pad(m)}m` : `${pad(h)}h ${pad(m)}m ${pad(s)}s`);
+    }
+    tick();
+    cdRef.current = setInterval(tick, 1000);
+    return () => clearInterval(cdRef.current);
+  }, [ev?.date, ev?.time]);
 
   useEffect(() => {
     let alive = true;
@@ -46,23 +77,6 @@ export default function EventDetail() {
       .finally(() => alive && setLoading(false));
     return () => { alive = false; };
   }, [id]);
-
-  useEffect(() => {
-    if (!ev?.date) return;
-    function tick() {
-      const target = new Date(ev.date.includes("T") ? ev.date : `${ev.date}T${ev.time || "20:00:00"}`);
-      const diff = target - Date.now();
-      if (diff <= 0) { setCountdown(null); return; }
-      setCountdown({
-        days:    Math.floor(diff / 86400000),
-        hours:   Math.floor((diff % 86400000) / 3600000),
-        minutes: Math.floor((diff % 3600000)  / 60000),
-      });
-    }
-    tick();
-    const timer = setInterval(tick, 60000);
-    return () => clearInterval(timer);
-  }, [ev]);
 
   useEffect(() => {
     if (!localStorage.getItem("token") || !id) return;
@@ -183,7 +197,7 @@ export default function EventDetail() {
                 <div className="ed-hero__when">
                   <CalendarIcon size={15} /><span>{when.dateLabel}</span>
                   {when.timeLabel && <><span className="ed-hero__sep">·</span><ClockIcon size={15} /><span>Ore {when.timeLabel}</span></>}
-                  {daysLeft && <span className="ed-hero__countdown">{daysLeft}</span>}
+                  {cdLabel && <span className="ed-hero__countdown">⏱ {cdLabel}</span>}
                 </div>
               </div>
             </div>
@@ -226,21 +240,6 @@ export default function EventDetail() {
               <div className="ed__row"><PinIcon size={18} /><span>{[v.name, v.address, v.city].filter(Boolean).join(" · ") || "Location da annunciare"}</span></div>
               {price && <div className="ed__row"><TicketIcon size={18} /><span>{price}</span></div>}
             </div>
-            {countdown && (
-              <div className="ed-countdown">
-                {[
-                  { val: countdown.days,    label: "giorni" },
-                  { val: countdown.hours,   label: "ore"    },
-                  { val: countdown.minutes, label: "min"    },
-                ].map(({ val, label }) => (
-                  <div key={label} className="ed-countdown__item">
-                    <span className="ed-countdown__num">{val}</span>
-                    <span className="ed-countdown__lbl">{label}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
             {favMsg && (
               <div className={`banner ${favMsg.startsWith("Aggiunto") ? "banner--ok" : "banner--error"}`} style={{ marginTop: 16 }}>
                 {favMsg}
@@ -258,8 +257,27 @@ export default function EventDetail() {
         {/* ARTISTA */}
         <ArtistSection ev={ev} artist={artist} {...media} />
 
-        {/* DOVE & COME */}
-        <VenueSection ev={ev} {...venue} />
+        {/* DOVE & COME — lazy: monta solo quando la sezione è vicina al viewport */}
+        <div ref={venueSentinelRef}>
+          {venueVisible && <VenueSection ev={ev} />}
+        </div>
+      </div>
+
+      {/* STICKY CTA — solo mobile */}
+      <div className="ed-sticky-cta">
+        {ev.url && (
+          <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary ed-sticky-cta__tickets">
+            <TicketIcon size={18} />Biglietti<ArrowRightIcon size={16} />
+          </a>
+        )}
+        <button
+          type="button"
+          className={`btn ${isFav ? "btn--fav-active" : "btn--ghost"} ed-sticky-cta__fav`}
+          onClick={handleFav}
+          aria-label={isFav ? "Rimuovi dai preferiti" : "Salva nei preferiti"}
+        >
+          <HeartIcon size={20} filled={isFav} />
+        </button>
       </div>
     </section>
   );

@@ -27,10 +27,11 @@ router.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password || password.length < 6) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email) || !password || password.length < 6) {
       return res
         .status(400)
-        .json({ message: 'Email e password (min 6 caratteri) sono obbligatori.' });
+        .json({ message: 'Email valida e password (min 6 caratteri) sono obbligatori.' });
     }
 
     const existing = await User.findOne({ email });

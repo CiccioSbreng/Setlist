@@ -59,27 +59,30 @@ export async function getEvent(id) {
 }
 
 // ---- SPOTIFY: artista per nome ----
-export async function getSpotifyArtist(name) {
+export async function getSpotifyArtist(name, signal) {
   const res = await fetch(
-    `${BASE}/api/spotify/artist?name=${encodeURIComponent(name)}`
+    `${BASE}/api/spotify/artist?name=${encodeURIComponent(name)}`,
+    { signal }
   );
   if (!res.ok) throw new Error(`Spotify API ${res.status}`);
   return res.json();
 }
 
 // ---- YOUTUBE: ultimi video del canale artista ----
-export async function getYoutubeVideos(name) {
+export async function getYoutubeVideos(name, signal) {
   const res = await fetch(
-    `${BASE}/api/youtube/channel-videos?name=${encodeURIComponent(name)}`
+    `${BASE}/api/youtube/channel-videos?name=${encodeURIComponent(name)}`,
+    { signal }
   );
   if (!res.ok) throw new Error(`API ${res.status}`);
   return res.json();
 }
 
 // ---- TICKETMASTER: prossime date di un artista ----
-export async function getArtistEvents(id) {
+export async function getArtistEvents(id, signal) {
   const res = await fetch(
-    `${BASE}/api/ticketmaster/artists/${encodeURIComponent(id)}/events`
+    `${BASE}/api/ticketmaster/artists/${encodeURIComponent(id)}/events`,
+    { signal }
   );
   if (!res.ok) throw new Error(`API ${res.status}`);
   return res.json();
@@ -196,22 +199,15 @@ export async function updatePassword(currentPassword, newPassword) {
 }
 
 // ---- WEATHER: previsione per la data del concerto ----
-export async function getWeather({ lat, lon, date }) {
-  const res = await fetch(`${BASE}/api/weather?${qs({ lat, lon, date })}`);
+export async function getWeather({ lat, lon, date }, signal) {
+  const res = await fetch(`${BASE}/api/weather?${qs({ lat, lon, date })}`, { signal });
   if (!res.ok) throw new Error(`Weather ${res.status}`);
   return res.json();
 }
 
-// ---- DISTANCE: tempo/distanza reali origine -> venue (Google) ----
-export async function getDistance({ origin, lat, lon }) {
-  const res = await fetch(`${BASE}/api/distance?${qs({ origin, lat, lon })}`);
-  if (!res.ok) throw new Error(`Distance ${res.status}`);
-  return res.json();
-}
-
 // ---- SETLIST: ultima scaletta dell'artista ----
-export async function getSetlist(artist) {
-  const res = await fetch(`${BASE}/api/setlist?artist=${encodeURIComponent(artist)}`);
+export async function getSetlist(artist, signal) {
+  const res = await fetch(`${BASE}/api/setlist?artist=${encodeURIComponent(artist)}`, { signal });
   if (!res.ok) throw new Error(`Setlist ${res.status}`);
   return res.json();
 }

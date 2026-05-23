@@ -24,7 +24,6 @@ const youtubeRouter      = require('./routes/youtube');
 const spotifyRouter      = require('./routes/spotify');
 const weatherRouter      = require('./routes/weather');
 const setlistRouter      = require('./routes/setlist');
-const distanceRouter     = require('./routes/distance');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -48,6 +47,15 @@ app.use(cors({
 
 app.use('/api/', rateLimit({ windowMs: 60_000, max: 60 }));
 
+// Blocca le route che richiedono DB se Mongoose non è connesso
+const DB_ROUTES = ['/api/auth', '/api/favorites'];
+app.use((req, res, next) => {
+  if (DB_ROUTES.some((r) => req.path.startsWith(r)) && mongoose.connection.readyState !== 1) {
+    return res.status(503).json({ message: 'Database non disponibile. Riprova tra poco.' });
+  }
+  next();
+});
+
 app.use('/api/ticketmaster', ticketmasterRouter);
 app.use('/api/auth',         authRouter);
 app.use('/api/favorites',    favoritesRouter);
@@ -55,7 +63,6 @@ app.use('/api/youtube',      youtubeRouter);
 app.use('/api/spotify',      spotifyRouter);
 app.use('/api/weather',      weatherRouter);
 app.use('/api/setlist',      setlistRouter);
-app.use('/api/distance',     distanceRouter);
 
 app.get('/__ping', (_req, res) => res.json({ ok: true }));
 

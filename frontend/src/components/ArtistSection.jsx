@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { formatWhen } from "../lib/format";
 import {
-  ArrowRightIcon, CalendarIcon, GlobeIcon, InstagramIcon,
-  ListMusicIcon, MusicIcon, SpotifyIcon, YoutubeIcon,
+  ArrowRightIcon, CalendarIcon, FacebookIcon, GlobeIcon, InstagramIcon,
+  ListMusicIcon, MusicIcon, SpotifyIcon, XIcon, YoutubeIcon,
 } from "./Icons";
 
 function compact(n) {
@@ -12,7 +12,7 @@ function compact(n) {
   return String(n);
 }
 
-export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, ytVideos, setlistData, otherDates }) {
+export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, ytVideos, setlistData, otherDates, spotifyLoading, ytLoading }) {
   const [bioExpanded, setBioExpanded] = useState(false);
 
   return (
@@ -58,73 +58,100 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
               )}
 
               <div className="ed-aphero__links">
-                {artist.links?.instagram && (
-                  <a href={artist.links.instagram} target="_blank" rel="noreferrer" className="ed-chip ed-chip--ig">
-                    <InstagramIcon size={15} />Instagram
-                  </a>
-                )}
-                {artist.links?.homepage && (
-                  <a href={artist.links.homepage} target="_blank" rel="noreferrer" className="ed-chip">
-                    <GlobeIcon size={15} />Sito ufficiale
-                  </a>
-                )}
-                {artist.links?.twitter && (
-                  <a href={artist.links.twitter} target="_blank" rel="noreferrer" className="ed-chip">Twitter / X</a>
-                )}
-                {artist.links?.facebook && (
-                  <a href={artist.links.facebook} target="_blank" rel="noreferrer" className="ed-chip">Facebook</a>
-                )}
+                {(() => {
+                  const n = encodeURIComponent(artist.name);
+                  const ig  = artist.links?.instagram  || `https://www.instagram.com/explore/search/keyword/?q=${n}`;
+                  const tw  = artist.links?.twitter    || `https://x.com/search?q=${n}&f=user`;
+                  const fb  = artist.links?.facebook   || `https://www.facebook.com/search/top?q=${n}`;
+                  const web = artist.links?.homepage;
+                  return (
+                    <>
+                      <a href={ig} target="_blank" rel="noreferrer" className="ed-chip ed-chip--ig">
+                        <InstagramIcon size={15} />Instagram
+                      </a>
+                      <a href={tw} target="_blank" rel="noreferrer" className="ed-chip ed-chip--x">
+                        <XIcon size={15} />X
+                      </a>
+                      <a href={fb} target="_blank" rel="noreferrer" className="ed-chip ed-chip--fb">
+                        <FacebookIcon size={15} />Facebook
+                      </a>
+                      {web && (
+                        <a href={web} target="_blank" rel="noreferrer" className="ed-chip">
+                          <GlobeIcon size={15} />Sito ufficiale
+                        </a>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {spotifyArtist && (
-        <section className="ed-block">
-          <div className="ed-block__head">
-            <div>
-              <span className="ed-eyebrow ed-eyebrow--sp"><SpotifyIcon size={13} /> Musica</span>
-              <h3 className="ed-block__title">Ascolta {artist?.name || "l'artista"}</h3>
-            </div>
-            {spotifyArtist.externalUrl && (
-              <a href={spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--sp">
-                <SpotifyIcon size={14} />Apri su Spotify<ArrowRightIcon size={14} />
-              </a>
-            )}
-          </div>
-          <div className="ed-video" style={{ maxHeight: 400 }}>
-            <iframe
-              title="Player Spotify"
-              src={spotifyArtist.embedUrl}
-              loading="lazy"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
-            />
-          </div>
-        </section>
-      )}
+      {(spotifyLoading || ytLoading || spotifyArtist || ytVideos.length > 0) && (
+        <div className="ed-media-duo">
+          {(spotifyLoading || spotifyArtist) && (
+            <section className="ed-block ed-block--sp">
+              <div className="ed-block__head">
+                <div>
+                  <span className="ed-eyebrow ed-eyebrow--sp"><SpotifyIcon size={13} /> Musica</span>
+                  <h3 className="ed-block__title">Ascolta {artist?.name || "l'artista"}</h3>
+                </div>
+                {spotifyArtist?.externalUrl && (
+                  <a href={spotifyArtist.externalUrl} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--sp">
+                    <SpotifyIcon size={14} />Apri su Spotify<ArrowRightIcon size={14} />
+                  </a>
+                )}
+              </div>
+              <div className="ed-sp__box">
+                {spotifyLoading && !spotifyArtist
+                  ? <div className="sk" style={{ height: "100%" }} />
+                  : (
+                    <iframe
+                      className="ed-sp__frame"
+                      title="Player Spotify"
+                      src={spotifyArtist.embedUrl}
+                      width="100%"
+                      height="450"
+                      loading="lazy"
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    />
+                  )
+                }
+              </div>
+            </section>
+          )}
 
-      {ytVideos.length > 0 && (
-        <section className="ed-block">
-          <div className="ed-block__head">
-            <div>
-              <span className="ed-eyebrow ed-eyebrow--yt"><YoutubeIcon size={13} /> Video</span>
-              <h3 className="ed-block__title">Ultimo video</h3>
-            </div>
-            <a href={`https://www.youtube.com/watch?v=${ytVideos[0].id}`} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--yt">
-              <YoutubeIcon size={14} />Apri su YouTube<ArrowRightIcon size={14} />
-            </a>
-          </div>
-          <div className="ed-video">
-            <iframe
-              src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
-              title={ytVideos[0].title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </section>
+          {(ytLoading || ytVideos.length > 0) && (
+            <section className="ed-block ed-block--yt">
+              <div className="ed-block__head">
+                <div>
+                  <span className="ed-eyebrow ed-eyebrow--yt"><YoutubeIcon size={13} /> Video</span>
+                  <h3 className="ed-block__title">Ultimo video</h3>
+                </div>
+                {ytVideos.length > 0 && (
+                  <a href={`https://www.youtube.com/watch?v=${ytVideos[0].id}`} target="_blank" rel="noreferrer" className="ed-block__cta ed-block__cta--yt">
+                    <YoutubeIcon size={14} />Apri su YouTube<ArrowRightIcon size={14} />
+                  </a>
+                )}
+              </div>
+              <div className="ed-video">
+                {ytLoading && ytVideos.length === 0
+                  ? <div className="sk" style={{ position: "absolute", inset: 0 }} />
+                  : (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
+                      title={ytVideos[0].title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  )
+                }
+              </div>
+            </section>
+          )}
+        </div>
       )}
 
       {setlistData?.songs?.length > 0 && (
