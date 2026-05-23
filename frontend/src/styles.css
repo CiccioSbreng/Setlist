@@ -4393,6 +4393,16 @@ input.input[type="date"] {
   min-height: 0;
   aspect-ratio: unset;
 }
+/* Spotify: nel duo si allinea a YouTube con flex:1 */
+.ed-media-duo .ed-sp__box {
+  flex: 1;
+  height: auto;
+  min-height: 300px;
+}
+.ed-media-duo .ed-sp__frame {
+  height: 100%;
+  min-height: 300px;
+}
 /* Spotify: 450px per mostrare più tracce */
 .ed-sp__box {
   height: 450px;
