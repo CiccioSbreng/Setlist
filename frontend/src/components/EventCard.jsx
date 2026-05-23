@@ -61,7 +61,7 @@ function formatPrice(min, max, currency) {
   return `da ${fmt(min ?? max)}`;
 }
 
-const SPRING = { stiffness: 220, damping: 26, mass: 0.6 };
+const SPRING = { stiffness: 260, damping: 22, mass: 0.5 };
 
 export default function EventCard({
   ev,
@@ -83,25 +83,31 @@ export default function EventCard({
   // Parallax 3D al passaggio mouse — tilt morbido via spring
   const mx = useSpring(useMotionValue(0.5), SPRING);
   const my = useSpring(useMotionValue(0.5), SPRING);
-  const rotateX = useTransform(my, [0, 1], [6, -6]);
-  const rotateY = useTransform(mx, [0, 1], [-6, 6]);
+  const rotateX = useTransform(my, [0, 1], [10, -10]);
+  const rotateY = useTransform(mx, [0, 1], [-10, 10]);
 
   function handleMove(e) {
     const r = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width);
-    my.set((e.clientY - r.top) / r.height);
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    mx.set(x);
+    my.set(y);
+    e.currentTarget.style.setProperty("--mx", x);
+    e.currentTarget.style.setProperty("--my", y);
   }
-  function handleLeave() {
+  function handleLeave(e) {
     mx.set(0.5);
     my.set(0.5);
+    e.currentTarget.style.setProperty("--mx", 0.5);
+    e.currentTarget.style.setProperty("--my", 0.5);
   }
 
   return (
     <motion.article
       className="ev-card press cinematic-card appear"
-      style={{ rotateX, rotateY, transformPerspective: 1000 }}
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.28, ease: [0.2, 0.9, 0.3, 1] }}
+      style={{ rotateX, rotateY, transformPerspective: 1200 }}
+      whileHover={{ y: -10, scale: 1.01 }}
+      transition={{ duration: 0.32, ease: [0.2, 0.9, 0.3, 1] }}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
     >
@@ -156,6 +162,10 @@ export default function EventCard({
           <div className="ev-card__genre">{ev.genre}</div>
         )}
       </div>
+
+      {/* Foil olografico + glare — reagiscono al mouse via --mx / --my */}
+      <div className="ev-card__foil" aria-hidden="true" />
+      <div className="ev-card__glare" aria-hidden="true" />
 
       <div className="ev-card__body">
         <h3 className="ev-card__title">
