@@ -216,14 +216,13 @@ export default function EventCard({
 
         <div className="ev-card__foot">
           <div className="ev-card__foot-left">
-            {ev.soldOut
-              ? <span className="ev-card__soldout-badge">Sold Out</span>
-              : cdLabel === "started"
+            {!ev.soldOut && (
+              cdLabel === "started"
                 ? <span className="ev-card__live">🔴 In corso</span>
                 : cdLabel
                   ? <span className="ev-card__countdown">⏱ {cdLabel}</span>
                   : null
-            }
+            )}
             {detailId && (
               <Link to={`/event/${detailId}`} className="ev-card__detail-link">
                 Scopri evento →
