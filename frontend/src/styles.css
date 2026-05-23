@@ -4384,38 +4384,25 @@ input.input[type="date"] {
   min-height: 0;
   aspect-ratio: unset;
 }
-/* Spotify: wrapper occupa spazio rimasto, iframe ASSOLUTO dentro */
-.ed-sp__wrap {
+/* Spotify: stesso pattern di .ed-video — div flex:1 + iframe absolute inset:0 */
+.ed-sp__box {
   flex: 1;
   min-height: 0;
   position: relative;
   border-radius: var(--r-lg);
-  padding: 3px;
-  background: linear-gradient(135deg, rgba(30,215,96,0.7), rgba(30,215,96,0.2), rgba(124,92,255,0.4));
-  box-shadow: 0 0 40px rgba(30,215,96,0.25), 0 0 80px rgba(30,215,96,0.1);
+  overflow: hidden;
+  border: 3px solid rgba(30,215,96,0.55);
+  box-shadow:
+    0 0 0 1px rgba(124,92,255,0.3),
+    0 0 32px rgba(30,215,96,0.35),
+    0 0 72px rgba(30,215,96,0.15);
 }
-.ed-sp__wrap::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, #1ed760, rgba(30,215,96,0.3), #7c5cff);
-  z-index: 0;
-  opacity: 0.5;
-  filter: blur(8px);
-}
-/* stesso pattern di .ed-video iframe: posizionamento assoluto */
 .ed-sp__frame {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  right: 3px;
-  bottom: 3px;
-  width: calc(100% - 6px);
-  height: calc(100% - 6px);
+  inset: 0;
+  width: 100%;
+  height: 100%;
   border: 0;
-  border-radius: var(--r-lg);
-  z-index: 1;
 }
 
 /* ── Block themed — accent line + gradient tint ── */
