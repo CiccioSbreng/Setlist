@@ -1956,9 +1956,8 @@ input.input[type="date"] {
   width: 100%;
   min-height: 460px;
   border-radius: var(--r-xl);
-  clip-path: inset(0 round var(--r-xl));
+  overflow: hidden;
   background: var(--surface-2);
-  transform-style: preserve-3d;
   transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
               box-shadow 0.5s ease;
@@ -1972,14 +1971,12 @@ input.input[type="date"] {
 .ed-hero__media {
   position: absolute;
   inset: 0;
-  transform: translateZ(-40px) scale(1.1);
-  transform-style: preserve-3d;
 }
 .ed-hero__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 18%;
+  object-position: center top;
 }
 .ed-hero__glow {
   position: absolute;
@@ -1991,7 +1988,6 @@ input.input[type="date"] {
   background: var(--grad-aurora);
   filter: blur(90px);
   opacity: 0.45;
-  transform: translateZ(10px);
   pointer-events: none;
 }
 .ed-hero--noimg .ed-hero__glow { opacity: 0.6; }
@@ -2011,7 +2007,6 @@ input.input[type="date"] {
 }
 .ed-hero__inner {
   width: 100%;
-  transform: translateZ(55px);
 }
 .ed-hero__title {
   font-size: clamp(1.6rem, 4.2vw, 2.6rem);
@@ -2108,11 +2103,22 @@ input.input[type="date"] {
 
 /* ── INFO CARD ── */
 .ed-card {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, rgba(255,138,0,0.08) 0%, var(--surface-2) 55%, var(--surface) 100%);
+  border: 1px solid rgba(255,138,0,0.2);
   border-radius: var(--r-xl);
-  padding: 24px;
+  padding: 28px;
   margin-bottom: 20px;
+  box-shadow: var(--sh-md);
+}
+.ed-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,138,0,0.65), transparent);
+  pointer-events: none;
 }
 
 /* ── TAB SECTIONS ── */
@@ -2248,12 +2254,17 @@ input.input[type="date"] {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--text-dim);
-  font-size: 0.98rem;
+  padding: 14px 18px;
+  border-radius: var(--r-lg);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text);
+  font-size: 0.97rem;
+  font-weight: 500;
 }
 
 .ed__row svg {
-  color: var(--brand);
+  color: var(--brand-soft);
   flex: none;
 }
 
@@ -4359,13 +4370,12 @@ input.input[type="date"] {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 
-/* Spotify embed: altezza fissa, no aspect-ratio */
+/* Spotify embed: stesso aspect-ratio di YouTube */
 .ed-video--sp {
-  aspect-ratio: unset;
-  height: 352px;
+  aspect-ratio: 16 / 9;
 }
 
 /* ── Block themed — accent line + gradient tint ── */
