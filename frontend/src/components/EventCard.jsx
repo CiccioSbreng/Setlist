@@ -175,9 +175,6 @@ export default function EventCard({
           <div className="ev-card__genre">{ev.genre}</div>
         )}
 
-        {ev.soldOut && (
-          <div className="ev-card__soldout">SOLD OUT</div>
-        )}
       </div>
 
       <div className="ev-card__body">
@@ -215,11 +212,13 @@ export default function EventCard({
 
         <div className="ev-card__foot">
           <div className="ev-card__foot-left">
-            {cdLabel === "started"
-              ? <span className="ev-card__live">🔴 In corso</span>
-              : cdLabel
-                ? <span className="ev-card__countdown">⏱ {cdLabel}</span>
-                : null
+            {ev.soldOut
+              ? <span className="ev-card__soldout-badge">Sold Out</span>
+              : cdLabel === "started"
+                ? <span className="ev-card__live">🔴 In corso</span>
+                : cdLabel
+                  ? <span className="ev-card__countdown">⏱ {cdLabel}</span>
+                  : null
             }
             {detailId && (
               <Link to={`/event/${detailId}`} className="ev-card__detail-link">
@@ -227,9 +226,7 @@ export default function EventCard({
               </Link>
             )}
           </div>
-          {ev.soldOut ? (
-            <span className="ev-card__soldout-cta">Sold Out</span>
-          ) : ev.url ? (
+          {ev.soldOut ? null : ev.url ? (
             <a
               href={ev.url}
               target="_blank"
