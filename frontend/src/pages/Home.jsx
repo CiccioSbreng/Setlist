@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import {
   searchEvents,
   toUtcStart,
@@ -12,6 +13,7 @@ import {
 } from "../lib/api";
 import EventCard from "../components/EventCard";
 import DateRangePopover from "../components/DateRangePopover";
+import { Stagger, StaggerItem } from "../components/Motion";
 import {
   SearchIcon,
   PinIcon,
@@ -80,7 +82,6 @@ export default function Home() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
   const [citySugg, setCitySugg] = useState([]);
   const [showCitySugg, setShowCitySugg] = useState(false);
   const [quickRange, setQuickRange] = useState(null);
@@ -100,13 +101,9 @@ export default function Home() {
   }, []);
 
   async function toggleFavorite(ev) {
-    setError("");
-    setInfo("");
     const token = localStorage.getItem("token");
     if (!token) {
-      setError(
-        "Per salvare un evento nei preferiti devi prima accedere o registrarti."
-      );
+      toast.error("Per salvare un evento devi prima accedere o registrarti.");
       return;
     }
 
@@ -119,9 +116,9 @@ export default function Home() {
           delete next[ev.id];
           return next;
         });
-        setInfo(`"${ev.name}" rimosso dai preferiti.`);
+        toast(`"${ev.name}" rimosso dai preferiti`);
       } catch (e) {
-        setError(e.message || "Non è stato possibile rimuovere il preferito.");
+        toast.error(e.message || "Non è stato possibile rimuovere il preferito.");
       }
       return;
     }
@@ -137,9 +134,9 @@ export default function Home() {
         url: ev.url,
       });
       setFavMap((m) => ({ ...m, [ev.id]: created._id }));
-      setInfo(`"${ev.name}" aggiunto ai preferiti.`);
+      toast.success(`"${ev.name}" aggiunto ai preferiti`);
     } catch (e) {
-      setError(e.message || "Non è stato possibile salvare il preferito.");
+      toast.error(e.message || "Non è stato possibile salvare il preferito.");
     }
   }
 
@@ -190,7 +187,6 @@ export default function Home() {
   async function runSearch(page = 0, overrideForm) {
     setLoading(true);
     setError("");
-    setInfo("");
 
     const usedForm = overrideForm ?? { ...form, page };
 
@@ -463,11 +459,6 @@ export default function Home() {
               {error}
             </div>
           )}
-          {info && !error && (
-            <div className="banner banner--ok" style={{ marginTop: 24 }}>
-              {info}
-            </div>
-          )}
 
           {/* risultati */}
           <div id="risultati" style={{ marginTop: 36 }}>
@@ -519,16 +510,17 @@ export default function Home() {
             )}
 
             {!loading && hasResults && (
-              <div className="events-grid">
+              <Stagger className="events-grid" key={data.page}>
                 {data.events.map((ev) => (
-                  <EventCard
-                    key={ev.id}
-                    ev={ev}
-                    favorited={Boolean(favMap[ev.id])}
-                    onToggleFavorite={() => toggleFavorite(ev)}
-                  />
+                  <StaggerItem key={ev.id}>
+                    <EventCard
+                      ev={ev}
+                      favorited={Boolean(favMap[ev.id])}
+                      onToggleFavorite={() => toggleFavorite(ev)}
+                    />
+                  </StaggerItem>
                 ))}
-              </div>
+              </Stagger>
             )}
 
             {!loading && hasResults && data.totalPages > 1 && (
