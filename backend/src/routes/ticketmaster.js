@@ -70,8 +70,18 @@ function mapVenue(v){
   }
 }
 
-function isSoldOut(ev) {
-  if (ev.dates?.status?.code === 'offsale') return true
+function normalizeStatus(code) {
+  if (!code) return null
+  const c = code.toLowerCase()
+  if (c === 'canceled' || c === 'cancelled') return 'cancelled'
+  if (c === 'postponed') return 'postponed'
+  if (c === 'rescheduled') return 'rescheduled'
+  return c
+}
+
+function isSoldOut(ev, status) {
+  if (status === 'cancelled' || status === 'postponed') return false
+  if (ev.dates?.status?.code?.toLowerCase() === 'offsale') return true
   if (ev.availability?.soldOut === true) return true
   const saleEnd = ev.sales?.public?.endDateTime
   const eventStart = ev.dates?.start?.dateTime || ev.dates?.start?.localDate
@@ -97,8 +107,8 @@ async function tmRequest(params) {
       lon: num(v?.location?.longitude),
       address: v?.address?.line1 || null,
       genre: ev.classifications?.[0]?.genre?.name || null,
-      status: ev.dates?.status?.code || null,
-      soldOut: isSoldOut(ev),
+      status: normalizeStatus(ev.dates?.status?.code),
+      soldOut: isSoldOut(ev, normalizeStatus(ev.dates?.status?.code)),
       priceMin: ev.priceRanges?.[0]?.min ?? null,
       priceMax: ev.priceRanges?.[0]?.max ?? null,
       currency: ev.priceRanges?.[0]?.currency || null,
@@ -122,8 +132,8 @@ function mapDetail(ev){
     name: ev.name,
     date: ev.dates?.start?.dateTime || ev.dates?.start?.localDate || null,
     time: ev.dates?.start?.localTime || null,
-    status: ev.dates?.status?.code || null,
-    soldOut: isSoldOut(ev),
+    status: normalizeStatus(ev.dates?.status?.code),
+    soldOut: isSoldOut(ev, normalizeStatus(ev.dates?.status?.code)),
     venue: mapVenue(ev._embedded?.venues?.[0]),
     segment: c?.segment?.name || null,
     genre: c?.genre?.name || null,
