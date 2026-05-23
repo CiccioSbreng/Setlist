@@ -4510,19 +4510,19 @@ input.input[type="date"] {
   display: flex;
   flex-direction: column;
 }
-/* YouTube: flex:1 riempie tutto lo spazio rimasto dopo l'header */
+/* Entrambi i player: altezza fissa identica, niente flex */
 .ed-media-duo .ed-video {
-  flex: 1;
-  min-height: 0;
+  flex: none;
+  height: 380px;
   aspect-ratio: unset;
+  min-height: unset;
 }
-/* Spotify: altezza fissa uguale al box base per mostrare le tracce */
 .ed-media-duo .ed-sp__box {
   flex: none;
-  height: 450px;
+  height: 380px;
 }
 .ed-media-duo .ed-sp__frame {
-  height: 450px;
+  height: 380px;
 }
 /* Spotify: 450px per mostrare più tracce */
 .ed-sp__box {
