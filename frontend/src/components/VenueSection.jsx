@@ -4,7 +4,6 @@ import {
   ArrowRightIcon, BedIcon, CloudIcon, ForkIcon,
   GlobeIcon, PinIcon, TreeIcon,
 } from "./Icons";
-import ConcertChecklist from "./ConcertChecklist";
 
 export default function VenueSection({ ev }) {
   const { weather, weatherLoading, parks, restaurants, parkings, cityInfo } = useVenueData(ev);
@@ -230,7 +229,6 @@ export default function VenueSection({ ev }) {
         </section>
       )}
 
-      <ConcertChecklist ev={ev} />
     </div>
   );
 }
