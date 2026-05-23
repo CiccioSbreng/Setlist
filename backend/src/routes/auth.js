@@ -19,7 +19,12 @@ function requireAuth(req, res, next) {
 
 function createToken(user) {
   const payload = { id: user._id.toString(), email: user.email };
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+}
+
+function createRefreshToken(user) {
+  const payload = { id: user._id.toString(), type: 'refresh' };
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '30d' });
 }
 
 // POST /api/auth/register
@@ -44,10 +49,12 @@ router.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = await User.create({ email, passwordHash });
-    const token = createToken(user);
+    const token        = createToken(user);
+    const refreshToken = createRefreshToken(user);
 
     return res.status(201).json({
       token,
+      refreshToken,
       user: user.toSafeObject(),
     });
   } catch (err) {
@@ -77,10 +84,12 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Credenziali non valide.' });
     }
 
-    const token = createToken(user);
+    const token        = createToken(user);
+    const refreshToken = createRefreshToken(user);
 
     return res.json({
       token,
+      refreshToken,
       user: user.toSafeObject(),
     });
   } catch (err) {
@@ -129,6 +138,26 @@ router.put('/password', requireAuth, async (req, res) => {
     res.json({ ok: true });
   } catch {
     res.status(500).json({ message: 'Errore aggiornamento password.' });
+  }
+});
+
+// POST /api/auth/refresh
+router.post('/refresh', async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(400).json({ message: 'refreshToken mancante.' });
+
+  try {
+    const payload = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    if (payload.type !== 'refresh') return res.status(401).json({ message: 'Token non valido.' });
+
+    const user = await User.findById(payload.id);
+    if (!user) return res.status(401).json({ message: 'Utente non trovato.' });
+
+    const token        = createToken(user);
+    const newRefresh   = createRefreshToken(user);
+    return res.json({ token, refreshToken: newRefresh });
+  } catch {
+    return res.status(401).json({ message: 'Refresh token scaduto o non valido.' });
   }
 });
 

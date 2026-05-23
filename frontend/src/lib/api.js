@@ -4,9 +4,54 @@
 const BASE =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
 
-// legge il token dal localStorage (per le API protette)
-function getToken() {
-  return localStorage.getItem('token');
+function getToken()        { return localStorage.getItem('token'); }
+function getRefreshToken() { return localStorage.getItem('refresh_token'); }
+
+function saveTokens({ token, refreshToken }) {
+  if (token)        localStorage.setItem('token', token);
+  if (refreshToken) localStorage.setItem('refresh_token', refreshToken);
+}
+
+function clearTokens() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('refresh_token');
+  window.dispatchEvent(new Event('auth-changed'));
+}
+
+let _refreshing = null;
+async function tryRefresh() {
+  const rt = getRefreshToken();
+  if (!rt) return false;
+  if (_refreshing) return _refreshing;
+  _refreshing = (async () => {
+    try {
+      const res  = await fetch(`${BASE}/api/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: rt }),
+      });
+      if (!res.ok) { clearTokens(); return false; }
+      const data = await res.json();
+      saveTokens({ token: data.token, refreshToken: data.refreshToken });
+      return true;
+    } catch {
+      return false;
+    } finally {
+      _refreshing = null;
+    }
+  })();
+  return _refreshing;
+}
+
+async function authFetch(url, options = {}) {
+  const token = getToken();
+  const headers = { ...options.headers, Authorization: `Bearer ${token}` };
+  const res = await fetch(url, { ...options, headers });
+  if (res.status !== 401) return res;
+  const refreshed = await tryRefresh();
+  if (!refreshed) return res;
+  const newToken  = getToken();
+  return fetch(url, { ...options, headers: { ...options.headers, Authorization: `Bearer ${newToken}` } });
 }
 
 // helper per querystring
@@ -104,12 +149,9 @@ export async function loginUser(email, password) {
     throw new Error(data.message || 'Errore login');
   }
 
-  // salva token per le altre API
-  localStorage.setItem('token', data.token);
-  // notifica la navbar ecc.
+  saveTokens({ token: data.token, refreshToken: data.refreshToken });
   window.dispatchEvent(new Event('auth-changed'));
-
-  return data; // { token, user }
+  return data;
 }
 
 // POST /api/auth/register
@@ -126,60 +168,42 @@ export async function registerUser(email, password) {
     throw new Error(data.message || 'Errore registrazione');
   }
 
-  localStorage.setItem('token', data.token);
+  saveTokens({ token: data.token, refreshToken: data.refreshToken });
   window.dispatchEvent(new Event('auth-changed'));
-
-  return data; // { token, user }
+  return data;
 }
 
 // ---- PREFERITI: richiedono token nell'header ----
 
 // GET /api/favorites
 export async function getFavorites() {
-  const token = getToken();
-
-  const res = await fetch(`${BASE}/api/favorites`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+  const res = await authFetch(`${BASE}/api/favorites`);
   if (!res.ok) throw new Error('Errore caricamento preferiti');
   return res.json();
 }
 
 // POST /api/favorites
 export async function addFavorite(event) {
-  const token = getToken();
-
-  const res = await fetch(`${BASE}/api/favorites`, {
+  const res = await authFetch(`${BASE}/api/favorites`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(event),
   });
-
   if (!res.ok) throw new Error('Errore salvataggio preferito');
   return res.json();
 }
 
 // ---- PROFILO UTENTE ----
 export async function getProfile() {
-  const token = getToken();
-  const res = await fetch(`${BASE}/api/auth/profile`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await authFetch(`${BASE}/api/auth/profile`);
   if (!res.ok) throw new Error('Errore caricamento profilo');
   return res.json();
 }
 
 export async function updateProfile(data) {
-  const token = getToken();
-  const res = await fetch(`${BASE}/api/auth/profile`, {
+  const res = await authFetch(`${BASE}/api/auth/profile`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error('Errore aggiornamento profilo');
@@ -187,10 +211,9 @@ export async function updateProfile(data) {
 }
 
 export async function updatePassword(currentPassword, newPassword) {
-  const token = getToken();
-  const res = await fetch(`${BASE}/api/auth/password`, {
+  const res = await authFetch(`${BASE}/api/auth/password`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ currentPassword, newPassword }),
   });
   const data = await res.json().catch(() => ({}));
@@ -214,15 +237,7 @@ export async function getSetlist(artist, signal) {
 
 // DELETE /api/favorites/:id
 export async function removeFavorite(id) {
-  const token = getToken();
-
-  const res = await fetch(`${BASE}/api/favorites/${id}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+  const res = await authFetch(`${BASE}/api/favorites/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error('Errore eliminazione preferito');
   return res.json();
 }
