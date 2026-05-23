@@ -202,13 +202,6 @@ export async function getWeather({ lat, lon, date }) {
   return res.json();
 }
 
-// ---- DISTANCE: tempo/distanza reali origine -> venue (Google) ----
-export async function getDistance({ origin, lat, lon }) {
-  const res = await fetch(`${BASE}/api/distance?${qs({ origin, lat, lon })}`);
-  if (!res.ok) throw new Error(`Distance ${res.status}`);
-  return res.json();
-}
-
 // ---- SETLIST: ultima scaletta dell'artista ----
 export async function getSetlist(artist) {
   const res = await fetch(`${BASE}/api/setlist?artist=${encodeURIComponent(artist)}`);

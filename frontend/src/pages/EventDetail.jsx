@@ -231,6 +231,23 @@ export default function EventDetail() {
         {/* DOVE & COME */}
         <VenueSection ev={ev} {...venue} />
       </div>
+
+      {/* STICKY CTA — solo mobile */}
+      <div className="ed-sticky-cta">
+        {ev.url && (
+          <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary ed-sticky-cta__tickets">
+            <TicketIcon size={18} />Biglietti<ArrowRightIcon size={16} />
+          </a>
+        )}
+        <button
+          type="button"
+          className={`btn ${isFav ? "btn--fav-active" : "btn--ghost"} ed-sticky-cta__fav`}
+          onClick={handleFav}
+          aria-label={isFav ? "Rimuovi dai preferiti" : "Salva nei preferiti"}
+        >
+          <HeartIcon size={20} filled={isFav} />
+        </button>
+      </div>
     </section>
   );
 }
