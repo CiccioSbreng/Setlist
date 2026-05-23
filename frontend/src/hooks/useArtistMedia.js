@@ -34,10 +34,13 @@ export function useArtistMedia(ev) {
     (async () => {
       for (const lang of ["it", "en"]) {
         try {
-          const r = await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(artistName)}`);
+          const url = `https://${lang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&redirects=1&titles=${encodeURIComponent(artistName)}&format=json&origin=*`;
+          const r = await fetch(url);
           if (!r.ok) continue;
           const d = await r.json();
-          if (d.extract && d.type !== "disambiguation") { if (alive) setArtistBio(d.extract); return; }
+          const pages = Object.values(d.query?.pages || {});
+          const page = pages.find((p) => p.extract && !p.missing);
+          if (page?.extract) { if (alive) setArtistBio(page.extract.trim()); return; }
         } catch {}
       }
     })();
