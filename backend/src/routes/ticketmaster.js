@@ -163,6 +163,7 @@ async function tmRequest(params, { enrich = true, listCacheKey = null } = {}) {
       genre: ev.classifications?.[0]?.genre?.name || null,
       status: normalizeStatus(ev.dates?.status?.code),
       soldOut: isSoldOut(ev, normalizeStatus(ev.dates?.status?.code)),
+      saleEnd: ev.sales?.public?.endDateTime || null,
       priceMin: ev.priceRanges?.[0]?.min ?? null,
       priceMax: ev.priceRanges?.[0]?.max ?? null,
       currency: ev.priceRanges?.[0]?.currency || null,
