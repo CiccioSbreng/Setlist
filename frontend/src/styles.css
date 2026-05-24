@@ -4082,33 +4082,88 @@ input.input[type="date"] {
 /* ── Autocomplete città ─────────────────────────────────── */
 .sb-seg--autocomplete { position: relative; }
 
-.sb-seg--select { flex: 0 0 auto; min-width: 170px; }
+/* ── GenreSelect custom dropdown ───────────────────────── */
+.gsel {
+  position: relative;
+  flex: none;
+}
 
-.sb-seg__select {
-  width: 100%;
+.gsel__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  height: 100%;
   background: transparent;
   border: 0;
-  padding: 0;
-  color: var(--text);
+  color: var(--text-dim);
   font: inherit;
   font-size: 0.98rem;
-  outline: none;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
+  white-space: nowrap;
+  transition: color 0.15s;
 }
 
-.sb-seg__select option {
-  background: #1a1728;
-  color: var(--text);
-}
+.gsel__trigger:hover { color: var(--text); }
 
-.sb-seg__select:focus { outline: none; }
+.gsel__trigger.is-active { color: var(--brand); }
 
-.sb-seg__chevron {
+.gsel__ic { flex: none; opacity: 0.6; }
+
+.gsel__label { flex: 1; }
+
+.gsel__arrow {
   flex: none;
   color: var(--text-mute);
-  pointer-events: none;
+  transition: transform 0.2s;
+}
+.gsel__arrow.is-open { transform: rotate(180deg); }
+
+.gsel__clear {
+  flex: none;
+  color: var(--text-mute);
+  transition: color 0.15s;
+}
+.gsel__clear:hover { color: var(--text); }
+
+.gsel__pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 180px;
+  background: #1a1728;
+  border: 1px solid rgba(255,138,0,0.25);
+  border-radius: var(--r-md);
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  z-index: 200;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+}
+
+.gsel__opt {
+  width: 100%;
+  display: block;
+  padding: 9px 18px;
+  background: none;
+  border: none;
+  color: #c8cadc;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.gsel__opt:hover {
+  background: rgba(255,138,0,0.1);
+  color: #fff;
+}
+
+.gsel__opt.is-active {
+  color: var(--brand);
+  font-weight: 600;
 }
 
 .sb-sugg {

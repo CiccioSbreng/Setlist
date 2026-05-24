@@ -2,10 +2,11 @@ import { Link } from "react-router-dom";
 import { useHomeSearch } from "../hooks/useHomeSearch";
 import EventCard from "../components/EventCard";
 import DateRangePopover from "../components/DateRangePopover";
+import GenreSelect from "../components/GenreSelect";
 import { Stagger, StaggerItem } from "../components/Motion";
 import {
   SearchIcon, PinIcon, MusicIcon, HeartIcon, SparkIcon,
-  TicketIcon, ArrowRightIcon, RefreshIcon, CloseIcon, SpotifyIcon, YoutubeIcon, ChevronDownIcon,
+  TicketIcon, ArrowRightIcon, RefreshIcon, CloseIcon, SpotifyIcon, YoutubeIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -31,7 +32,6 @@ export default function Home() {
     hasResults, hasActiveFilters, hasSearch, isShowcase,
   } = useHomeSearch();
 
-  const GENRES = ["Rock", "Pop", "Metal", "Hip-Hop/Rap", "Electronic", "Punk", "R&B", "Alternative"];
 
   return (
     <>
@@ -148,19 +148,10 @@ export default function Home() {
 
               <span className="sb-div" aria-hidden="true" />
 
-              <label className="sb-seg sb-seg--select" htmlFor="genre">
-                <MusicIcon size={20} className="sb-seg__ic" />
-                <select
-                  id="genre"
-                  className="sb-seg__select"
-                  value={form.genre}
-                  onChange={(e) => { const g = e.target.value; const next = { ...form, genre: g, page: 0 }; update({ genre: g }); runSearch(0, next); }}
-                >
-                  <option value="">Tutti i generi</option>
-                  {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
-                </select>
-                <ChevronDownIcon size={16} className="sb-seg__chevron" />
-              </label>
+              <GenreSelect
+                value={form.genre}
+                onChange={(g) => { const next = { ...form, genre: g, page: 0 }; update({ genre: g }); runSearch(0, next); }}
+              />
 
               <button type="submit" className="sb-go">
                 <SearchIcon size={18} /><span>Cerca</span>
