@@ -52,7 +52,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
                 </div>
               )}
 
-              {artistBio && artistBio.length >= 150 && (
+              {artistBio && (
                 <>
                   <p className={`ed-aphero__bio${bioExpanded ? " is-open" : ""}`}>{artistBio}</p>
                   <button type="button" className="ed-link-btn" onClick={() => setBioExpanded((v) => !v)}>
