@@ -107,6 +107,13 @@ export function useHomeSearch() {
     runSearch(0, cleared);
   }
 
+  function clearSearch() {
+    setQuickRange(null);
+    const cleared = { ...form, city: "", keyword: "", start: "", end: "", page: 0 };
+    setForm(cleared);
+    runSearch(0, cleared);
+  }
+
   async function runSearch(page = 0, overrideForm) {
     clearTimeout(silentRefetchTimer.current);
     setLoading(true);
@@ -178,14 +185,15 @@ export function useHomeSearch() {
 
   const hasResults       = data.events?.length > 0;
   const hasActiveFilters = Boolean(form.start || form.end || quickRange);
+  const hasSearch        = Boolean(form.city || form.keyword || form.start || form.end || quickRange);
   const isShowcase       = !form.city && !form.keyword && !form.start && !form.end && !quickRange;
 
   return {
     form, update, data, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
-    quickRange, applyQuickRange, clearDates,
+    quickRange, applyQuickRange, clearDates, clearSearch,
     runSearch, goToPage, scrollToSearch,
     favMap, toggleFavorite,
-    hasResults, hasActiveFilters, isShowcase,
+    hasResults, hasActiveFilters, hasSearch, isShowcase,
   };
 }

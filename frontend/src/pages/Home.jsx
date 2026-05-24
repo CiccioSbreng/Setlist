@@ -5,7 +5,7 @@ import DateRangePopover from "../components/DateRangePopover";
 import { Stagger, StaggerItem } from "../components/Motion";
 import {
   SearchIcon, PinIcon, MusicIcon, HeartIcon, SparkIcon,
-  TicketIcon, ArrowRightIcon, RefreshIcon, SpotifyIcon, YoutubeIcon,
+  TicketIcon, ArrowRightIcon, RefreshIcon, CloseIcon, SpotifyIcon, YoutubeIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -25,10 +25,10 @@ export default function Home() {
   const {
     form, update, data, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
-    quickRange, applyQuickRange, clearDates,
+    quickRange, applyQuickRange, clearDates, clearSearch,
     runSearch, goToPage, scrollToSearch,
     favMap, toggleFavorite,
-    hasResults, hasActiveFilters, isShowcase,
+    hasResults, hasActiveFilters, hasSearch, isShowcase,
   } = useHomeSearch();
 
   return (
@@ -144,6 +144,11 @@ export default function Home() {
                 />
               </label>
 
+              {hasSearch && (
+                <button type="button" className="sb-clear" onClick={clearSearch} title="Cancella ricerca" aria-label="Cancella ricerca">
+                  <CloseIcon size={16} />
+                </button>
+              )}
               <button type="submit" className="sb-go">
                 <SearchIcon size={18} /><span>Cerca</span>
               </button>
