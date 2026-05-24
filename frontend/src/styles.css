@@ -1414,12 +1414,13 @@ input.input[type="date"] {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: linear-gradient(160deg, rgba(255,138,0,0.08) 0%, rgba(255,255,255,0.03) 55%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid rgba(255,138,0,0.18);
   border-radius: var(--r-xl);
   overflow: hidden;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  position: relative;
   --rx: 0deg;
   --ry: 0deg;
   --lift: 0px;
@@ -1429,11 +1430,21 @@ input.input[type="date"] {
   will-change: transform;
 }
 
+.ev-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,138,0,0.75), transparent);
+  pointer-events: none;
+  border-radius: 1px;
+}
+
 .ev-card:hover {
-  border-color: rgba(255, 138, 0, 0.3);
+  border-color: rgba(255, 138, 0, 0.4);
   box-shadow:
     0 24px 64px rgba(0, 0, 0, 0.55),
-    0 0 40px rgba(255, 138, 0, 0.1);
+    0 0 40px rgba(255, 138, 0, 0.15);
 }
 
 .ev-card__media {
@@ -3804,11 +3815,12 @@ input.input[type="date"] {
     max-width: 100%;
   }
 
-  /* Card: footer in colonna per testi lunghi */
+  /* Card: footer sempre in riga su mobile */
   .ev-card__foot {
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
-    align-items: flex-start;
   }
 
   /* CTA band */
