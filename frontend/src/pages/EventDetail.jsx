@@ -181,7 +181,6 @@ export default function EventDetail() {
                   {ev.status === "cancelled"  && <span className="tag tag--warn">Annullato</span>}
                   {ev.status === "postponed"  && <span className="tag tag--warn">Rinviato</span>}
                   {ev.status === "rescheduled" && <span className="tag tag--warn">Riprogrammato</span>}
-                  {ev.soldOut && ev.status !== "cancelled" && <span className="tag tag--soldout">Sold Out</span>}
                 </div>
                 <h1 className="ed-hero__title">{ev.name}</h1>
                 {ev.lineup?.length > 1 && (
@@ -215,15 +214,11 @@ export default function EventDetail() {
             ))}
           </nav>
           <div className="ed-bar__actions">
-            {ev.status === "cancelled" ? null : ev.soldOut ? (
-              <button type="button" className="btn btn--ghost" disabled>
-                <TicketIcon size={18} />Sold Out
-              </button>
-            ) : ev.url ? (
+            {ev.status !== "cancelled" && ev.url && (
               <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary">
-                <TicketIcon size={18} />Biglietti<ArrowRightIcon size={18} />
+                <TicketIcon size={18} />Controlla disponibilità<ArrowRightIcon size={18} />
               </a>
-            ) : null}
+            )}
             <button
               type="button"
               className={`btn ${isFav ? "btn--fav-active" : "btn--ghost"}`}
@@ -246,11 +241,6 @@ export default function EventDetail() {
             {ev.status === "cancelled" && (
               <div className="ed__status-banner ed__status-banner--cancelled">
                 Evento annullato — i biglietti acquistati verranno rimborsati
-              </div>
-            )}
-            {ev.soldOut && ev.status !== "cancelled" && (
-              <div className="ed__status-banner ed__status-banner--soldout">
-                Biglietti esauriti — evento Sold Out
               </div>
             )}
             {ev.status === "postponed" && (
@@ -316,15 +306,11 @@ export default function EventDetail() {
 
       {/* ── STICKY CTA (solo mobile) ── */}
       <div className="ed-sticky-cta">
-        {ev.status === "cancelled" ? null : ev.soldOut ? (
-          <button type="button" className="btn btn--ghost ed-sticky-cta__tickets" disabled>
-            <TicketIcon size={18} />Sold Out
-          </button>
-        ) : ev.url ? (
+        {ev.status !== "cancelled" && ev.url && (
           <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary ed-sticky-cta__tickets">
-            <TicketIcon size={18} />Biglietti<ArrowRightIcon size={16} />
+            <TicketIcon size={18} />Controlla disponibilità<ArrowRightIcon size={16} />
           </a>
-        ) : null}
+        )}
         <button
           type="button"
           className={`btn ${isFav ? "btn--fav-active" : "btn--ghost"} ed-sticky-cta__fav`}
