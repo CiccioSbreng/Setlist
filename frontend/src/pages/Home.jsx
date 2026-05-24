@@ -5,7 +5,7 @@ import DateRangePopover from "../components/DateRangePopover";
 import { Stagger, StaggerItem } from "../components/Motion";
 import {
   SearchIcon, PinIcon, MusicIcon, HeartIcon, SparkIcon,
-  TicketIcon, ArrowRightIcon, RefreshIcon, CloseIcon, SpotifyIcon, YoutubeIcon,
+  TicketIcon, ArrowRightIcon, RefreshIcon, CloseIcon, SpotifyIcon, YoutubeIcon, ChevronDownIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -149,6 +149,7 @@ export default function Home() {
               <span className="sb-div" aria-hidden="true" />
 
               <label className="sb-seg sb-seg--select" htmlFor="genre">
+                <MusicIcon size={20} className="sb-seg__ic" />
                 <select
                   id="genre"
                   className="sb-seg__select"
@@ -158,6 +159,7 @@ export default function Home() {
                   <option value="">Tutti i generi</option>
                   {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
                 </select>
+                <ChevronDownIcon size={16} className="sb-seg__chevron" />
               </label>
 
               <button type="submit" className="sb-go">

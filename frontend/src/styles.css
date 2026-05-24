@@ -4082,7 +4082,7 @@ input.input[type="date"] {
 /* ── Autocomplete città ─────────────────────────────────── */
 .sb-seg--autocomplete { position: relative; }
 
-.sb-seg--select { flex: 0 0 auto; min-width: 160px; }
+.sb-seg--select { flex: 0 0 auto; min-width: 170px; }
 
 .sb-seg__select {
   width: 100%;
@@ -4104,6 +4104,12 @@ input.input[type="date"] {
 }
 
 .sb-seg__select:focus { outline: none; }
+
+.sb-seg__chevron {
+  flex: none;
+  color: var(--text-mute);
+  pointer-events: none;
+}
 
 .sb-sugg {
   position: absolute;
