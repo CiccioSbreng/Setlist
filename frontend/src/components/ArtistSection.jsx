@@ -79,9 +79,6 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
                       <a href={fb} target="_blank" rel="noreferrer" className="ed-chip ed-chip--fb">
                         <FacebookIcon size={15} />Facebook
                       </a>
-                      <a href={yt} target="_blank" rel="noreferrer" className="ed-chip ed-chip--yt">
-                        <YoutubeIcon size={15} />YouTube
-                      </a>
                       {web && (
                         <a href={web} target="_blank" rel="noreferrer" className="ed-chip">
                           <GlobeIcon size={15} />Sito ufficiale
