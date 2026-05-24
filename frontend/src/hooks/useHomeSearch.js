@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -32,6 +32,7 @@ export function useHomeSearch() {
   const [showCitySugg, setShowCitySugg] = useState(false);
   const [quickRange,   setQuickRange]   = useState(null);
   const [favMap,       setFavMap]       = useState({});
+  const silentRefetchTimer = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -107,15 +108,17 @@ export function useHomeSearch() {
   }
 
   async function runSearch(page = 0, overrideForm) {
+    clearTimeout(silentRefetchTimer.current);
     setLoading(true);
     setError("");
     const usedForm = overrideForm ?? { ...form, page };
+    const params = {
+      city: usedForm.city, keyword: usedForm.keyword,
+      size: usedForm.size, page,
+      start: toUtcStart(usedForm.start), end: toUtcEnd(usedForm.end),
+    };
     try {
-      const res = await searchEvents({
-        city: usedForm.city, keyword: usedForm.keyword,
-        size: usedForm.size, page,
-        start: toUtcStart(usedForm.start), end: toUtcEnd(usedForm.end),
-      });
+      const res = await searchEvents(params);
       const seen = new Set();
       const uniqueEvents = [];
       for (const ev of res.events || []) {
@@ -124,6 +127,18 @@ export function useHomeSearch() {
       setData({ ...res, events: uniqueEvents });
       setForm((f) => ({ ...f, page: res.page ?? page }));
       updateURL(usedForm, res.page ?? page);
+
+      // silent refetch dopo 10s per aggiornare badge quando enrichment backend è completo
+      silentRefetchTimer.current = setTimeout(() => {
+        searchEvents(params).then((r) => {
+          const s = new Set();
+          const uniq = [];
+          for (const ev of r.events || []) {
+            if (!s.has(ev.id)) { s.add(ev.id); uniq.push(ev); }
+          }
+          setData((prev) => ({ ...prev, events: uniq }));
+        }).catch(() => {});
+      }, 10000);
     } catch {
       setError("Non siamo riusciti a caricare gli eventi in questo momento. Riprova tra poco.");
     } finally {
@@ -133,27 +148,7 @@ export function useHomeSearch() {
 
   useEffect(() => {
     runSearch(form.page || 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Refetch silenzioso dopo 7s per aggiornare sold out/status dal background enrichment
-  useEffect(() => {
-    const tid = setTimeout(() => {
-      const f = form;
-      searchEvents({
-        city: f.city, keyword: f.keyword,
-        size: f.size, page: f.page || 0,
-        start: toUtcStart(f.start), end: toUtcEnd(f.end),
-      }).then((res) => {
-        const seen = new Set();
-        const uniqueEvents = [];
-        for (const ev of res.events || []) {
-          if (!seen.has(ev.id)) { seen.add(ev.id); uniqueEvents.push(ev); }
-        }
-        setData((prev) => ({ ...prev, events: uniqueEvents }));
-      }).catch(() => {});
-    }, 7000);
-    return () => clearTimeout(tid);
+    return () => clearTimeout(silentRefetchTimer.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
