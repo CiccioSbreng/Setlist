@@ -5,6 +5,14 @@ function overpass(query, signal) {
   return fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`, { signal }).then((r) => r.json());
 }
 
+function distanceM(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
 export function useVenueData(ev) {
   const [weather,        setWeather]        = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
@@ -57,16 +65,27 @@ export function useVenueData(ev) {
 
     q(`[out:json][timeout:8];(node(around:1500,${lat},${lon})[amenity=parking];way(around:1500,${lat},${lon})[amenity=parking];);out center 8;`)
       .then((d) => {
-        const named = (d.elements || []).filter((e) => e.tags?.name && !PARKING_NOISE_RE.test(e.tags.name));
-        // se non ci sono parcheggi con nome "pulito", prende anche quelli senza nome con access=yes o fee
-        const list = named.length > 0 ? named : (d.elements || []).filter((e) => !PARKING_NOISE_RE.test(e.tags?.name ?? ""));
+        const all = (d.elements || [])
+          .filter((e) => e.tags?.access !== "private" && e.tags?.access !== "no")
+          .filter((e) => !PARKING_NOISE_RE.test(e.tags?.name ?? ""));
+        const named = all.filter((e) => e.tags?.name);
+        const list = named.length > 0 ? named : all;
         setParkings(
-          list.slice(0, 5).map((e) => ({
-            id: e.id,
-            name: e.tags?.name || (e.tags?.fee === "yes" ? "Parcheggio a pagamento" : "Parcheggio"),
-            lat: e.lat ?? e.center?.lat,
-            lon: e.lon ?? e.center?.lon,
-          }))
+          list
+            .map((e) => {
+              const pLat = e.lat ?? e.center?.lat;
+              const pLon = e.lon ?? e.center?.lon;
+              return {
+                id: e.id,
+                name: e.tags?.name || (e.tags?.fee === "yes" ? "Parcheggio a pagamento" : "Parcheggio"),
+                fee: e.tags?.fee || null,
+                lat: pLat,
+                lon: pLon,
+                dist: pLat != null && pLon != null ? distanceM(lat, lon, pLat, pLon) : null,
+              };
+            })
+            .sort((a, b) => (a.dist ?? 9999) - (b.dist ?? 9999))
+            .slice(0, 5)
         );
       })
       .catch(() => {});
