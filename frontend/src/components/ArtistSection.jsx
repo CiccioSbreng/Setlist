@@ -70,18 +70,18 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
                   const web = artist.links?.homepage;
                   return (
                     <>
-                      <a href={ig} target="_blank" rel="noreferrer" className="ed-chip ed-chip--ig">
-                        <InstagramIcon size={15} />Instagram
+                      <a href={ig} target="_blank" rel="noreferrer" className="ap-social ap-social--ig" aria-label="Instagram">
+                        <InstagramIcon size={18} />
                       </a>
-                      <a href={tw} target="_blank" rel="noreferrer" className="ed-chip ed-chip--x">
-                        <XIcon size={15} />X
+                      <a href={tw} target="_blank" rel="noreferrer" className="ap-social ap-social--x" aria-label="X / Twitter">
+                        <XIcon size={18} />
                       </a>
-                      <a href={fb} target="_blank" rel="noreferrer" className="ed-chip ed-chip--fb">
-                        <FacebookIcon size={15} />Facebook
+                      <a href={fb} target="_blank" rel="noreferrer" className="ap-social ap-social--fb" aria-label="Facebook">
+                        <FacebookIcon size={18} />
                       </a>
                       {web && (
-                        <a href={web} target="_blank" rel="noreferrer" className="ed-chip">
-                          <GlobeIcon size={15} />Sito ufficiale
+                        <a href={web} target="_blank" rel="noreferrer" className="ap-social" aria-label="Sito ufficiale">
+                          <GlobeIcon size={18} />
                         </a>
                       )}
                     </>

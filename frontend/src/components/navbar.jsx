@@ -1,7 +1,7 @@
 // frontend/src/components/navbar.jsx
 
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MusicIcon,
   HeartIcon,
@@ -14,6 +14,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
 
   useEffect(() => {
     function handleAuthChange() {
@@ -21,6 +23,17 @@ export default function Navbar() {
     }
     window.addEventListener("auth-changed", handleAuthChange);
     return () => window.removeEventListener("auth-changed", handleAuthChange);
+  }, []);
+
+  useEffect(() => {
+    function onScroll() {
+      const y = window.scrollY;
+      if (y > lastY.current && y > 80) setHidden(true);
+      else setHidden(false);
+      lastY.current = y;
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   function handleLogout() {
@@ -34,7 +47,7 @@ export default function Navbar() {
     "nav-link" + (isActive ? " is-active" : "");
 
   return (
-    <nav className="nav">
+    <nav className={"nav" + (hidden ? " nav--hidden" : "")}>
       <div className="wrap nav__inner">
         <Link to="/home" className="brand" onClick={() => setOpen(false)}>
           <span className="brand__mark">

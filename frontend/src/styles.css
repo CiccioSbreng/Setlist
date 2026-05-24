@@ -286,7 +286,9 @@ img {
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--border);
+  transition: transform 0.3s ease;
 }
+.nav--hidden { transform: translateY(-100%); }
 
 .nav__inner {
   height: 70px;
@@ -3825,8 +3827,16 @@ input.input[type="date"] {
   .ev-card__foot {
     flex-direction: row;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
+  }
+  .ev-card__foot .btn--sm {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+  .ev-card__detail-link {
+    font-size: 0.8rem;
+    white-space: nowrap;
   }
 
   /* CTA band */
@@ -4457,9 +4467,27 @@ input.input[type="date"] {
 .ed-aphero__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   margin-top: 18px;
 }
+
+.ap-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
+}
+.ap-social:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); color: #fff; transform: translateY(-2px); }
+.ap-social--ig:hover { background: rgba(225,48,108,0.18); border-color: rgba(225,48,108,0.5); color: #e1306c; }
+.ap-social--x:hover  { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); color: #fff; }
+.ap-social--fb:hover { background: rgba(24,119,242,0.18); border-color: rgba(24,119,242,0.5); color: #6ea9ff; }
 
 /* ── ArtistPage: hero più grande ── */
 .ed-aphero--page {
