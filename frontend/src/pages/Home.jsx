@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useHomeSearch } from "../hooks/useHomeSearch";
 import EventCard from "../components/EventCard";
 import DateRangePopover from "../components/DateRangePopover";
-import GenreSelect from "../components/GenreSelect";
 import { Stagger, StaggerItem } from "../components/Motion";
 import {
   SearchIcon, PinIcon, MusicIcon, HeartIcon, SparkIcon,
@@ -140,18 +139,12 @@ export default function Home() {
                 <input
                   id="keyword"
                   className="sb-seg__input"
-                  placeholder="Artista o band"
+                  placeholder="Artista, band o genere"
                   value={form.keyword}
                   onChange={(e) => update({ keyword: e.target.value })}
                 />
               </label>
 
-              <span className="sb-div" aria-hidden="true" />
-
-              <GenreSelect
-                value={form.genre}
-                onChange={(g) => { const next = { ...form, genre: g, page: 0 }; update({ genre: g }); runSearch(0, next); }}
-              />
 
               <button type="submit" className="sb-go">
                 <SearchIcon size={18} /><span>Cerca</span>
