@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { formatPrice } from "../lib/format";
 import {
   CalendarIcon,
   ClockIcon,
@@ -79,16 +80,6 @@ function parseWhen(date, time) {
       ? d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })
       : null,
   };
-}
-
-function formatPrice(min, max, currency) {
-  if (min == null && max == null) return null;
-  const cur = currency === "EUR" ? "€" : currency ? `${currency} ` : "€";
-  const fmt = (n) => `${cur}${Math.round(n)}`;
-  if (min != null && max != null && Math.round(min) !== Math.round(max)) {
-    return `${fmt(min)} – ${fmt(max)}`;
-  }
-  return `da ${fmt(min ?? max)}`;
 }
 
 function handleMove(e) {

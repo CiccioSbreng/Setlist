@@ -19,6 +19,7 @@ const favoriteSchema = new mongoose.Schema(
     venue: String,
     city: String,
     url: String,
+    genre: String,
   },
   {
     timestamps: true,

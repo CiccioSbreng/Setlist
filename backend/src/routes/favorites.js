@@ -21,7 +21,7 @@ router.get('/', auth, async (req, res) => {
 // POST /api/favorites  → aggiunge o aggiorna un preferito
 router.post('/', auth, async (req, res) => {
   try {
-    const { eventId, name, image, date, venue, city, url } = req.body;
+    const { eventId, name, image, date, venue, city, url, genre } = req.body;
 
     if (!eventId) {
       return res.status(400).json({ message: 'eventId è obbligatorio.' });
@@ -30,7 +30,7 @@ router.post('/', auth, async (req, res) => {
     const fav = await Favorite.findOneAndUpdate(
       { user: req.user.id, eventId }, // filtro
       {
-        $set: { name, image, date, venue, city, url },       // aggiorna questi campi
+        $set: { name, image, date, venue, city, url, genre },
         $setOnInsert: { user: req.user.id, eventId },        // solo se il documento è nuovo
       },
       {

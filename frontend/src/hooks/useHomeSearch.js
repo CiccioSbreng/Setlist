@@ -33,7 +33,7 @@ export function useHomeSearch() {
   const [showCitySugg, setShowCitySugg] = useState(false);
   const [quickRange,   setQuickRange]   = useState(null);
   const [favMap,       setFavMap]       = useState({});
-  const silentRefetchTimer = useRef(null);
+  const searchSeq = useRef(0);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -75,7 +75,7 @@ export function useHomeSearch() {
     try {
       const created = await addFavorite({
         eventId: ev.id, name: ev.name, image: ev.image,
-        date: ev.date, venue: ev.venue, city: ev.city, url: ev.url,
+        date: ev.date, venue: ev.venue, city: ev.city, url: ev.url, genre: ev.genre,
       });
       setFavMap((m) => ({ ...m, [ev.id]: created._id }));
       toast.success(`"${ev.name}" aggiunto ai preferiti`);
@@ -123,7 +123,7 @@ export function useHomeSearch() {
   }
 
   async function runSearch(page = 0, overrideForm) {
-    clearTimeout(silentRefetchTimer.current);
+    const seq = ++searchSeq.current;
     setLoading(true);
     setError("");
     const usedForm = overrideForm ?? { ...form, page };
@@ -135,6 +135,7 @@ export function useHomeSearch() {
     };
     try {
       const res = await searchEvents(params);
+      if (seq !== searchSeq.current) return;
       const seen = new Set();
       const uniqueEvents = [];
       for (const ev of res.events || []) {
@@ -143,27 +144,16 @@ export function useHomeSearch() {
       setData({ ...res, events: uniqueEvents });
       setForm((f) => ({ ...f, page: res.page ?? page }));
       updateURL(usedForm, res.page ?? page);
-
-      silentRefetchTimer.current = setTimeout(() => {
-        searchEvents(params).then((r) => {
-          const s = new Set();
-          const uniq = [];
-          for (const ev of r.events || []) {
-            if (!s.has(ev.id)) { s.add(ev.id); uniq.push(ev); }
-          }
-          setData((prev) => ({ ...prev, events: uniq }));
-        }).catch(() => {});
-      }, 10000);
     } catch {
+      if (seq !== searchSeq.current) return;
       setError("Non siamo riusciti a caricare gli eventi in questo momento. Riprova tra poco.");
     } finally {
-      setLoading(false);
+      if (seq === searchSeq.current) setLoading(false);
     }
   }
 
   useEffect(() => {
     runSearch(form.page || 0);
-    return () => clearTimeout(silentRefetchTimer.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

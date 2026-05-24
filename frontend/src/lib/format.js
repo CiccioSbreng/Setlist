@@ -17,16 +17,3 @@ export function formatPrice(min, max, currency) {
   return `da ${fmt(min ?? max)}`;
 }
 
-export function getDaysLeft(date, time) {
-  if (!date) return null;
-  const d = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
-  if (Number.isNaN(d.getTime())) return null;
-  const diff = d - new Date();
-  if (diff < 0) return null;
-  const days = Math.floor(diff / 86400000);
-  if (days === 0) return "Oggi!";
-  if (days === 1) return "Domani!";
-  if (days < 30) return `Tra ${days} giorni`;
-  const months = Math.floor(days / 30);
-  return `Tra ${months} ${months === 1 ? "mese" : "mesi"}`;
-}

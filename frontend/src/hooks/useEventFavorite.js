@@ -30,7 +30,7 @@ export function useEventFavorite(id, ev) {
       } else if (ev) {
         const created = await addFavorite({
           eventId: ev.id, name: ev.name, image: ev.image,
-          date: ev.date, venue: ev.venue?.name, city: ev.venue?.city, url: ev.url,
+          date: ev.date, venue: ev.venue?.name, city: ev.venue?.city, url: ev.url, genre: ev.genre,
         });
         setIsFav(true);
         setFavId(created._id);

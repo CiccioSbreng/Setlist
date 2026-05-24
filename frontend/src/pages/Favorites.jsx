@@ -143,6 +143,7 @@ export default function FavoritesPage() {
                     venue: fav.venue,
                     city: fav.city,
                     url: fav.url,
+                    genre: fav.genre,
                   }}
                   onRemove={() => handleDelete(fav._id)}
                 />
