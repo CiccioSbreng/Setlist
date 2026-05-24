@@ -118,9 +118,6 @@ export default function EventCard({
   const detailId = ev.eventId || ev.id;
   const cdLabel = useCardCountdown(ev.date, ev.time);
 
-  const now = Date.now();
-  const eventStart = ev.date ? new Date(ev.date.includes("T") ? ev.date : `${ev.date}T${ev.time || "20:00:00"}`).getTime() : null;
-  const ticketsUnavailable = ev.saleEnd && new Date(ev.saleEnd).getTime() < now && eventStart && eventStart > now;
 
   const favAction = onRemove || onToggleFavorite || onAddFavorite;
   const active = typeof onRemove === "function" ? true : Boolean(favorited);
@@ -174,8 +171,6 @@ export default function EventCard({
 
         {ev.status === "cancelled" ? (
           <div className="ev-card__cancelled-badge">Annullato</div>
-        ) : ticketsUnavailable ? (
-          <div className="ev-card__soldout-badge">Biglietti non disp.</div>
         ) : cdLabel === "started" ? (
           <div className="ev-card__live-badge"><span className="ev-card__live-dot" />LIVE ORA</div>
         ) : cdLabel ? (
@@ -230,7 +225,7 @@ export default function EventCard({
               </Link>
             )}
           </div>
-          {!ticketsUnavailable && (
+          {(
             <div className="ev-card__foot-right">
               {price && ev.status !== "cancelled" && (
                 <span className="ev-card__foot-price">{price}</span>

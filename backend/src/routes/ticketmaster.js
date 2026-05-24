@@ -8,9 +8,7 @@ const cache = new NodeCache({ stdTTL: 60 * 15 }) // 15 minuti
 
 const TM_BASE = 'https://app.ticketmaster.com/discovery/v2'
 const API_KEY = process.env.TICKETMASTER_API_KEY
-const BIT_APP_ID = process.env.BANDSINTOWN_APP_ID || 'concerthub'
 
-// lat/long base per le principali città (fallback)
 const CITY_LL = {
   'roma':     { lat: 41.9028, lon: 12.4964 },
   'milano':   { lat: 45.4642, lon: 9.1900 },
@@ -80,106 +78,7 @@ function normalizeStatus(code) {
   return c
 }
 
-function isSoldOut(ev, status) {
-  if (status === 'cancelled' || status === 'postponed') return false
-  if (ev.dates?.status?.code?.toLowerCase() === 'offsale') return true
-  if (ev.availability?.soldOut === true) return true
-  if (ev.ticketAvailability?.hasAvailableTickets === false) return true
-  const saleEnd = ev.sales?.public?.endDateTime
-  const eventStart = ev.dates?.start?.dateTime || ev.dates?.start?.localDate
-  if (saleEnd && eventStart) {
-    const now = Date.now()
-    if (new Date(saleEnd).getTime() < now && new Date(eventStart).getTime() > now) return true
-  }
-  return false
-}
-
-async function checkBandsintown(artistName, eventDate) {
-  if (!artistName || !eventDate) return null
-  const key = `bit:${artistName.toLowerCase().trim()}`
-  let events
-  if (cache.has(key)) {
-    events = cache.get(key)
-  } else {
-    try {
-      const { data } = await axios.get(
-        `https://rest.bandsintown.com/artists/${encodeURIComponent(artistName)}/events`,
-        { params: { app_id: BIT_APP_ID }, timeout: 5000 }
-      )
-      events = Array.isArray(data) ? data : []
-      cache.set(key, events, 60 * 30)
-    } catch {
-      cache.set(key, [], 60 * 5)
-      return null
-    }
-  }
-  const targetDate = eventDate.slice(0, 10)
-  const match = events.find(e => e.datetime?.slice(0, 10) === targetDate)
-  if (!match) return null
-  const offerStatus = match.offers?.[0]?.status
-  if (offerStatus === 'soldout') return 'soldout'
-  return null
-}
-
-async function fetchEventDetail(id) {
-  const cacheKey = `event:${id}`
-  if (cache.has(cacheKey)) return cache.get(cacheKey)
-  const { data } = await axios.get(`${TM_BASE}/events/${encodeURIComponent(id)}.json`, {
-    params: { apikey: API_KEY, locale: '*' }
-  })
-  let detail = mapDetail(data)
-  if (!detail.soldOut && detail.artists?.[0]?.name) {
-    const bitStatus = await checkBandsintown(detail.artists[0].name, detail.date)
-    if (bitStatus === 'soldout') detail = { ...detail, soldOut: true }
-  }
-  cache.set(cacheKey, detail)
-  return detail
-}
-
-const sleep = ms => new Promise(r => setTimeout(r, ms))
-
-async function fetchWithRetry(id) {
-  const delays = [1000, 2000, 4000]
-  for (let i = 0; i <= delays.length; i++) {
-    try { return await fetchEventDetail(id) } catch (e) {
-      if (e.response?.status === 429 && i < delays.length) await sleep(delays[i])
-      else break
-    }
-  }
-}
-
-function enrichFromCache(events) {
-  return events.map(ev => {
-    const d = cache.get(`event:${ev.id}`)
-    if (!d) return ev
-    return {
-      ...ev,
-      status: d.status ?? ev.status,
-      soldOut: d.soldOut ?? ev.soldOut,
-      priceMin: d.priceMin ?? ev.priceMin,
-      priceMax: d.priceMax ?? ev.priceMax,
-      currency: d.currency ?? ev.currency,
-    }
-  })
-}
-
-function enrichBackground(events, listCacheKey) {
-  const missing = events.filter(ev => !cache.has(`event:${ev.id}`))
-  if (!missing.length) return
-  ;(async () => {
-    for (const ev of missing) {
-      await fetchWithRetry(ev.id)
-      await sleep(700)
-    }
-    // aggiorna la list cache con i dati enriched completi
-    if (listCacheKey && cache.has(listCacheKey)) {
-      const cached = cache.get(listCacheKey)
-      cache.set(listCacheKey, { ...cached, events: enrichFromCache(cached.events) })
-    }
-  })().catch(() => {})
-}
-
-async function tmRequest(params, { enrich = true, listCacheKey = null } = {}) {
+async function tmRequest(params) {
   const { data } = await axios.get(`${TM_BASE}/events.json`, { params })
   const events = (data?._embedded?.events || []).map(ev => {
     const v = ev._embedded?.venues?.[0]
@@ -195,8 +94,6 @@ async function tmRequest(params, { enrich = true, listCacheKey = null } = {}) {
       address: v?.address?.line1 || null,
       genre: ev.classifications?.[0]?.genre?.name || null,
       status: normalizeStatus(ev.dates?.status?.code),
-      soldOut: isSoldOut(ev, normalizeStatus(ev.dates?.status?.code)),
-      saleEnd: ev.sales?.public?.endDateTime || null,
       priceMin: ev.priceRanges?.[0]?.min ?? null,
       priceMax: ev.priceRanges?.[0]?.max ?? null,
       currency: ev.priceRanges?.[0]?.currency || null,
@@ -204,7 +101,6 @@ async function tmRequest(params, { enrich = true, listCacheKey = null } = {}) {
       image: bestImage(ev.images)
     }
   })
-  if (enrich) enrichBackground(events, listCacheKey)
   return {
     page: data?.page?.number ?? 0,
     size: data?.page?.size ?? events.length,
@@ -222,7 +118,6 @@ function mapDetail(ev){
     date: ev.dates?.start?.dateTime || ev.dates?.start?.localDate || null,
     time: ev.dates?.start?.localTime || null,
     status: normalizeStatus(ev.dates?.status?.code),
-    soldOut: isSoldOut(ev, normalizeStatus(ev.dates?.status?.code)),
     venue: mapVenue(ev._embedded?.venues?.[0]),
     segment: c?.segment?.name || null,
     genre: c?.genre?.name || null,
@@ -239,6 +134,17 @@ function mapDetail(ev){
   }
 }
 
+async function fetchEventDetail(id) {
+  const cacheKey = `event:${id}`
+  if (cache.has(cacheKey)) return cache.get(cacheKey)
+  const { data } = await axios.get(`${TM_BASE}/events/${encodeURIComponent(id)}.json`, {
+    params: { apikey: API_KEY, locale: '*' }
+  })
+  const detail = mapDetail(data)
+  cache.set(cacheKey, detail)
+  return detail
+}
+
 router.get('/events', async (req, res) => {
   try {
     const { city = '', keyword = '', size = 12, page = 0, start, end, genre = '' } = req.query
@@ -252,34 +158,28 @@ router.get('/events', async (req, res) => {
       sort: 'date,asc',
       startDateTime: toIsoUTC(start),
       endDateTime: toIsoUTC(end),
-      locale: '*' // evita filtri lingua strani
+      locale: '*'
     }
 
-    const enrich = Number(size) > 6
-
-    const serve = out => res.json({ ...out, events: enrichFromCache(out.events) })
-
-    // ---- Primo tentativo: per città
     const p1 = { ...baseParams, city, keyword }
     const key1 = JSON.stringify(p1)
-    if (cache.has(key1)) return serve(cache.get(key1))
-    let out = await tmRequest(p1, { enrich, listCacheKey: key1 })
+    if (cache.has(key1)) return res.json(cache.get(key1))
+    let out = await tmRequest(p1)
 
-    // ---- Fallback: se 0 risultati e c'è una città nota, usa latlong + radius
     if ((out.events?.length ?? 0) === 0 && city) {
       const ll = CITY_LL[city.trim().toLowerCase()]
       if (ll) {
         const p2 = { ...baseParams, latlong: `${ll.lat},${ll.lon}`, radius: 50, unit: 'km', keyword }
         const key2 = JSON.stringify(p2)
-        if (cache.has(key2)) return serve(cache.get(key2))
-        out = await tmRequest(p2, { enrich, listCacheKey: key2 })
+        if (cache.has(key2)) return res.json(cache.get(key2))
+        out = await tmRequest(p2)
         cache.set(key2, out)
-        return serve(out)
+        return res.json(out)
       }
     }
 
     cache.set(key1, out)
-    serve(out)
+    res.json(out)
   } catch (err) {
     const status = err.response?.status || 500
     res.status(status).json({ error: 'Ticketmaster API error', details: err.response?.data || err.message })
@@ -297,21 +197,18 @@ router.get('/events/:id', async (req, res) => {
   }
 })
 
-// Prossime date di un artista (per la pagina dettaglio)
 router.get('/artists/:id/events', async (req, res) => {
   try {
     const { id } = req.params
     const cacheKey = `artist-events:${id}`
     if (cache.has(cacheKey)) return res.json(cache.get(cacheKey))
-
     const out = await tmRequest({
       apikey: API_KEY,
       attractionId: id,
       sort: 'date,asc',
       size: 12,
       locale: '*'
-    }, { enrich: false })
-
+    })
     cache.set(cacheKey, out)
     res.json(out)
   } catch (err) {
