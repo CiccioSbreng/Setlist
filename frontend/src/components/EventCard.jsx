@@ -225,7 +225,7 @@ export default function EventCard({
               </Link>
             )}
           </div>
-          {(
+          {cdLabel !== "started" && (
             <div className="ev-card__foot-right">
               {price && ev.status !== "cancelled" && (
                 <span className="ev-card__foot-price">{price}</span>
