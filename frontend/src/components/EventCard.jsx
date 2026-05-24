@@ -174,8 +174,6 @@ export default function EventCard({
 
         {ev.status === "cancelled" ? (
           <div className="ev-card__cancelled-badge">Annullato</div>
-        ) : ev.soldOut ? (
-          <div className="ev-card__soldout-badge">Sold Out</div>
         ) : ticketsUnavailable ? (
           <div className="ev-card__soldout-badge">Biglietti non disp.</div>
         ) : cdLabel === "started" ? (
@@ -232,7 +230,7 @@ export default function EventCard({
               </Link>
             )}
           </div>
-          {!ev.soldOut && !ticketsUnavailable && (
+          {!ticketsUnavailable && (
             <div className="ev-card__foot-right">
               {price && ev.status !== "cancelled" && (
                 <span className="ev-card__foot-price">{price}</span>
