@@ -172,10 +172,6 @@ export default function EventCard({
           <div className="ev-card__cancelled-badge">Annullato</div>
         ) : ev.soldOut ? (
           <div className="ev-card__soldout-badge">Sold Out</div>
-        ) : cdLabel === "started" ? (
-          <div className="ev-card__live-badge">🔴 In corso</div>
-        ) : cdLabel ? (
-          <div className="ev-card__countdown-badge">⏱ {cdLabel}</div>
         ) : price ? (
           <div className="ev-card__price">
             <TicketIcon size={15} />
@@ -226,26 +222,29 @@ export default function EventCard({
               </Link>
             )}
           </div>
-          {ev.status === "cancelled" ? (
-            <button type="button" className="btn btn--sm ev-card__cancelled-btn" disabled>
-              Annullato
-            </button>
-          ) : ev.soldOut ? (
-            <button type="button" className="btn btn--sm ev-card__soldout-btn" disabled>
-              Sold Out
-            </button>
-          ) : ev.url ? (
-            <a
-              href={ev.url}
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn--primary btn--sm"
-            >
-              <TicketIcon size={18} />
-              Biglietti
-            </a>
-          ) : (
-            <span className="ev-card__no-ticket">Biglietti non disponibili</span>
+          {!ev.soldOut && (
+            <div className="ev-card__foot-right">
+              {price && ev.status !== "cancelled" && (
+                <span className="ev-card__foot-price">{price}</span>
+              )}
+              {ev.status === "cancelled" ? (
+                <button type="button" className="btn btn--sm ev-card__cancelled-btn" disabled>
+                  Annullato
+                </button>
+              ) : ev.url ? (
+                <a
+                  href={ev.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn--primary btn--sm"
+                >
+                  <TicketIcon size={18} />
+                  Biglietti
+                </a>
+              ) : (
+                <span className="ev-card__no-ticket">Biglietti non disponibili</span>
+              )}
+            </div>
           )}
         </div>
       </div>

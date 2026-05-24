@@ -92,7 +92,46 @@ function isSoldOut(ev, status) {
   return false
 }
 
-async function tmRequest(params) {
+async function fetchEventDetail(id) {
+  const cacheKey = `event:${id}`
+  if (cache.has(cacheKey)) return cache.get(cacheKey)
+  const { data } = await axios.get(`${TM_BASE}/events/${encodeURIComponent(id)}.json`, {
+    params: { apikey: API_KEY, locale: '*' }
+  })
+  const detail = mapDetail(data)
+  cache.set(cacheKey, detail)
+  return detail
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+
+function enrichFromCache(events) {
+  return events.map(ev => {
+    const d = cache.get(`event:${ev.id}`)
+    if (!d) return ev
+    return {
+      ...ev,
+      status: d.status ?? ev.status,
+      soldOut: d.soldOut ?? ev.soldOut,
+      priceMin: d.priceMin ?? ev.priceMin,
+      priceMax: d.priceMax ?? ev.priceMax,
+      currency: d.currency ?? ev.currency,
+    }
+  })
+}
+
+function enrichBackground(events) {
+  const missing = events.filter(ev => !cache.has(`event:${ev.id}`))
+  if (!missing.length) return
+  ;(async () => {
+    for (const ev of missing) {
+      try { await fetchEventDetail(ev.id) } catch {}
+      await sleep(400)
+    }
+  })().catch(() => {})
+}
+
+async function tmRequest(params, { enrich = true } = {}) {
   const { data } = await axios.get(`${TM_BASE}/events.json`, { params })
   const events = (data?._embedded?.events || []).map(ev => {
     const v = ev._embedded?.venues?.[0]
@@ -116,6 +155,7 @@ async function tmRequest(params) {
       image: bestImage(ev.images)
     }
   })
+  if (enrich) enrichBackground(events)
   return {
     page: data?.page?.number ?? 0,
     size: data?.page?.size ?? events.length,
@@ -166,11 +206,15 @@ router.get('/events', async (req, res) => {
       locale: '*' // evita filtri lingua strani
     }
 
+    const enrich = Number(size) > 6
+
+    const serve = out => res.json({ ...out, events: enrichFromCache(out.events) })
+
     // ---- Primo tentativo: per città
     const p1 = { ...baseParams, city, keyword }
     const key1 = JSON.stringify(p1)
-    if (cache.has(key1)) return res.json(cache.get(key1))
-    let out = await tmRequest(p1)
+    if (cache.has(key1)) return serve(cache.get(key1))
+    let out = await tmRequest(p1, { enrich })
 
     // ---- Fallback: se 0 risultati e c'è una città nota, usa latlong + radius
     if ((out.events?.length ?? 0) === 0 && city) {
@@ -178,15 +222,15 @@ router.get('/events', async (req, res) => {
       if (ll) {
         const p2 = { ...baseParams, latlong: `${ll.lat},${ll.lon}`, radius: 50, unit: 'km', keyword }
         const key2 = JSON.stringify(p2)
-        if (cache.has(key2)) return res.json(cache.get(key2))
-        out = await tmRequest(p2)
+        if (cache.has(key2)) return serve(cache.get(key2))
+        out = await tmRequest(p2, { enrich })
         cache.set(key2, out)
-        return res.json(out)
+        return serve(out)
       }
     }
 
     cache.set(key1, out)
-    res.json(out)
+    serve(out)
   } catch (err) {
     const status = err.response?.status || 500
     res.status(status).json({ error: 'Ticketmaster API error', details: err.response?.data || err.message })
@@ -195,22 +239,11 @@ router.get('/events', async (req, res) => {
 
 router.get('/events/:id', async (req, res) => {
   try {
-    const { id } = req.params
-    const cacheKey = `event:${id}`
-    if (cache.has(cacheKey)) return res.json(cache.get(cacheKey))
-
-    const { data } = await axios.get(`${TM_BASE}/events/${encodeURIComponent(id)}.json`, {
-      params: { apikey: API_KEY, locale: '*' }
-    })
-
-    const out = mapDetail(data)
-    cache.set(cacheKey, out)
+    const out = await fetchEventDetail(req.params.id)
     res.json(out)
   } catch (err) {
     const status = err.response?.status || 500
-    if (status === 404) {
-      return res.status(404).json({ error: 'Evento non trovato' })
-    }
+    if (status === 404) return res.status(404).json({ error: 'Evento non trovato' })
     res.status(status).json({ error: 'Ticketmaster API error', details: err.response?.data || err.message })
   }
 })
@@ -228,7 +261,7 @@ router.get('/artists/:id/events', async (req, res) => {
       sort: 'date,asc',
       size: 12,
       locale: '*'
-    })
+    }, { enrich: false })
 
     cache.set(cacheKey, out)
     res.json(out)

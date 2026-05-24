@@ -12,7 +12,7 @@ function compact(n) {
   return String(n);
 }
 
-export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, ytVideos, setlistData, otherDates, spotifyLoading, ytLoading }) {
+export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, ytVideos, setlistData, otherDates, spotifyLoading, ytLoading, ytError }) {
   const [bioExpanded, setBioExpanded] = useState(false);
 
   return (
@@ -79,6 +79,9 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
                       <a href={fb} target="_blank" rel="noreferrer" className="ed-chip ed-chip--fb">
                         <FacebookIcon size={15} />Facebook
                       </a>
+                      <a href={yt} target="_blank" rel="noreferrer" className="ed-chip ed-chip--yt">
+                        <YoutubeIcon size={15} />YouTube
+                      </a>
                       {web && (
                         <a href={web} target="_blank" rel="noreferrer" className="ed-chip">
                           <GlobeIcon size={15} />Sito ufficiale
@@ -93,7 +96,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
         </div>
       )}
 
-      {(spotifyLoading || ytLoading || spotifyArtist || ytVideos.length > 0) && (
+      {(spotifyLoading || ytLoading || spotifyArtist || ytVideos.length > 0 || ytError) && (
         <div className="ed-media-duo">
           {(spotifyLoading || spotifyArtist) && (
             <section className="ed-block ed-block--sp">
@@ -127,7 +130,7 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
             </section>
           )}
 
-          {(ytLoading || ytVideos.length > 0) && (
+          {(ytLoading || ytVideos.length > 0 || ytError) && (
             <section className="ed-block ed-block--yt">
               <div className="ed-block__head">
                 <div>
@@ -141,17 +144,29 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
                 )}
               </div>
               <div className="ed-video">
-                {ytLoading && ytVideos.length === 0
-                  ? <div className="sk" style={{ position: "absolute", inset: 0 }} />
-                  : (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
-                      title={ytVideos[0].title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  )
-                }
+                {ytLoading && ytVideos.length === 0 ? (
+                  <div className="sk" style={{ position: "absolute", inset: 0 }} />
+                ) : ytError || ytVideos.length === 0 ? (
+                  <div className="ed-yt-fallback">
+                    <YoutubeIcon size={36} />
+                    <p>Video non disponibile</p>
+                    <a
+                      href={`https://www.youtube.com/results?search_query=${encodeURIComponent(artist?.name || "")}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn--ghost btn--sm"
+                    >
+                      Cerca su YouTube
+                    </a>
+                  </div>
+                ) : (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${ytVideos[0].id}`}
+                    title={ytVideos[0].title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                )}
               </div>
             </section>
           )}

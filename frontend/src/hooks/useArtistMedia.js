@@ -9,6 +9,7 @@ export function useArtistMedia(ev) {
   const [setlistData,    setSetlistData]    = useState(null);
   const [spotifyLoading, setSpotifyLoading] = useState(false);
   const [ytLoading,      setYtLoading]      = useState(false);
+  const [ytError,        setYtError]        = useState(false);
 
   const artistId   = ev?.artists?.[0]?.id;
   const artistName = ev?.artists?.[0]?.name;
@@ -32,10 +33,11 @@ export function useArtistMedia(ev) {
 
     setSpotifyLoading(true);
     setYtLoading(true);
+    setYtError(false);
 
     getYoutubeVideos(artistName, signal)
       .then((d) => { setYtVideos(d.videos || []); setYtLoading(false); })
-      .catch((e) => { if (e.name !== "AbortError") setYtLoading(false); });
+      .catch((e) => { if (e.name !== "AbortError") { setYtLoading(false); setYtError(true); } });
 
     getSpotifyArtist(artistName, signal)
       .then((d) => { setSpotifyArtist(d); setSpotifyLoading(false); })
@@ -62,5 +64,5 @@ export function useArtistMedia(ev) {
     return () => ctrl.abort();
   }, [artistName]);
 
-  return { otherDates, ytVideos, spotifyArtist, artistBio, setlistData, spotifyLoading, ytLoading };
+  return { otherDates, ytVideos, spotifyArtist, artistBio, setlistData, spotifyLoading, ytLoading, ytError };
 }
