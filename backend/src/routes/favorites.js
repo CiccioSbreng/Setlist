@@ -1,25 +1,21 @@
-// backend/src/routes/favorites.js
 const express = require('express');
 const auth = require('../middleware/auth');
 const Favorite = require('../models/favorites');
 
 const router = express.Router();
 
-// GET /api/favorites  → lista preferiti dell'utente loggato
-router.get('/', auth, async (req, res) => {
+// GET /api/favorites
+router.get('/', auth, async (req, res, next) => {
   try {
-    const items = await Favorite.find({ user: req.user.id }).sort({
-      createdAt: -1,
-    });
+    const items = await Favorite.find({ user: req.user.id }).sort({ createdAt: -1 });
     res.json(items);
   } catch (err) {
-    console.error('Get favorites error:', err);
-    res.status(500).json({ message: 'Errore nel recupero dei preferiti.' });
+    next(err);
   }
 });
 
-// POST /api/favorites  → aggiunge o aggiorna un preferito
-router.post('/', auth, async (req, res) => {
+// POST /api/favorites
+router.post('/', auth, async (req, res, next) => {
   try {
     const { eventId, name, image, date, venue, city, url, genre } = req.body;
 
@@ -28,31 +24,25 @@ router.post('/', auth, async (req, res) => {
     }
 
     const fav = await Favorite.findOneAndUpdate(
-      { user: req.user.id, eventId }, // filtro
+      { user: req.user.id, eventId },
       {
         $set: { name, image, date, venue, city, url, genre },
-        $setOnInsert: { user: req.user.id, eventId },        // solo se il documento è nuovo
+        $setOnInsert: { user: req.user.id, eventId },
       },
-      {
-        new: true,
-        upsert: true,
-      }
+      { new: true, upsert: true }
     );
 
     res.status(201).json(fav);
   } catch (err) {
-    console.error('Create favorite error:', err);
-    res.status(500).json({ message: 'Errore nel salvataggio del preferito.' });
+    next(err);
   }
 });
 
-// DELETE /api/favorites/:id  → rimuove un preferito per _id
-router.delete('/:id', auth, async (req, res) => {
+// DELETE /api/favorites/:id
+router.delete('/:id', auth, async (req, res, next) => {
   try {
-    const { id } = req.params;
-
     const deleted = await Favorite.findOneAndDelete({
-      _id: id,
+      _id: req.params.id,
       user: req.user.id,
     });
 
@@ -62,8 +52,7 @@ router.delete('/:id', auth, async (req, res) => {
 
     res.json({ ok: true });
   } catch (err) {
-    console.error('Delete favorite error:', err);
-    res.status(500).json({ message: 'Errore nella rimozione del preferito.' });
+    next(err);
   }
 });
 

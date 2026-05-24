@@ -24,6 +24,7 @@ const youtubeRouter      = require('./routes/youtube');
 const spotifyRouter      = require('./routes/spotify');
 const weatherRouter      = require('./routes/weather');
 const setlistRouter      = require('./routes/setlist');
+const errorHandler       = require('./middleware/errorHandler');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -65,6 +66,8 @@ app.use('/api/weather',      weatherRouter);
 app.use('/api/setlist',      setlistRouter);
 
 app.get('/__ping', (_req, res) => res.json({ ok: true }));
+
+app.use(errorHandler);
 
 // ── Banner e diagnostica ────────────────────────────────────────────
 

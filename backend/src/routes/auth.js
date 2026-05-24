@@ -28,7 +28,7 @@ function createRefreshToken(user) {
 }
 
 // POST /api/auth/register
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -58,13 +58,12 @@ router.post('/register', async (req, res) => {
       user: user.toSafeObject(),
     });
   } catch (err) {
-    console.error('Register error:', err);
-    return res.status(500).json({ message: 'Errore server durante la registrazione.' });
+    next(err);
   }
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -93,39 +92,38 @@ router.post('/login', async (req, res) => {
       user: user.toSafeObject(),
     });
   } catch (err) {
-    console.error('Login error:', err);
-    return res.status(500).json({ message: 'Errore server durante il login.' });
+    next(err);
   }
 });
 
 // GET /api/auth/profile
-router.get('/profile', requireAuth, async (req, res) => {
+router.get('/profile', requireAuth, async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'Utente non trovato.' });
     res.json(user.toSafeObject());
-  } catch {
-    res.status(500).json({ message: 'Errore server.' });
+  } catch (err) {
+    next(err);
   }
 });
 
 // PUT /api/auth/profile
-router.put('/profile', requireAuth, async (req, res) => {
+router.put('/profile', requireAuth, async (req, res, next) => {
   try {
     const { displayName, bio, avatar } = req.body;
     const update = {};
     if (displayName !== undefined) update.displayName = String(displayName).slice(0, 60);
     if (bio !== undefined) update.bio = String(bio).slice(0, 200);
-    if (avatar !== undefined) update.avatar = avatar; // base64 jpeg, già ridimensionato dal client
+    if (avatar !== undefined) update.avatar = avatar;
     const user = await User.findByIdAndUpdate(req.user.id, update, { new: true });
     res.json(user.toSafeObject());
-  } catch {
-    res.status(500).json({ message: 'Errore aggiornamento profilo.' });
+  } catch (err) {
+    next(err);
   }
 });
 
 // PUT /api/auth/password
-router.put('/password', requireAuth, async (req, res) => {
+router.put('/password', requireAuth, async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
     if (!currentPassword || !newPassword || newPassword.length < 6)
@@ -136,13 +134,13 @@ router.put('/password', requireAuth, async (req, res) => {
     user.passwordHash = await bcrypt.hash(newPassword, 10);
     await user.save();
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ message: 'Errore aggiornamento password.' });
+  } catch (err) {
+    next(err);
   }
 });
 
 // POST /api/auth/refresh
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', async (req, res, next) => {
   const { refreshToken } = req.body;
   if (!refreshToken) return res.status(400).json({ message: 'refreshToken mancante.' });
 
@@ -153,11 +151,11 @@ router.post('/refresh', async (req, res) => {
     const user = await User.findById(payload.id);
     if (!user) return res.status(401).json({ message: 'Utente non trovato.' });
 
-    const token        = createToken(user);
-    const newRefresh   = createRefreshToken(user);
+    const token      = createToken(user);
+    const newRefresh = createRefreshToken(user);
     return res.json({ token, refreshToken: newRefresh });
-  } catch {
-    return res.status(401).json({ message: 'Refresh token scaduto o non valido.' });
+  } catch (err) {
+    next(err);
   }
 });
 
