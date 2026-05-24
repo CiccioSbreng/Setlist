@@ -8,7 +8,7 @@ import { useEventFavorite } from "../hooks/useEventFavorite";
 import { useCountdown } from "../hooks/useCountdown";
 import { useTilt } from "../hooks/useTilt";
 import {
-  CalendarIcon, ClockIcon, PinIcon, TicketIcon,
+  CalendarIcon, ClockIcon, PinIcon, TicketIcon, MusicIcon, GlobeIcon,
   HeartIcon, ArrowRightIcon, SearchIcon, ShareIcon, DownloadIcon,
 } from "../components/Icons";
 import ArtistSection from "../components/ArtistSection";
@@ -81,7 +81,6 @@ export default function EventDetail() {
   const stageRef = useRef(null);
   const [barFloating, setBarFloating] = useState(false);
 
-  // VenueSection: monta solo quando il sentinella entra nel viewport
   const [venueVisible, setVenueVisible] = useState(false);
   const venueSentinelRef = useRef(null);
   useEffect(() => {
@@ -266,12 +265,34 @@ export default function EventDetail() {
             )}
             <div className="ed__meta">
               <div className="ed__row">
+                <CalendarIcon size={18} />
+                <span>{when.dateLabel}</span>
+              </div>
+              {when.timeLabel && (
+                <div className="ed__row">
+                  <ClockIcon size={18} />
+                  <span>Ore {when.timeLabel}</span>
+                </div>
+              )}
+              <div className="ed__row">
                 <PinIcon size={18} />
                 <span>{[v.name, v.address, v.city].filter(Boolean).join(" · ") || "Location da annunciare"}</span>
               </div>
+              {(ev.genre || ev.segment) && (
+                <div className="ed__row">
+                  <MusicIcon size={18} />
+                  <span>{[ev.genre, ev.subGenre && ev.subGenre !== ev.genre ? ev.subGenre : null].filter(Boolean).join(" · ") || ev.segment}</span>
+                </div>
+              )}
               {price && (
                 <div className="ed__row">
                   <TicketIcon size={18} /><span>{price}</span>
+                </div>
+              )}
+              {v.url && (
+                <div className="ed__row">
+                  <GlobeIcon size={18} />
+                  <a href={v.url} target="_blank" rel="noreferrer" className="ed__row-link">{v.name || "Sito del venue"}</a>
                 </div>
               )}
             </div>

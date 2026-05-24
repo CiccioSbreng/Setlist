@@ -172,6 +172,10 @@ export default function EventCard({
           <div className="ev-card__cancelled-badge">Annullato</div>
         ) : ev.soldOut ? (
           <div className="ev-card__soldout-badge">Sold Out</div>
+        ) : cdLabel === "started" ? (
+          <div className="ev-card__live-badge"><span className="ev-card__live-dot" />LIVE ORA</div>
+        ) : cdLabel ? (
+          <div className="ev-card__countdown-badge">⏱ {cdLabel}</div>
         ) : price ? (
           <div className="ev-card__price">
             <TicketIcon size={15} />
