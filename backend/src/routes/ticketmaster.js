@@ -8,6 +8,7 @@ const cache = new NodeCache({ stdTTL: 60 * 15 }) // 15 minuti
 
 const TM_BASE = 'https://app.ticketmaster.com/discovery/v2'
 const API_KEY = process.env.TICKETMASTER_API_KEY
+const BIT_APP_ID = process.env.BANDSINTOWN_APP_ID || 'concerthub'
 
 // lat/long base per le principali città (fallback)
 const CITY_LL = {
@@ -83,6 +84,7 @@ function isSoldOut(ev, status) {
   if (status === 'cancelled' || status === 'postponed') return false
   if (ev.dates?.status?.code?.toLowerCase() === 'offsale') return true
   if (ev.availability?.soldOut === true) return true
+  if (ev.ticketAvailability?.hasAvailableTickets === false) return true
   const saleEnd = ev.sales?.public?.endDateTime
   const eventStart = ev.dates?.start?.dateTime || ev.dates?.start?.localDate
   if (saleEnd && eventStart) {
@@ -92,13 +94,44 @@ function isSoldOut(ev, status) {
   return false
 }
 
+async function checkBandsintown(artistName, eventDate) {
+  if (!artistName || !eventDate) return null
+  const key = `bit:${artistName.toLowerCase().trim()}`
+  let events
+  if (cache.has(key)) {
+    events = cache.get(key)
+  } else {
+    try {
+      const { data } = await axios.get(
+        `https://rest.bandsintown.com/artists/${encodeURIComponent(artistName)}/events`,
+        { params: { app_id: BIT_APP_ID }, timeout: 5000 }
+      )
+      events = Array.isArray(data) ? data : []
+      cache.set(key, events, 60 * 30)
+    } catch {
+      cache.set(key, [], 60 * 5)
+      return null
+    }
+  }
+  const targetDate = eventDate.slice(0, 10)
+  const match = events.find(e => e.datetime?.slice(0, 10) === targetDate)
+  if (!match) return null
+  const offerStatus = match.offers?.[0]?.status
+  if (offerStatus === 'soldout') return 'soldout'
+  return null
+}
+
 async function fetchEventDetail(id) {
   const cacheKey = `event:${id}`
   if (cache.has(cacheKey)) return cache.get(cacheKey)
   const { data } = await axios.get(`${TM_BASE}/events/${encodeURIComponent(id)}.json`, {
     params: { apikey: API_KEY, locale: '*' }
   })
-  const detail = mapDetail(data)
+  let detail = mapDetail(data)
+  if (!detail.soldOut && detail.artists?.[0]?.name) {
+    const bitStatus = await checkBandsintown(detail.artists[0].name, detail.date)
+    if (bitStatus === 'soldout') detail = { ...detail, soldOut: true }
+  }
   cache.set(cacheKey, detail)
   return detail
 }
