@@ -19,6 +19,7 @@ export function useHomeSearch() {
   const [form, setForm] = useState({
     city:    searchParams.get("city")  || "",
     keyword: searchParams.get("q")     || "",
+    genre:   searchParams.get("genre") || "",
     start:   searchParams.get("start") || "",
     end:     searchParams.get("end")   || "",
     size: 12,
@@ -50,6 +51,7 @@ export function useHomeSearch() {
     const p = {};
     if (f.city)    p.city  = f.city;
     if (f.keyword) p.q     = f.keyword;
+    if (f.genre)   p.genre = f.genre;
     if (f.start)   p.start = f.start;
     if (f.end)     p.end   = f.end;
     if (page > 0)  p.page  = String(page);
@@ -82,6 +84,12 @@ export function useHomeSearch() {
 
   function update(p) { setForm((f) => ({ ...f, ...p })); }
 
+  function applyGenre(g) {
+    const next = { ...form, genre: form.genre === g ? "" : g, page: 0 };
+    setForm(next);
+    runSearch(0, next);
+  }
+
   function applyQuickRange(id) {
     const now = new Date();
     let startDate = null, endDate = null;
@@ -109,7 +117,7 @@ export function useHomeSearch() {
 
   function clearSearch() {
     setQuickRange(null);
-    const cleared = { ...form, city: "", keyword: "", start: "", end: "", page: 0 };
+    const cleared = { ...form, city: "", keyword: "", genre: "", start: "", end: "", page: 0 };
     setForm(cleared);
     runSearch(0, cleared);
   }
@@ -121,6 +129,7 @@ export function useHomeSearch() {
     const usedForm = overrideForm ?? { ...form, page };
     const params = {
       city: usedForm.city, keyword: usedForm.keyword,
+      genre: usedForm.genre,
       size: usedForm.size, page,
       start: toUtcStart(usedForm.start), end: toUtcEnd(usedForm.end),
     };
@@ -135,7 +144,6 @@ export function useHomeSearch() {
       setForm((f) => ({ ...f, page: res.page ?? page }));
       updateURL(usedForm, res.page ?? page);
 
-      // silent refetch dopo 10s per aggiornare badge quando enrichment backend è completo
       silentRefetchTimer.current = setTimeout(() => {
         searchEvents(params).then((r) => {
           const s = new Set();
@@ -185,13 +193,13 @@ export function useHomeSearch() {
 
   const hasResults       = data.events?.length > 0;
   const hasActiveFilters = Boolean(form.start || form.end || quickRange);
-  const hasSearch        = Boolean(form.city || form.keyword || form.start || form.end || quickRange);
-  const isShowcase       = !form.city && !form.keyword && !form.start && !form.end && !quickRange;
+  const hasSearch        = Boolean(form.city || form.keyword || form.genre || form.start || form.end || quickRange);
+  const isShowcase       = !form.city && !form.keyword && !form.genre && !form.start && !form.end && !quickRange;
 
   return {
     form, update, data, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
-    quickRange, applyQuickRange, clearDates, clearSearch,
+    quickRange, applyQuickRange, applyGenre, clearDates, clearSearch,
     runSearch, goToPage, scrollToSearch,
     favMap, toggleFavorite,
     hasResults, hasActiveFilters, hasSearch, isShowcase,

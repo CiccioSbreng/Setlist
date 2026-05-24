@@ -241,12 +241,12 @@ function mapDetail(ev){
 
 router.get('/events', async (req, res) => {
   try {
-    const { city = '', keyword = '', size = 12, page = 0, start, end } = req.query
+    const { city = '', keyword = '', size = 12, page = 0, start, end, genre = '' } = req.query
 
     const baseParams = {
       apikey: API_KEY,
       countryCode: 'IT',
-      classificationName: 'music',
+      classificationName: genre || 'music',
       size: Math.min(Number(size) || 12, 100),
       page: Number(page) || 0,
       sort: 'date,asc',

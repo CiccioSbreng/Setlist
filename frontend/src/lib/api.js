@@ -68,7 +68,7 @@ export const toUtcStart = d => (d ? `${d}T00:00:00Z` : undefined);
 export const toUtcEnd   = d => (d ? `${d}T23:59:59Z` : undefined);
 
 // ---- TICKETMASTER: ricerca eventi ----
-export async function searchEvents({ city, keyword, size = 12, page = 0, start, end }) {
+export async function searchEvents({ city, keyword, size = 12, page = 0, start, end, genre }) {
   const url = `${BASE}/api/ticketmaster/events?${qs({
     city,
     keyword,
@@ -76,6 +76,7 @@ export async function searchEvents({ city, keyword, size = 12, page = 0, start, 
     page,
     start,
     end,
+    genre,
   })}`;
 
   const res = await fetch(url);

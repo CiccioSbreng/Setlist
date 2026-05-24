@@ -1046,6 +1046,11 @@ input.input[type="date"] {
   gap: 6px;
 }
 
+.chip--genre {
+  font-size: 0.78rem;
+  padding: 5px 11px;
+}
+
 .sb-reset {
   display: inline-flex;
   align-items: center;

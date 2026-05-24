@@ -25,11 +25,13 @@ export default function Home() {
   const {
     form, update, data, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
-    quickRange, applyQuickRange, clearDates, clearSearch,
+    quickRange, applyQuickRange, applyGenre, clearDates, clearSearch,
     runSearch, goToPage, scrollToSearch,
     favMap, toggleFavorite,
     hasResults, hasActiveFilters, hasSearch, isShowcase,
   } = useHomeSearch();
+
+  const GENRES = ["Rock", "Pop", "Metal", "Hip-Hop/Rap", "Electronic", "Punk", "R&B", "Alternative"];
 
   return (
     <>
@@ -162,6 +164,13 @@ export default function Home() {
                   onChange={({ start, end }) => { update({ start, end }); }}
                   onClear={() => update({ start: "", end: "" })}
                 />
+              </div>
+              <div className="chips" role="group" aria-label="Genere">
+                {GENRES.map((g) => (
+                  <button key={g} type="button" className={"chip chip--genre" + (form.genre === g ? " is-active" : "")} onClick={() => applyGenre(g)}>
+                    {g}
+                  </button>
+                ))}
               </div>
               {hasSearch && (
                 <button type="button" className="sb-reset" onClick={clearSearch}>
