@@ -136,6 +136,27 @@ export function useHomeSearch() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Refetch silenzioso dopo 7s per aggiornare sold out/status dal background enrichment
+  useEffect(() => {
+    const tid = setTimeout(() => {
+      const f = form;
+      searchEvents({
+        city: f.city, keyword: f.keyword,
+        size: f.size, page: f.page || 0,
+        start: toUtcStart(f.start), end: toUtcEnd(f.end),
+      }).then((res) => {
+        const seen = new Set();
+        const uniqueEvents = [];
+        for (const ev of res.events || []) {
+          if (!seen.has(ev.id)) { seen.add(ev.id); uniqueEvents.push(ev); }
+        }
+        setData((prev) => ({ ...prev, events: uniqueEvents }));
+      }).catch(() => {});
+    }, 7000);
+    return () => clearTimeout(tid);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     const city = form.city.trim();
     if (city.length < 2) { setCitySugg([]); return; }

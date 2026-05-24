@@ -3503,6 +3503,11 @@ input.input[type="date"] {
   font-weight: 600;
   margin-bottom: 16px;
 }
+.ed__status-banner--cancelled {
+  background: rgba(180, 0, 0, 0.12);
+  border: 1px solid rgba(255, 68, 68, 0.35);
+  color: #ff6060;
+}
 .ed__status-banner--soldout {
   background: rgba(255, 68, 68, 0.1);
   border: 1px solid rgba(255, 68, 68, 0.25);

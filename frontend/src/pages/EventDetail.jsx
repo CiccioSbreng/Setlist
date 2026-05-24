@@ -244,6 +244,11 @@ export default function EventDetail() {
         {/* ── SEZIONE EVENTO ── */}
         <div id="section-evento" className="ed-section">
           <div className="ed-card">
+            {ev.status === "cancelled" && (
+              <div className="ed__status-banner ed__status-banner--cancelled">
+                Evento annullato — i biglietti acquistati verranno rimborsati
+              </div>
+            )}
             {ev.soldOut && ev.status !== "cancelled" && (
               <div className="ed__status-banner ed__status-banner--soldout">
                 Biglietti esauriti — evento Sold Out
