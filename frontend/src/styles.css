@@ -1008,11 +1008,11 @@ input.input[type="date"] {
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 7px 13px;
+  padding: 7px 15px;
   border-radius: var(--r-pill);
-  background: rgba(8, 8, 12, 0.55);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
+  background: rgba(255,138,0,0.08);
+  border: 1px solid rgba(255,138,0,0.22);
+  color: var(--text);
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
@@ -1020,15 +1020,16 @@ input.input[type="date"] {
 }
 
 .chip:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
+  background: rgba(255,138,0,0.16);
+  border-color: rgba(255,138,0,0.45);
+  color: #fff;
   transform: translateY(-1px);
 }
 
 .chip.is-active {
   background: var(--grad-brand);
   border-color: transparent;
-  color: #1c0900;
+  color: #fff;
   font-weight: 600;
 }
 
