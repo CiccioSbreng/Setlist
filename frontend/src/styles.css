@@ -4485,9 +4485,9 @@ input.input[type="date"] {
   transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
 }
 .ap-social:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); color: #fff; transform: translateY(-2px); }
-.ap-social--ig:hover { background: rgba(225,48,108,0.18); border-color: rgba(225,48,108,0.5); color: #e1306c; }
-.ap-social--x:hover  { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); color: #fff; }
-.ap-social--fb:hover { background: rgba(24,119,242,0.18); border-color: rgba(24,119,242,0.5); color: #6ea9ff; }
+.ap-social--ig:hover { background: rgba(225,48,108,0.18); border-color: rgba(225,48,108,0.5); color: #e1306c; transform: translateY(-2px); }
+.ap-social--x:hover  { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.45); color: #fff; transform: translateY(-2px); }
+.ap-social--fb:hover { background: rgba(24,119,242,0.18); border-color: rgba(24,119,242,0.5); color: #6ea9ff; transform: translateY(-2px); }
 
 /* ── ArtistPage: hero più grande ── */
 .ed-aphero--page {
