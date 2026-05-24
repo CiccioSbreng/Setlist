@@ -23,7 +23,7 @@ const FEATURES = [
 
 export default function Home() {
   const {
-    form, update, data, loading, error,
+    form, update, data, visibleEvents, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
     quickRange, applyQuickRange, applyGenre, clearDates, clearSearch,
     runSearch, goToPage, scrollToSearch,
@@ -218,7 +218,7 @@ export default function Home() {
 
             {!loading && hasResults && (
               <Stagger className="events-grid" key={data.page}>
-                {data.events.map((ev) => (
+                {visibleEvents.map((ev) => (
                   <StaggerItem key={ev.id}>
                     <EventCard ev={ev} favorited={Boolean(favMap[ev.id])} onToggleFavorite={() => toggleFavorite(ev)} />
                   </StaggerItem>

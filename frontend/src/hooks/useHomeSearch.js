@@ -191,13 +191,27 @@ export function useHomeSearch() {
     document.getElementById("ricerca")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  const hasResults       = data.events?.length > 0;
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  const SHOW_AFTER_START_MS = 90 * 60 * 1000; // 90 minuti
+  const visibleEvents = (data.events || []).filter(ev => {
+    if (!ev.date) return true;
+    const start = new Date(ev.date.includes('T') ? ev.date : `${ev.date}T${ev.time || '20:00:00'}`).getTime();
+    if (start > now) return true;
+    return now - start < SHOW_AFTER_START_MS;
+  });
+
+  const hasResults       = visibleEvents.length > 0;
   const hasActiveFilters = Boolean(form.start || form.end || quickRange);
   const hasSearch        = Boolean(form.city || form.keyword || form.genre || form.start || form.end || quickRange);
   const isShowcase       = !form.city && !form.keyword && !form.genre && !form.start && !form.end && !quickRange;
 
   return {
-    form, update, data, loading, error,
+    form, update, data, visibleEvents, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
     quickRange, applyQuickRange, applyGenre, clearDates, clearSearch,
     runSearch, goToPage, scrollToSearch,
