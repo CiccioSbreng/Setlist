@@ -249,7 +249,7 @@ export default function EventCard({
                   className="btn btn--primary btn--sm"
                 >
                   <TicketIcon size={18} />
-                  Biglietti
+                  Controlla disponibilità
                 </a>
               ) : (
                 <span className="ev-card__no-ticket">Biglietti non disponibili</span>
