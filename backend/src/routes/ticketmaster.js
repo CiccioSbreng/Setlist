@@ -105,6 +105,16 @@ async function fetchEventDetail(id) {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
+async function fetchWithRetry(id) {
+  const delays = [1000, 2000, 4000]
+  for (let i = 0; i <= delays.length; i++) {
+    try { return await fetchEventDetail(id) } catch (e) {
+      if (e.response?.status === 429 && i < delays.length) await sleep(delays[i])
+      else break
+    }
+  }
+}
+
 function enrichFromCache(events) {
   return events.map(ev => {
     const d = cache.get(`event:${ev.id}`)
@@ -120,18 +130,23 @@ function enrichFromCache(events) {
   })
 }
 
-function enrichBackground(events) {
+function enrichBackground(events, listCacheKey) {
   const missing = events.filter(ev => !cache.has(`event:${ev.id}`))
   if (!missing.length) return
   ;(async () => {
     for (const ev of missing) {
-      try { await fetchEventDetail(ev.id) } catch {}
-      await sleep(400)
+      await fetchWithRetry(ev.id)
+      await sleep(700)
+    }
+    // aggiorna la list cache con i dati enriched completi
+    if (listCacheKey && cache.has(listCacheKey)) {
+      const cached = cache.get(listCacheKey)
+      cache.set(listCacheKey, { ...cached, events: enrichFromCache(cached.events) })
     }
   })().catch(() => {})
 }
 
-async function tmRequest(params, { enrich = true } = {}) {
+async function tmRequest(params, { enrich = true, listCacheKey = null } = {}) {
   const { data } = await axios.get(`${TM_BASE}/events.json`, { params })
   const events = (data?._embedded?.events || []).map(ev => {
     const v = ev._embedded?.venues?.[0]
@@ -155,7 +170,7 @@ async function tmRequest(params, { enrich = true } = {}) {
       image: bestImage(ev.images)
     }
   })
-  if (enrich) enrichBackground(events)
+  if (enrich) enrichBackground(events, listCacheKey)
   return {
     page: data?.page?.number ?? 0,
     size: data?.page?.size ?? events.length,
@@ -214,7 +229,7 @@ router.get('/events', async (req, res) => {
     const p1 = { ...baseParams, city, keyword }
     const key1 = JSON.stringify(p1)
     if (cache.has(key1)) return serve(cache.get(key1))
-    let out = await tmRequest(p1, { enrich })
+    let out = await tmRequest(p1, { enrich, listCacheKey: key1 })
 
     // ---- Fallback: se 0 risultati e c'è una città nota, usa latlong + radius
     if ((out.events?.length ?? 0) === 0 && city) {
@@ -223,7 +238,7 @@ router.get('/events', async (req, res) => {
         const p2 = { ...baseParams, latlong: `${ll.lat},${ll.lon}`, radius: 50, unit: 'km', keyword }
         const key2 = JSON.stringify(p2)
         if (cache.has(key2)) return serve(cache.get(key2))
-        out = await tmRequest(p2, { enrich })
+        out = await tmRequest(p2, { enrich, listCacheKey: key2 })
         cache.set(key2, out)
         return serve(out)
       }
