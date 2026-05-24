@@ -1050,23 +1050,21 @@ input.input[type="date"] {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
+  padding: 7px 16px;
   border-radius: var(--r-pill);
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
+  background: var(--grad-brand);
+  border: 0;
+  color: #fff;
   font: inherit;
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease,
-    background 0.15s ease;
+  transition: opacity 0.15s ease, transform 0.1s ease;
 }
 
 .sb-reset:hover {
-  color: #fff;
-  border-color: var(--border-strong);
-  background: var(--surface-2);
+  opacity: 0.88;
+  transform: translateY(-1px);
 }
 
 .sb-clear {
