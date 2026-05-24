@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
+const logger = require('./lib/logger');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const { runChecks } = require('./lib/health');
@@ -29,7 +30,7 @@ const errorHandler       = require('./middleware/errorHandler');
 const app = express();
 app.set('trust proxy', 1);
 app.use(helmet());
-app.use(morgan('dev'));
+if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 app.use(express.json());
 
 const allowedOrigins = [
@@ -130,7 +131,7 @@ async function start() {
     await mongoose.connect(MONGO_URI);
     dbOk = true;
   } catch (err) {
-    console.error(`MongoDB non raggiungibile: ${err.message}`);
+    logger.error(`MongoDB non raggiungibile: ${err.message}`);
   }
 
   app.listen(PORT, () => {
