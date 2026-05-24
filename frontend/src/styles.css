@@ -1010,27 +1010,24 @@ input.input[type="date"] {
   align-items: center;
   padding: 7px 15px;
   border-radius: var(--r-pill);
-  background: rgba(255,138,0,0.08);
-  border: 1px solid rgba(255,138,0,0.22);
-  color: var(--text);
+  background: var(--grad-aurora);
+  border: 0;
+  color: #fff;
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  opacity: 0.72;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .chip:hover {
-  background: rgba(255,138,0,0.16);
-  border-color: rgba(255,138,0,0.45);
-  color: #fff;
+  opacity: 1;
   transform: translateY(-1px);
 }
 
 .chip.is-active {
-  background: var(--grad-brand);
-  border-color: transparent;
-  color: #fff;
-  font-weight: 600;
+  opacity: 1;
+  box-shadow: 0 0 0 2px #fff4, 0 4px 16px rgba(255,61,139,0.4);
 }
 
 /* ---- Riga strumenti: quando + reset ---- */
