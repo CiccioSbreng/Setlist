@@ -172,7 +172,7 @@ export default function EventCard({
         {ev.status === "cancelled" ? (
           <div className="ev-card__cancelled-badge">Annullato</div>
         ) : cdLabel === "started" ? (
-          <div className="ev-card__live-badge"><span className="ev-card__live-dot" />LIVE ORA</div>
+          <div className="ev-card__incorso-badge"><span className="ev-card__incorso-dot" />In Corso</div>
         ) : cdLabel ? (
           <div className="ev-card__countdown-badge">⏱ {cdLabel}</div>
         ) : price ? (
