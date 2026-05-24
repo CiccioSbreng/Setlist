@@ -140,10 +140,24 @@ export default function Home() {
                 <input
                   id="keyword"
                   className="sb-seg__input"
-                  placeholder="Artista, band o genere"
+                  placeholder="Artista o band"
                   value={form.keyword}
                   onChange={(e) => update({ keyword: e.target.value })}
                 />
+              </label>
+
+              <span className="sb-div" aria-hidden="true" />
+
+              <label className="sb-seg sb-seg--select" htmlFor="genre">
+                <select
+                  id="genre"
+                  className="sb-seg__select"
+                  value={form.genre}
+                  onChange={(e) => { const g = e.target.value; const next = { ...form, genre: g, page: 0 }; update({ genre: g }); runSearch(0, next); }}
+                >
+                  <option value="">Tutti i generi</option>
+                  {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
+                </select>
               </label>
 
               <button type="submit" className="sb-go">
@@ -164,13 +178,6 @@ export default function Home() {
                   onChange={({ start, end }) => { update({ start, end }); }}
                   onClear={() => update({ start: "", end: "" })}
                 />
-              </div>
-              <div className="chips" role="group" aria-label="Genere">
-                {GENRES.map((g) => (
-                  <button key={g} type="button" className={"chip chip--genre" + (form.genre === g ? " is-active" : "")} onClick={() => applyGenre(g)}>
-                    {g}
-                  </button>
-                ))}
               </div>
               {hasSearch && (
                 <button type="button" className="sb-reset" onClick={clearSearch}>
