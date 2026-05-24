@@ -1010,7 +1010,7 @@ input.input[type="date"] {
   align-items: center;
   padding: 7px 16px;
   border-radius: var(--r-pill);
-  background: var(--grad-aurora);
+  background: var(--grad-brand);
   border: 0;
   color: #000;
   font-size: 0.83rem;
