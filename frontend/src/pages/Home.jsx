@@ -144,11 +144,6 @@ export default function Home() {
                 />
               </label>
 
-              {hasSearch && (
-                <button type="button" className="sb-clear" onClick={clearSearch} title="Cancella ricerca" aria-label="Cancella ricerca">
-                  <CloseIcon size={16} />
-                </button>
-              )}
               <button type="submit" className="sb-go">
                 <SearchIcon size={18} /><span>Cerca</span>
               </button>
@@ -168,9 +163,9 @@ export default function Home() {
                   onClear={() => update({ start: "", end: "" })}
                 />
               </div>
-              {hasActiveFilters && (
-                <button type="button" className="sb-reset" onClick={clearDates}>
-                  <RefreshIcon size={15} />Azzera
+              {hasSearch && (
+                <button type="button" className="sb-reset" onClick={clearSearch}>
+                  <CloseIcon size={15} />Azzera tutto
                 </button>
               )}
             </div>
