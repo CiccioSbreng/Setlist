@@ -304,8 +304,8 @@ export default function EventDetail() {
         </div>
       </div>
 
-      {/* ── STICKY CTA (solo mobile) ── */}
-      <div className="ed-sticky-cta">
+      {/* ── STICKY CTA (solo mobile, solo tab Evento) ── */}
+      <div className={`ed-sticky-cta${activeTab !== "evento" ? " ed-sticky-cta--hidden" : ""}`}>
         {ev.status !== "cancelled" && ev.url && (
           <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary ed-sticky-cta__tickets">
             <TicketIcon size={18} />Controlla disponibilità<ArrowRightIcon size={16} />

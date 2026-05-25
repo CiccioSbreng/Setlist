@@ -2244,15 +2244,29 @@ input.input[type="date"] {
   .ed-hero__inner { transform: none; }
   .ed-hero__title { font-size: 1.5rem; }
   .ed-bar:not(.is-floating) {
-    margin: 0 -16px 18px;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    margin: 0;
     border-radius: 0;
     border-left: none;
     border-right: none;
     overflow-x: auto;
+    transition: top 0.3s ease;
+    z-index: 45;
+  }
+  /* Quando la navbar scompare, la barra sale al top */
+  .nav.nav--hidden ~ .app-main .ed-bar:not(.is-floating) {
+    top: 0;
   }
   .ed-bar:not(.is-floating) .ed-bar__nav { flex-shrink: 0; }
-  /* Azioni già presenti nel sticky-cta in fondo → nascondi dalla barra */
+  /* Azioni già nel sticky-cta in basso → nascondi dalla barra */
   .ed-bar__actions { display: none; }
+  /* Offset scroll per i tab (barra fissa + navbar) */
+  .ed-section { scroll-margin-top: 130px; }
+  /* Compensazione altezza barra fissa sulla prima sezione */
+  #section-evento { padding-top: 56px; }
 }
 
 /* ── ED-BACK ── */
@@ -5300,6 +5314,9 @@ input.input[type="date"] {
 
 .ed-sticky-cta {
   display: none;
+}
+.ed-sticky-cta--hidden {
+  display: none !important;
 }
 
 @media (max-width: 820px) {
