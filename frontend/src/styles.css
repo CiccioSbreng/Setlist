@@ -2244,29 +2244,20 @@ input.input[type="date"] {
   .ed-hero__inner { transform: none; }
   .ed-hero__title { font-size: 1.5rem; }
   .ed-bar:not(.is-floating) {
-    position: fixed;
+    position: sticky;
     top: 70px;
-    left: 0;
-    right: 0;
-    margin: 0;
+    margin: 0 -20px 18px;
     border-radius: 0;
     border-left: none;
     border-right: none;
     overflow-x: auto;
-    transition: top 0.3s ease;
     z-index: 45;
-  }
-  /* Quando la navbar scompare, la barra sale al top */
-  .nav.nav--hidden ~ .app-main .ed-bar:not(.is-floating) {
-    top: 0;
   }
   .ed-bar:not(.is-floating) .ed-bar__nav { flex-shrink: 0; }
   /* Azioni già nel sticky-cta in basso → nascondi dalla barra */
   .ed-bar__actions { display: none; }
-  /* Offset scroll per i tab (barra fissa + navbar) */
+  /* Offset scroll per i tab nav (navbar + ed-bar) */
   .ed-section { scroll-margin-top: 130px; }
-  /* Compensazione altezza barra fissa sulla prima sezione */
-  #section-evento { padding-top: 56px; }
 }
 
 /* ── ED-BACK ── */
@@ -5310,13 +5301,10 @@ input.input[type="date"] {
   }
 }
 
-/* ===================== STICKY CTA BIGLIETTI (EventDetail mobile) ===================== */
+/* ===================== CTA BIGLIETTI (EventDetail mobile — in-flow) ===================== */
 
 .ed-sticky-cta {
   display: none;
-}
-.ed-sticky-cta--hidden {
-  display: none !important;
 }
 
 @media (max-width: 820px) {
@@ -5324,16 +5312,8 @@ input.input[type="date"] {
     display: flex;
     align-items: center;
     gap: 10px;
-    position: fixed;
-    bottom: 72px; /* altezza bottom-nav */
-    left: 0;
-    right: 0;
-    z-index: 50;
-    padding: 10px 16px;
-    background: rgba(8, 8, 12, 0.82);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    margin: 24px 0 8px;
   }
 
   .ed-sticky-cta__tickets {
@@ -5349,9 +5329,8 @@ input.input[type="date"] {
     border-radius: var(--r-lg);
   }
 
-  /* alza il toaster sopra bottom-nav + sticky-cta */
   [data-sonner-toaster] {
-    bottom: 152px !important;
+    bottom: 90px !important;
   }
 }
 
