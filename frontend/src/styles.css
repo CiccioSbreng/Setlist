@@ -3832,11 +3832,15 @@ input.input[type="date"] {
   }
   .ev-card__foot .btn--sm {
     font-size: 0.75rem;
-    padding: 6px 10px;
+    padding: 9px 12px;
+    min-height: 40px;
   }
   .ev-card__detail-link {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     white-space: nowrap;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
   }
 
   /* CTA band */
@@ -3851,6 +3855,11 @@ input.input[type="date"] {
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
+  }
+
+  /* Previene auto-zoom iOS su input (Safari zooma se font-size < 16px) */
+  .sb-seg__input {
+    font-size: 16px;
   }
 
   /* 404 */
@@ -5257,7 +5266,7 @@ input.input[type="date"] {
     justify-content: center;
     gap: 3px;
     color: var(--text-dim);
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.02em;
     text-transform: uppercase;
