@@ -17,21 +17,21 @@ export default function BottomNav() {
   return (
     <nav className="bottom-nav" aria-label="Navigazione principale">
       <NavLink to="/home" className={cls}>
-        <MusicIcon size={22} />
+        <MusicIcon size={26} />
         <span>Esplora</span>
       </NavLink>
       <NavLink to="/favorites" className={cls}>
-        <HeartIcon size={22} />
+        <HeartIcon size={26} />
         <span>Preferiti</span>
       </NavLink>
       {token ? (
         <NavLink to="/profile" className={cls}>
-          <UserIcon size={22} />
+          <UserIcon size={26} />
           <span>Profilo</span>
         </NavLink>
       ) : (
         <NavLink to="/login" className={cls}>
-          <UserIcon size={22} />
+          <UserIcon size={26} />
           <span>Accedi</span>
         </NavLink>
       )}

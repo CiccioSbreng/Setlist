@@ -2251,7 +2251,8 @@ input.input[type="date"] {
     overflow-x: auto;
   }
   .ed-bar:not(.is-floating) .ed-bar__nav { flex-shrink: 0; }
-  .ed-bar:not(.is-floating) .ed-bar__actions { flex-shrink: 0; }
+  /* Azioni già presenti nel sticky-cta in fondo → nascondi dalla barra */
+  .ed-bar__actions { display: none; }
 }
 
 /* ── ED-BACK ── */
@@ -5232,7 +5233,7 @@ input.input[type="date"] {
 @media (max-width: 820px) {
   /* padding-bottom su app-main per non coprire contenuto */
   .app-main {
-    padding-bottom: 68px;
+    padding-bottom: 78px;
   }
 
   /* nasconde il burger: la bottom nav gestisce la navigazione */
@@ -5250,7 +5251,7 @@ input.input[type="date"] {
     left: 0;
     right: 0;
     z-index: 60;
-    height: 62px;
+    height: 72px;
     background: rgba(8, 8, 12, 0.88);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -5264,9 +5265,9 @@ input.input[type="date"] {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 4px;
     color: var(--text-dim);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 600;
     letter-spacing: 0.02em;
     text-transform: uppercase;
@@ -5307,7 +5308,7 @@ input.input[type="date"] {
     align-items: center;
     gap: 10px;
     position: fixed;
-    bottom: 62px; /* altezza bottom-nav */
+    bottom: 72px; /* altezza bottom-nav */
     left: 0;
     right: 0;
     z-index: 50;
@@ -5333,7 +5334,7 @@ input.input[type="date"] {
 
   /* alza il toaster sopra bottom-nav + sticky-cta */
   [data-sonner-toaster] {
-    bottom: 140px !important;
+    bottom: 152px !important;
   }
 }
 
