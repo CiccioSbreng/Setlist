@@ -80,6 +80,7 @@ export default function EventDetail() {
   const heroRef = useTilt({ max: 7 });
   const stageRef = useRef(null);
   const [barFloating, setBarFloating] = useState(false);
+  const [barStuck, setBarStuck] = useState(false);
 
   const [venueVisible, setVenueVisible] = useState(false);
   const venueSentinelRef = useRef(null);
@@ -98,8 +99,14 @@ export default function EventDetail() {
     const stage = stageRef.current;
     if (!stage) return;
     const check = () => {
-      if (window.innerWidth <= 860) { setBarFloating(false); return; }
+      const isMobile = window.innerWidth <= 820;
       const rect = stage.getBoundingClientRect();
+      if (isMobile) {
+        setBarFloating(false);
+        setBarStuck(rect.bottom < 70);
+        return;
+      }
+      setBarStuck(false);
       setBarFloating(rect.bottom < 72);
     };
     window.addEventListener("scroll", check, { passive: true });
@@ -200,7 +207,8 @@ export default function EventDetail() {
         </div>
 
         {/* ── BARRA: navigazione + azioni ── */}
-        <div className={`ed-bar${barFloating ? " is-floating" : ""}`}>
+        {barStuck && <div className="ed-bar-spacer" />}
+        <div className={`ed-bar${barFloating ? " is-floating" : ""}${barStuck ? " is-bar-stuck" : ""}`}>
           <nav className="ed-bar__nav" aria-label="Sezioni evento">
             {[["evento","Evento"],["artista","Artista"],["dove","Dove & Come"]].map(([tab, label]) => (
               <button

@@ -2287,41 +2287,57 @@ input.input[type="date"] {
   .ed-hero__inner { transform: none; }
   .ed-hero__title { font-size: 1.5rem; }
   .ed-bar:not(.is-floating) {
-    position: sticky;
-    top: 70px;
+    position: static;
     margin: 0 -20px 18px;
     border-radius: 0;
     border-left: none;
     border-right: none;
     overflow-x: auto;
     z-index: 45;
-    transition: top 0.3s ease;
   }
-  /* Quando la navbar si nasconde, la barra sale su */
-  .nav.nav--hidden ~ .app-main .ed-bar:not(.is-floating) {
+  /* Barra incollata in cima (JS toggled) */
+  .ed-bar.is-bar-stuck {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    z-index: 45;
+  }
+  .nav.nav--hidden ~ .app-main .ed-bar.is-bar-stuck {
     top: 0;
   }
+  .ed-bar-spacer {
+    height: 49px;
+    margin-bottom: 18px;
+  }
   /* Tab occupano tutta la larghezza equamente */
-  .ed-bar:not(.is-floating) .ed-bar__nav {
+  .ed-bar:not(.is-floating) .ed-bar__nav,
+  .ed-bar.is-bar-stuck .ed-bar__nav {
     width: 100%;
     gap: 0;
   }
-  .ed-bar:not(.is-floating) .ed-bar__tab {
+  .ed-bar:not(.is-floating) .ed-bar__tab,
+  .ed-bar.is-bar-stuck .ed-bar__tab {
     flex: 1;
     text-align: center;
     padding: 12px 8px;
     border-radius: 0;
     font-size: 0.88rem;
   }
-  .ed-bar:not(.is-floating) .ed-bar__tab.active {
+  .ed-bar:not(.is-floating) .ed-bar__tab.active,
+  .ed-bar.is-bar-stuck .ed-bar__tab.active {
     background: rgba(0, 212, 138, 0.12);
     color: var(--brand);
     box-shadow: inset 0 -2px 0 var(--brand);
   }
   /* Azioni già nel sticky-cta in basso → nascondi dalla barra */
   .ed-bar__actions { display: none; }
-  /* Offset scroll per i tab nav (navbar + ed-bar) */
-  .ed-section { scroll-margin-top: 130px; }
+  /* Offset scroll per i tab nav */
+  .ed-section { scroll-margin-top: 60px; }
 }
 
 /* ── ED-BACK ── */
