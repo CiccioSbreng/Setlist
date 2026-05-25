@@ -45,13 +45,13 @@ export default function Home() {
             </span>
 
             <h1 className="hero__title">
-              Vivi la musica.
+              Your next show
               <br />
-              <span className="grad">Trova il tuo prossimo concerto.</span>
+              <span className="grad">starts here.</span>
             </h1>
 
             <p className="hero__sub">
-              ConcertHub raccoglie concerti ed eventi live in tutta Italia.
+              Concerti, festival, esperienze live — tutto nella tua setlist.
               Cerca per città, artista o data, scopri venue e prezzi, e salva
               gli show che non vuoi perdere.
             </p>
@@ -61,7 +61,7 @@ export default function Home() {
                 <SearchIcon size={18} />Cerca eventi
               </button>
               <Link to="/favorites" className="btn btn--ghost">
-                <HeartIcon size={18} />I miei preferiti
+                <HeartIcon size={18} />My List
               </Link>
             </div>
 
@@ -245,7 +245,7 @@ export default function Home() {
       <section className="section" id="why">
         <div className="wrap">
           <div className="section-head">
-            <h2>Perché usare ConcertHub</h2>
+            <h2>Perché usare Setlist</h2>
             <p>Tutto quello che ti serve per non perderti più un concerto, in un unico posto.</p>
           </div>
           <div className="features">

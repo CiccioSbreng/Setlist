@@ -50,10 +50,13 @@ export default function Navbar() {
     <nav className={"nav" + (hidden ? " nav--hidden" : "")}>
       <div className="wrap nav__inner">
         <Link to="/home" className="brand" onClick={() => setOpen(false)}>
-          <span className="brand__mark">
-            <MusicIcon size={20} />
-          </span>
-          Concert<span className="brand__accent">Hub</span>
+          <svg width="120" height="29" viewBox="0 0 200 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Setlist">
+            <rect x="0" y="4"  width="36" height="5" rx="2.5" fill="#00D48A"/>
+            <rect x="0" y="15" width="24" height="5" rx="2.5" fill="#00D48A"/>
+            <rect x="0" y="26" width="31" height="5" rx="2.5" fill="#00D48A"/>
+            <rect x="0" y="37" width="19" height="5" rx="2.5" fill="#00D48A"/>
+            <text x="52" y="38" fontFamily="-apple-system,'Helvetica Neue',Arial,sans-serif" fontSize="30" fontWeight="700" fill="#EEF1FF" letterSpacing="-0.8">Setlist</text>
+          </svg>
         </Link>
 
         <div className="nav__links">
@@ -63,7 +66,7 @@ export default function Navbar() {
           </NavLink>
           <NavLink to="/favorites" className={linkClass}>
             <HeartIcon size={18} />
-            Preferiti
+            My List
           </NavLink>
 
           {!token ? (
@@ -114,7 +117,7 @@ export default function Navbar() {
             onClick={() => setOpen(false)}
           >
             <HeartIcon size={18} />
-            Preferiti
+            My List
           </NavLink>
 
           {!token ? (

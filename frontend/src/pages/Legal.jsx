@@ -9,7 +9,7 @@ const DOCS = {
     blocks: [
       [
         "Chi siamo",
-        "ConcertHub è un progetto dimostrativo che aggrega eventi musicali e informazioni sugli artisti da servizi di terze parti. Non è un servizio commerciale e non vende biglietti direttamente.",
+        "Setlist è un progetto dimostrativo che aggrega eventi musicali e informazioni sugli artisti da servizi di terze parti. Non è un servizio commerciale e non vende biglietti direttamente.",
       ],
       [
         "Dati che raccogliamo",
@@ -35,11 +35,11 @@ const DOCS = {
     blocks: [
       [
         "Natura del servizio",
-        "ConcertHub è un progetto a scopo dimostrativo e di portfolio. Il servizio è fornito \"così com'è\", senza garanzie di disponibilità continuativa o di accuratezza dei dati.",
+        "Setlist è un progetto a scopo dimostrativo e di portfolio. Il servizio è fornito \"così com'è\", senza garanzie di disponibilità continuativa o di accuratezza dei dati.",
       ],
       [
         "Acquisto biglietti",
-        "ConcertHub non vende biglietti. I link \"Biglietti\" reindirizzano a Ticketmaster: ogni acquisto avviene sul loro sito e secondo le loro condizioni.",
+        "Setlist non vende biglietti. I link \"Biglietti\" reindirizzano a Ticketmaster: ogni acquisto avviene sul loro sito e secondo le loro condizioni.",
       ],
       [
         "Account utente",
@@ -57,7 +57,7 @@ const DOCS = {
     blocks: [
       [
         "Cosa usiamo",
-        "ConcertHub non utilizza cookie di tracciamento, analitici o di marketing.",
+        "Setlist non utilizza cookie di tracciamento, analitici o di marketing.",
       ],
       [
         "Archiviazione locale",

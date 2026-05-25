@@ -34,7 +34,7 @@ export function downloadICS(ev) {
   const end   = buildEndStr(start);
   const loc   = [v.name, v.address, v.city].filter(Boolean).join(", ");
   const lines = [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ConcertHub//IT",
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Setlist//IT",
     "BEGIN:VEVENT",
     start  ? `DTSTART:${start}` : "",
     end    ? `DTEND:${end}`     : "",

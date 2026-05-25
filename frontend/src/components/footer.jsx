@@ -34,7 +34,7 @@ export default function Footer() {
           <div className="footer__col">
             <h4>Risorse</h4>
             <a href="#how">Come funziona</a>
-            <a href="#why">Perché ConcertHub</a>
+            <a href="#why">Perché Setlist</a>
             <a
               href="https://www.ticketmaster.com"
               target="_blank"
@@ -55,7 +55,7 @@ export default function Footer() {
 
       <div className="wrap">
         <div className="footer__bar">
-          <span>© {year} ConcertHub · Tutti i diritti riservati</span>
+          <span>© {year} Setlist · Tutti i diritti riservati</span>
           <span>
             Designed &amp; developed by <span className="hl">Fabio Annoni</span>
           </span>

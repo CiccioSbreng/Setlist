@@ -1,11 +1,11 @@
 {
-  "name": "ConcertHub",
-  "short_name": "ConcertHub",
-  "description": "Scopri concerti ed eventi live nella tua città",
+  "name": "Setlist",
+  "short_name": "Setlist",
+  "description": "Concerti, festival, esperienze live — tutto nella tua setlist.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#08080c",
-  "theme_color": "#ff8a00",
+  "background_color": "#060912",
+  "theme_color": "#00D48A",
   "icons": [
     {
       "src": "/favicon.svg",

@@ -1,56 +1,98 @@
 /* =========================================================
-   ConcertHub — Design System "Stage Lights"
-   Dark premium · ambra → corallo → viola
+   Setlist — Design System
+   Dark premium · verde signal #00D48A
    ========================================================= */
 
 :root {
   /* Superfici / sfondi */
-  --bg-900: #08080c;
-  --bg-850: #0b0c12;
-  --bg-800: #0f1118;
-  --bg-700: #161823;
-  --surface: rgba(255, 255, 255, 0.035);
-  --surface-2: rgba(255, 255, 255, 0.06);
+  --bg-900: #060912;
+  --bg-850: #090D1C;
+  --bg-800: #0D1226;
+  --bg-700: #131730;
+  --surface: rgba(255, 255, 255, 0.03);
+  --surface-2: rgba(255, 255, 255, 0.055);
   --surface-strong: rgba(255, 255, 255, 0.09);
 
-  /* Brand */
-  --brand: #ff8a00;
-  --brand-soft: #ffab3d;
-  --coral: #ff5c5c;
-  --violet: #7c5cff;
-  --fuchsia: #ff3d8b;
+  /* Brand Setlist */
+  --brand: #00D48A;
+  --brand-soft: #33DFA2;
+  --coral: #FF5540;
+  --violet: #4A6FFF;
+  --fuchsia: #00D48A;
 
-  --grad-brand: linear-gradient(135deg, #ff9d2f 0%, #ff5c5c 52%, #ff3d8b 100%);
-  --grad-aurora: linear-gradient(135deg, #ff8a00 0%, #ff3d8b 50%, #7c5cff 100%);
+  --grad-brand: linear-gradient(135deg, #00D48A 0%, #00B87A 100%);
+  --grad-aurora: linear-gradient(135deg, #00D48A 0%, #4A6FFF 100%);
 
   /* Testo */
-  --text: #f3f4f8;
-  --text-dim: #c4c6d8;
-  --text-mute: #9496aa;
+  --text: #EEF1FF;
+  --text-dim: #B0B8D8;
+  --text-mute: #7A84A8;
 
   /* Bordi / linee */
-  --border: rgba(255, 255, 255, 0.09);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --ring: rgba(255, 138, 0, 0.45);
+  --border: #1E2640;
+  --border-strong: #2D3660;
+  --ring: rgba(0, 212, 138, 0.4);
 
   /* Raggi */
-  --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 20px;
-  --r-xl: 28px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
   --r-pill: 999px;
 
   /* Ombre */
-  --sh-sm: 0 2px 10px rgba(0, 0, 0, 0.35);
-  --sh-md: 0 14px 38px rgba(0, 0, 0, 0.5);
-  --sh-lg: 0 28px 70px rgba(0, 0, 0, 0.6);
-  --sh-glow: 0 14px 40px rgba(255, 92, 92, 0.28);
+  --sh-sm: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --sh-md: 0 14px 38px rgba(0, 0, 0, 0.55);
+  --sh-lg: 0 28px 70px rgba(0, 0, 0, 0.65);
+  --sh-glow: 0 14px 40px rgba(0, 212, 138, 0.22);
 
   --maxw: 1180px;
+
+  /* Alias Setlist (compatibilità futura) */
+  --color-ink:     #060912;
+  --color-surface: #0D1226;
+  --color-border:  #1E2640;
+  --color-accent:  #00D48A;
+  --color-live:    #FF5540;
+  --color-frost:   #EEF1FF;
+  --color-muted:   #7A84A8;
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --radius-lg:     16px;
+  --radius-pill:   999px;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* ===================== BADGE SYSTEM — Setlist ===================== */
+.badge-live {
+  background: #FF5540; color: #fff;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 11px; border-radius: var(--r-pill);
+  letter-spacing: .06em; text-transform: uppercase;
+}
+.badge-on-sale {
+  background: #00D48A; color: #060912;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 11px; border-radius: var(--r-pill);
+}
+.badge-neutral {
+  background: #1E2640; color: #EEF1FF;
+  font-size: 11px; font-weight: 500;
+  padding: 4px 11px; border-radius: var(--r-pill);
+}
+.badge-sold-out {
+  border: 1px solid #1E2640; color: #7A84A8;
+  font-size: 11px; font-weight: 500;
+  padding: 4px 11px; border-radius: var(--r-pill);
+  background: transparent;
+}
+.badge-trending {
+  background: #1E2640; color: #00D48A;
+  font-size: 11px; font-weight: 600;
+  padding: 4px 11px; border-radius: var(--r-pill);
 }
 
 html,
@@ -443,17 +485,18 @@ img {
 }
 
 .btn--primary {
-  background: var(--grad-brand);
-  color: #1c0900;
+  background: var(--brand);
+  color: var(--bg-900);
   font-weight: 700;
-  box-shadow: 0 6px 28px rgba(255, 92, 92, 0.38), 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 28px rgba(0, 212, 138, 0.28), 0 2px 8px rgba(0,0,0,0.3);
   padding: 14px 26px;
 }
 
 .btn--primary:hover {
-  color: #1c0900;
-  transform: translateY(-3px);
-  box-shadow: 0 16px 48px rgba(255, 92, 92, 0.5), 0 4px 12px rgba(0,0,0,0.3);
+  color: var(--bg-900);
+  opacity: 0.88;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(0, 212, 138, 0.38), 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .btn--ghost {
