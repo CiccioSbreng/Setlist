@@ -138,7 +138,7 @@ export default function VenueSection({ ev }) {
                         <span>{p.name}</span>
                         <span className="ed-col__tags">
                           {p.dist != null && <small className="ed-col__tag">{p.dist < 1000 ? `${p.dist} m` : `${(p.dist / 1000).toFixed(1)} km`}</small>}
-                          {p.fee === "yes" && <small className="ed-col__tag ed-col__tag--fee">a pagamento</small>}
+                          {p.fee === "yes" && <small className="ed-col__tag ed-col__tag--fee">€ pag.</small>}
                         </span>
                         <ArrowRightIcon size={12} />
                       </a>

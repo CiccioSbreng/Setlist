@@ -4797,8 +4797,8 @@ input.input[type="date"] {
 .ed-col__row:hover { background: rgba(255,255,255,0.05); color: #fff; }
 .ed-col__row span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ed-col__tag {
-  font-size: 0.68rem;
-  padding: 2px 7px;
+  font-size: 0.74rem;
+  padding: 3px 9px;
   border-radius: var(--r-pill);
   background: rgba(255,255,255,0.08);
   color: var(--text-mute);
@@ -5500,6 +5500,13 @@ input.input[type="date"] {
 /* Mobile skeleton */
 @media (max-width: 820px) {
   .ed-hero-sk { min-height: 300px; }
+  /* Venue section su mobile */
+  .ed-block { padding: 18px 16px; }
+  .ed-block__title { font-size: 1.1rem; }
+  .ed-eyebrow { font-size: 0.66rem; }
+  .ed-cols { grid-template-columns: 1fr; }
+  .ed-col__row { font-size: 0.88rem; padding: 11px 12px; }
+  .ed-col__head { font-size: 0.85rem; padding: 10px 12px; }
 }
 
 /* ── Countdown EventDetail ─────────────────────────────────────────── */
