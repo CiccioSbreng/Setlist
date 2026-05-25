@@ -93,7 +93,7 @@ function printBanner({ port, dbOk }) {
 
   console.log([
     '',
-    `  ${C.bar}▌${C.reset}  ${C.title}ConcertHub API${C.reset}`,
+    `  ${C.bar}▌${C.reset}  ${C.title}Setlist API${C.reset}`,
     `  ${C.bar}▌${C.reset}`,
     row('Ambiente', process.env.NODE_ENV || 'development'),
     row('URL',      `http://localhost:${port}`),

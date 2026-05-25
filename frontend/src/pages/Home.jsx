@@ -241,7 +241,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== PERCHÉ CONCERTHUB ===== */}
+      {/* ===== PERCHÉ SETLIST ===== */}
       <section className="section" id="why">
         <div className="wrap">
           <div className="section-head">

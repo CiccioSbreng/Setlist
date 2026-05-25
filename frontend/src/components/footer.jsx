@@ -1,7 +1,6 @@
 // frontend/src/components/footer.jsx
 
 import { Link } from "react-router-dom";
-import { MusicIcon } from "./Icons";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -12,15 +11,17 @@ export default function Footer() {
         <div className="footer__grid">
           <div className="footer__about">
             <Link to="/home" className="brand">
-              <span className="brand__mark">
-                <MusicIcon size={20} />
-              </span>
-              Concert<span className="brand__accent">Hub</span>
+              <svg width="110" height="26" viewBox="0 0 200 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Setlist">
+                <rect x="0" y="4"  width="36" height="5" rx="2.5" fill="#00D48A"/>
+                <rect x="0" y="15" width="24" height="5" rx="2.5" fill="#00D48A"/>
+                <rect x="0" y="26" width="31" height="5" rx="2.5" fill="#00D48A"/>
+                <rect x="0" y="37" width="19" height="5" rx="2.5" fill="#00D48A"/>
+                <text x="52" y="38" fontFamily="-apple-system,'Helvetica Neue',Arial,sans-serif" fontSize="30" fontWeight="700" fill="#EEF1FF" letterSpacing="-0.8">Setlist</text>
+              </svg>
             </Link>
             <p>
-              La piattaforma per scoprire concerti ed eventi live nella tua
-              città. Cerca artisti, salva i tuoi preferiti e non perderti più
-              uno show.
+              Concerti, festival, esperienze live — tutto nella tua setlist.
+              Cerca per città e artista, ascolta su Spotify e pianifica la serata.
             </p>
           </div>
 

@@ -302,10 +302,9 @@ export default function EventDetail() {
         <div ref={venueSentinelRef}>
           {venueVisible && <VenueSection ev={ev} />}
         </div>
-      </div>
 
-      {/* ── CTA biglietti (solo mobile, in fondo alla pagina) ── */}
-      <div className="ed-sticky-cta">
+        {/* ── CTA biglietti (solo mobile, in fondo al contenuto) ── */}
+        <div className="ed-sticky-cta">
         {ev.status !== "cancelled" && ev.url && (
           <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary ed-sticky-cta__tickets">
             <TicketIcon size={18} />Controlla disponibilità<ArrowRightIcon size={16} />
@@ -319,6 +318,7 @@ export default function EventDetail() {
         >
           <HeartIcon size={20} filled={isFav} />
         </button>
+        </div>
       </div>
     </section>
   );
