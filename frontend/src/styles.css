@@ -2288,11 +2288,11 @@ input.input[type="date"] {
   border-color: var(--border-strong);
   box-shadow: 0 12px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.08);
   background: rgba(10, 11, 17, 0.96);
-  animation: bar-slide-in 0.25s cubic-bezier(0.22,1,0.36,1) both;
+  animation: bar-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @keyframes bar-slide-in {
-  from { opacity: 0; transform: translateX(28px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(40px) scale(0.96); }
+  to   { opacity: 1; transform: translateX(0)    scale(1); }
 }
 .ed-bar.is-floating .ed-bar__nav {
   flex-direction: column;
@@ -2389,29 +2389,28 @@ input.input[type="date"] {
   /* Barra incollata in cima (JS toggled) */
   .ed-bar.is-bar-stuck {
     position: fixed;
-    top: 70px;
-    left: 0;
-    right: 0;
+    top: 80px;
+    left: 12px;
+    right: 12px;
     margin: 0;
     padding: 6px 10px;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
+    border-radius: var(--r-xl);
+    border: 1px solid var(--border-strong);
     z-index: 45;
-    animation: ed-bar-slide-down 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+    animation: ed-bar-slide-down 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .nav.nav--hidden ~ .app-main .ed-bar.is-bar-stuck {
-    top: 0;
+    top: 10px;
   }
   @keyframes ed-bar-slide-down {
-    from { transform: translateY(-100%); opacity: 0; }
+    from { transform: translateY(-110%); opacity: 0; }
     to   { transform: translateY(0);     opacity: 1; }
   }
   @media (prefers-reduced-motion: reduce) {
     .ed-bar.is-bar-stuck { animation: none; }
   }
   .ed-bar-spacer {
-    height: 49px;
+    height: 56px;
     margin-bottom: 14px;
   }
   /* Tab occupano tutta la larghezza equamente */

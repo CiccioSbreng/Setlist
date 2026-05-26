@@ -99,7 +99,7 @@ export default function EventDetail() {
     if (!ev) return;
     const stage = stageRef.current;
     if (!stage) return;
-    const SCROLL_TOLERANCE = 6; // ignora micro-scroll/inerzia
+    const SCROLL_TOLERANCE = 22;
     const check = () => {
       const isMobile = window.innerWidth <= 820;
       const rect = stage.getBoundingClientRect();
@@ -110,17 +110,16 @@ export default function EventDetail() {
       if (isMobile) {
         setBarFloating(false);
         if (!heroOutOfView) {
-          // Hero ancora visibile: barra nella sua posizione naturale
           setBarStuck(false);
+          lastScrollY.current = currentY;
         } else if (delta < -SCROLL_TOLERANCE) {
-          // Sto risalendo: barra si stacca e scende dall'alto
           setBarStuck(true);
+          lastScrollY.current = currentY;
         } else if (delta > SCROLL_TOLERANCE) {
-          // Sto scendendo: barra scorre via con la pagina
           setBarStuck(false);
+          lastScrollY.current = currentY;
         }
-        // delta piccolo: lascia lo stato precedente (evita flicker)
-        lastScrollY.current = currentY;
+        // delta < SCROLL_TOLERANCE: non aggiornare lastScrollY, accumula
         return;
       }
 
@@ -166,7 +165,14 @@ export default function EventDetail() {
 
   function scrollTo(tab) {
     setActiveTab(tab);
-    document.getElementById(`section-${tab}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const doScroll = () =>
+      document.getElementById(`section-${tab}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (tab === "dove" && !venueVisible) {
+      setVenueVisible(true);
+      setTimeout(doScroll, 60);
+    } else {
+      doScroll();
+    }
   }
 
   /* ── early returns ── */
