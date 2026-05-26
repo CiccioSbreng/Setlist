@@ -2518,6 +2518,7 @@ input.input[type="date"] {
     padding: 6px;
     border-radius: var(--r-xl);
     z-index: 45;
+    transition: top 0.3s ease;
   }
   /* Quando la navbar si nasconde, la barra sale in cima */
   .nav.nav--hidden ~ main.app-main .ed-bar:not(.is-floating) {
