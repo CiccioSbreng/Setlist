@@ -2297,16 +2297,18 @@ input.input[type="date"] {
   /* Barra incollata in cima (JS toggled) */
   .ed-bar.is-bar-stuck {
     position: fixed;
-    top: 78px;
-    left: 12px;
-    right: 12px;
+    top: 70px;
+    left: 0;
+    right: 0;
     margin: 0;
-    padding: 6px;
-    border-radius: var(--r-xl);
+    padding: 6px 10px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
     z-index: 45;
   }
   .nav.nav--hidden ~ .app-main .ed-bar.is-bar-stuck {
-    top: 10px;
+    top: 0;
   }
   .ed-bar-spacer {
     height: 49px;
