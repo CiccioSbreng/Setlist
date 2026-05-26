@@ -1,5 +1,3 @@
-// frontend/src/components/VideoBackground.jsx
-
 import { useState, useEffect, useRef } from "react";
 
 const VIDEOS = [
@@ -13,38 +11,73 @@ const VIDEOS = [
 
 const CLIP_DURATION = 15000;
 
-function randomNext(current) {
-  if (VIDEOS.length === 1) return 0;
-  let next;
-  do { next = Math.floor(Math.random() * VIDEOS.length); } while (next === current);
-  return next;
+function pick(excludeIdx) {
+  let n;
+  do { n = Math.floor(Math.random() * VIDEOS.length); } while (n === excludeIdx);
+  return n;
 }
 
 export default function VideoBackground() {
-  const [idx, setIdx] = useState(() => Math.floor(Math.random() * VIDEOS.length));
-  const timerRef = useRef(null);
+  const ref0 = useRef(null);
+  const ref1 = useRef(null);
 
-  function advance() {
-    setIdx((i) => randomNext(i));
+  const [front, setFront] = useState(0);
+  const [idx0] = useState(() => Math.floor(Math.random() * VIDEOS.length));
+  const [idx1] = useState(() => pick(Math.floor(Math.random() * VIDEOS.length)));
+  const backIdxRef = useRef(idx1);
+
+  function playEl(el) {
+    if (!el) return;
+    el.muted = true;
+    el.play().catch(() => {});
   }
 
   useEffect(() => {
-    timerRef.current = setTimeout(advance, CLIP_DURATION);
-    return () => clearTimeout(timerRef.current);
-  }, [idx]);
+    playEl(ref0.current);
+    playEl(ref1.current);
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setFront((f) => {
+        const next = f === 0 ? 1 : 0;
+        const backRef = f === 0 ? ref0 : ref1;
+        const currentFrontIdx = f === 0 ? idx0 : idx1;
+        const newIdx = pick(currentFrontIdx);
+        backIdxRef.current = newIdx;
+        const el = backRef.current;
+        if (el) {
+          el.src = VIDEOS[newIdx];
+          el.load();
+          el.currentTime = 0;
+          playEl(el);
+        }
+        return next;
+      });
+    }, CLIP_DURATION);
+    return () => clearTimeout(t);
+  }, [front, idx0, idx1]);
 
   return (
     <div className="video-bg" aria-hidden="true">
       <video
-        key={idx}
-        className="video-bg__video"
-        ref={(el) => { if (el) { el.muted = true; el.play().catch(() => {}); } }}
-        autoPlay
+        ref={ref0}
+        className={`video-bg__video${front === 0 ? " is-active" : ""}`}
+        src={VIDEOS[idx0]}
+        muted
         playsInline
+        loop
         preload="auto"
-      >
-        <source src={VIDEOS[idx]} type="video/mp4" />
-      </video>
+      />
+      <video
+        ref={ref1}
+        className={`video-bg__video${front === 1 ? " is-active" : ""}`}
+        src={VIDEOS[idx1]}
+        muted
+        playsInline
+        loop
+        preload="auto"
+      />
     </div>
   );
 }
