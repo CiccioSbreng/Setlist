@@ -166,8 +166,8 @@ In produzione punta all'URL del backend Render.
 
 Il file `render.yaml` definisce due servizi su [Render](https://render.com):
 
-1. **`concerthub-backend`** — Node web service, root `backend/`, start `npm start`
-2. **`concerthub-frontend`** — Static site, root `frontend/`, build `npm run build`, publish `dist/`, con rewrite `/* → /index.html` per il client routing
+1. **`setlist-backend`** — Node web service, root `backend/`, start `npm start`, healthcheck `/__ping`
+2. **`setlist-frontend`** — Static site, root `frontend/`, build `npm run build`, publish `dist/`, con rewrite `/* → /index.html` per il client routing
 
 Le variabili d'ambiente sono dichiarate con `sync: false`: vanno impostate
 dalla dashboard di Render (non vengono committate).
@@ -244,9 +244,8 @@ Setlist/
 
 ## Note
 
-- Il package backend si chiama internamente `concerthub-backend` e il
-  frontend `concerthub-frontend` (nome legacy del progetto). Il brand
-  utente è **Setlist** ed è quello mostrato in UI.
+- I servizi su Render si chiamano `setlist-backend` e `setlist-frontend`,
+  in linea con il brand mostrato in UI.
 - Le API key non vengono mai esposte al client: ogni chiamata verso
   servizi esterni passa dal backend, che proxy-a la risposta normalizzata.
 - I preferiti dell'utente sono indicizzati su `(user, eventId)` con

@@ -1,11 +1,12 @@
 services:
   # ── Backend: Node/Express API ──────────────────────────────────────────────
   - type: web
-    name: concerthub-backend
+    name: setlist-backend
     runtime: node
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /__ping
     envVars:
       - key: NODE_ENV
         value: production
@@ -26,18 +27,18 @@ services:
       - key: SETLIST_API_KEY
         sync: false          # opzionale: scaletta probabile (setlist.fm)
       - key: CLIENT_ORIGIN
-        sync: false          # es: https://concerthub-frontend.onrender.com
+        sync: false          # es: https://setlist-frontend.onrender.com
 
   # ── Frontend: React/Vite Static Site ──────────────────────────────────────
   - type: web
-    name: concerthub-frontend
+    name: setlist-frontend
     runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
-        sync: false          # es: https://concerthub-backend.onrender.com
+        sync: false          # es: https://setlist-backend.onrender.com
     routes:
       - type: rewrite
         source: /*

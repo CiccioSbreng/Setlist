@@ -1,5 +1,5 @@
 {
-  "name": "concerthub-backend",
+  "name": "setlist-backend",
   "version": "0.1.0",
   "private": true,
   "main": "src/server.js",
