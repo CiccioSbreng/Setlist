@@ -1,12 +1,16 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { getFavorites } from "../lib/api";
 import {
-  MusicIcon,
-  HeartIcon,
-  UserIcon,
-  MenuIcon,
-  CloseIcon,
+  MusicIcon, HeartIcon, UserIcon, MenuIcon, CloseIcon, SearchIcon,
 } from "./Icons";
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr.includes("T") ? dateStr : `${dateStr}T00:00:00`);
+  const diff = Math.ceil((d - Date.now()) / 86_400_000);
+  return diff >= 0 ? diff : null;
+}
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -18,6 +22,9 @@ export default function Navbar() {
   const sidebarTimer = useRef(null);
   const lastY = useRef(0);
 
+  const [searchQ, setSearchQ] = useState("");
+  const [nextEvent, setNextEvent] = useState(null);
+
   useEffect(() => {
     function handleAuthChange() {
       setToken(localStorage.getItem("token"));
@@ -25,6 +32,18 @@ export default function Navbar() {
     window.addEventListener("auth-changed", handleAuthChange);
     return () => window.removeEventListener("auth-changed", handleAuthChange);
   }, []);
+
+  useEffect(() => {
+    if (!sidebar || !token) { setNextEvent(null); return; }
+    getFavorites()
+      .then((list) => {
+        const upcoming = list
+          .filter((f) => daysUntil(f.date) !== null)
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+        setNextEvent(upcoming[0] ?? null);
+      })
+      .catch(() => {});
+  }, [sidebar, token]);
 
   useEffect(() => {
     function onScroll() {
@@ -66,12 +85,21 @@ export default function Navbar() {
     navigate("/home");
   }
 
-  const linkClass = ({ isActive }) =>
-    "nav-link" + (isActive ? " is-active" : "");
+  function handleSearch(e) {
+    e.preventDefault();
+    const q = searchQ.trim();
+    if (!q) return;
+    navigate(`/home?q=${encodeURIComponent(q)}`);
+    setSearchQ("");
+  }
+
+  const linkClass = ({ isActive }) => "nav-link" + (isActive ? " is-active" : "");
 
   const sidebarClass = sidebar
     ? ` nav--sidebar${sidebarOut ? " nav--sidebar-out" : ""}`
     : "";
+
+  const days = nextEvent ? daysUntil(nextEvent.date) : null;
 
   return (
     <nav className={`nav${hidden ? " nav--hidden" : ""}${sidebarClass}`}>
@@ -89,6 +117,18 @@ export default function Navbar() {
             </svg>
           </Link>
 
+          {/* ── Mini search ── */}
+          <form className="nav__sb-form" onSubmit={handleSearch}>
+            <SearchIcon size={14} />
+            <input
+              className="nav__sb-input"
+              type="text"
+              placeholder="Cerca artista o evento…"
+              value={searchQ}
+              onChange={(e) => setSearchQ(e.target.value)}
+            />
+          </form>
+
           <nav className="nav__sidebar-links" aria-label="Navigazione principale">
             <NavLink to="/home" className={linkClass}>
               <MusicIcon size={18} />
@@ -105,6 +145,25 @@ export default function Navbar() {
               </NavLink>
             )}
           </nav>
+
+          {/* ── Prossimo evento ── */}
+          {nextEvent && days !== null && (
+            <Link to={`/event/${nextEvent.eventId}`} className="nav__next">
+              {nextEvent.image && (
+                <img src={nextEvent.image} alt={nextEvent.name} className="nav__next-img" />
+              )}
+              <div className="nav__next-body">
+                <div className="nav__next-label">Prossimo show</div>
+                <div className="nav__next-name">{nextEvent.name}</div>
+                <div className="nav__next-meta">
+                  {nextEvent.city && <span>{nextEvent.city}</span>}
+                  <span className="nav__next-days">
+                    {days === 0 ? "oggi!" : `tra ${days} ${days === 1 ? "giorno" : "giorni"}`}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          )}
 
           <div className="nav__sidebar-foot">
             {!token ? (
