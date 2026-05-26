@@ -2513,16 +2513,11 @@ input.input[type="date"] {
   /* Barra sticky sotto la navbar */
   .ed-bar:not(.is-floating) {
     position: sticky;
-    top: 70px;
+    top: 10px;
     margin: 0 0 16px;
     padding: 6px;
     border-radius: var(--r-xl);
     z-index: 45;
-    transition: top 0.3s ease;
-  }
-  /* Quando la navbar si nasconde, la barra sale in cima */
-  .nav.nav--hidden ~ main.app-main .ed-bar:not(.is-floating) {
-    top: 10px;
   }
   /* Tab occupano tutta la larghezza equamente */
   .ed-bar:not(.is-floating) .ed-bar__nav {

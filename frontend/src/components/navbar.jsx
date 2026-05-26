@@ -52,7 +52,7 @@ export default function Navbar() {
 
       if (isMobile) {
         if (y > lastY.current && y > 80) setHidden(true);
-        else setHidden(false);
+        else if (y <= 5) setHidden(false);
       } else {
         setHidden(false);
         if (y > 110 && !sidebar && !sidebarOut) {
