@@ -5319,9 +5319,11 @@ input.input[type="date"] {
 }
 
 @media (max-width: 820px) {
-  /* padding-bottom su app-main per non coprire contenuto */
-  .app-main {
-    padding-bottom: 78px;
+  /* Lo spazio per la bottom nav lo riserviamo sul footer, non sull'app-main:
+     così il footer resta attaccato alla fine del contenuto senza buco
+     vuoto sopra (la bottom-nav è fixed e sovrasta il footer, non il main). */
+  .footer {
+    padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px));
   }
 
   /* nasconde il burger: la bottom nav gestisce la navigazione */
