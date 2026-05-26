@@ -159,7 +159,7 @@ body {
   height: 60vw;
   top: -18%;
   left: -12%;
-  background: #7c5cff;
+  background: #4A6FFF;
   animation: blob-1 23s ease-in-out infinite alternate;
 }
 
@@ -168,7 +168,7 @@ body {
   height: 52vw;
   top: -10%;
   right: -14%;
-  background: #ff3d8b;
+  background: #FF5540;
   animation: blob-2 28s ease-in-out infinite alternate;
 }
 
@@ -177,7 +177,7 @@ body {
   height: 50vw;
   bottom: -22%;
   left: 10%;
-  background: #ff8a00;
+  background: #00D48A;
   animation: blob-3 32s ease-in-out infinite alternate;
 }
 
@@ -186,7 +186,7 @@ body {
   height: 44vw;
   bottom: -16%;
   right: 4%;
-  background: #ff5c5c;
+  background: #33DFA2;
   animation: blob-1 37s ease-in-out infinite alternate-reverse;
 }
 
@@ -312,8 +312,8 @@ img {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--brand-soft);
-  background: rgba(255, 138, 0, 0.1);
-  border: 1px solid rgba(255, 138, 0, 0.28);
+  background: rgba(0, 212, 138, 0.1);
+  border: 1px solid rgba(0, 212, 138, 0.28);
   padding: 6px 14px;
   border-radius: var(--r-pill);
 }
@@ -884,7 +884,7 @@ img {
   padding: 7px;
   background: radial-gradient(
       130% 200% at 100% 0%,
-      rgba(255, 122, 24, 0.1),
+      rgba(0, 212, 138, 0.1),
       transparent 55%
     ),
     linear-gradient(180deg, var(--surface-2), var(--surface));
@@ -1161,7 +1161,7 @@ input.input[type="date"] {
   max-width: calc(100vw - 32px);
   padding: 14px;
   background: linear-gradient(180deg, var(--bg-700), var(--bg-850));
-  border: 1px solid rgba(255, 138, 0, 0.22);
+  border: 1px solid rgba(0, 212, 138, 0.22);
   border-radius: 16px;
   box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.75),
     0 0 0 1px rgba(255, 255, 255, 0.04), var(--sh-glow);
@@ -1247,7 +1247,7 @@ input.input[type="date"] {
 }
 
 .drp__day:hover {
-  background: rgba(255, 138, 0, 0.16);
+  background: rgba(0, 212, 138, 0.16);
   color: #fff;
 }
 
@@ -1263,7 +1263,7 @@ input.input[type="date"] {
 }
 
 .drp__day.is-range {
-  background: rgba(255, 122, 24, 0.16);
+  background: rgba(0, 212, 138, 0.16);
   border-radius: 0;
 }
 
@@ -1398,8 +1398,8 @@ input.input[type="date"] {
   width: 50px;
   height: 50px;
   border-radius: 14px;
-  background: rgba(255, 138, 0, 0.12);
-  border: 1px solid rgba(255, 138, 0, 0.26);
+  background: rgba(0, 212, 138, 0.12);
+  border: 1px solid rgba(0, 212, 138, 0.26);
   color: var(--brand-soft);
   margin-bottom: 18px;
 }
@@ -1460,8 +1460,8 @@ input.input[type="date"] {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: linear-gradient(160deg, rgba(255,138,0,0.08) 0%, rgba(255,255,255,0.03) 55%, rgba(255,255,255,0.02) 100%);
-  border: 1px solid rgba(255,138,0,0.18);
+  background: linear-gradient(160deg, rgba(0,212,138,0.08) 0%, rgba(255,255,255,0.03) 55%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid rgba(0,212,138,0.18);
   border-radius: var(--r-xl);
   overflow: hidden;
   backdrop-filter: blur(14px);
@@ -1481,16 +1481,16 @@ input.input[type="date"] {
   position: absolute;
   top: 0; left: 15%; right: 15%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,138,0,0.75), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,212,138,0.75), transparent);
   pointer-events: none;
   border-radius: 1px;
 }
 
 .ev-card:hover {
-  border-color: rgba(255, 138, 0, 0.4);
+  border-color: rgba(0, 212, 138, 0.4);
   box-shadow:
     0 24px 64px rgba(0, 0, 0, 0.55),
-    0 0 40px rgba(255, 138, 0, 0.15);
+    0 0 40px rgba(0, 212, 138, 0.15);
 }
 
 .ev-card__media {
@@ -1734,8 +1734,8 @@ input.input[type="date"] {
   height: 72px;
   margin: 0 auto 20px;
   border-radius: 20px;
-  background: rgba(255, 138, 0, 0.1);
-  border: 1px solid rgba(255, 138, 0, 0.26);
+  background: rgba(0, 212, 138, 0.1);
+  border: 1px solid rgba(0, 212, 138, 0.26);
   color: var(--brand-soft);
 }
 
@@ -2256,8 +2256,8 @@ input.input[type="date"] {
 .ed-card {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(160deg, rgba(255,138,0,0.08) 0%, var(--surface-2) 55%, var(--surface) 100%);
-  border: 1px solid rgba(255,138,0,0.2);
+  background: linear-gradient(160deg, rgba(0,212,138,0.08) 0%, var(--surface-2) 55%, var(--surface) 100%);
+  border: 1px solid rgba(0,212,138,0.2);
   border-radius: var(--r-xl);
   padding: 28px;
   margin-bottom: 20px;
@@ -2268,7 +2268,7 @@ input.input[type="date"] {
   position: absolute;
   top: 0; left: 15%; right: 15%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,138,0,0.65), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,212,138,0.65), transparent);
   pointer-events: none;
 }
 
@@ -2409,8 +2409,8 @@ input.input[type="date"] {
   align-items: center;
   padding: 5px 12px;
   border-radius: var(--r-pill);
-  background: rgba(255, 122, 24, 0.12);
-  border: 1px solid rgba(255, 122, 24, 0.3);
+  background: rgba(0, 212, 138, 0.12);
+  border: 1px solid rgba(0, 212, 138, 0.3);
   color: var(--brand);
   font-size: 0.74rem;
   font-weight: 700;
@@ -2419,9 +2419,9 @@ input.input[type="date"] {
 }
 
 .tag--warn {
-  background: rgba(220, 60, 60, 0.14);
-  border-color: rgba(220, 60, 60, 0.4);
-  color: #ff8a8a;
+  background: rgba(255, 85, 64, 0.14);
+  border-color: rgba(255, 85, 64, 0.4);
+  color: #FF8580;
 }
 
 .ed__title {
@@ -2899,7 +2899,7 @@ input.input[type="date"] {
   justify-content: space-between;
   gap: 24px;
   flex-wrap: wrap;
-  background: linear-gradient(135deg, rgba(255,138,0,0.08), rgba(124,92,255,0.08));
+  background: linear-gradient(135deg, rgba(0,212,138,0.08), rgba(124,92,255,0.08));
   border: 1px solid var(--border-strong);
   border-radius: var(--r-xl);
   padding: 36px 40px;
@@ -3116,7 +3116,7 @@ input.input[type="date"] {
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: rgba(255,138,0,0.12);
+  background: rgba(0,212,138,0.12);
   color: var(--accent);
   display: flex;
   align-items: center;
@@ -3543,7 +3543,7 @@ input.input[type="date"] {
   color: var(--brand-soft);
   background: rgba(10, 8, 12, 0.78);
   backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 138, 0, 0.45);
+  border: 1px solid rgba(0, 212, 138, 0.45);
   border-radius: var(--r-pill);
   padding: 4px 10px;
 }
@@ -3655,9 +3655,9 @@ input.input[type="date"] {
   color: #ff8888;
 }
 .ed__status-banner--warn {
-  background: rgba(255, 165, 0, 0.1);
-  border: 1px solid rgba(255, 165, 0, 0.25);
-  color: #ffb347;
+  background: rgba(255, 85, 64, 0.1);
+  border: 1px solid rgba(255, 85, 64, 0.3);
+  color: #FF8580;
 }
 
 @media (max-width: 640px) {
@@ -3794,8 +3794,8 @@ input.input[type="date"] {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(255, 138, 0, 0.12);
-  border: 1px solid rgba(255, 138, 0, 0.26);
+  background: rgba(0, 212, 138, 0.12);
+  border: 1px solid rgba(0, 212, 138, 0.26);
   color: var(--brand-soft);
   flex: none;
 }
@@ -4081,7 +4081,7 @@ input.input[type="date"] {
 }
 
 .pf__nav-btn:hover { background: rgba(255,255,255,0.05); color: var(--text); }
-.pf__nav-btn.active { background: rgba(255,138,0,0.1); color: var(--accent); }
+.pf__nav-btn.active { background: rgba(0,212,138,0.1); color: var(--accent); }
 
 .pf__side-links {
   display: flex;
@@ -4243,7 +4243,7 @@ input.input[type="date"] {
   transform: translateX(-50%);
   min-width: 180px;
   background: #1a1728;
-  border: 1px solid rgba(255,138,0,0.25);
+  border: 1px solid rgba(0,212,138,0.25);
   border-radius: var(--r-md);
   list-style: none;
   margin: 0;
@@ -4267,7 +4267,7 @@ input.input[type="date"] {
 }
 
 .gsel__opt:hover {
-  background: rgba(255,138,0,0.1);
+  background: rgba(0,212,138,0.1);
   color: #fff;
 }
 
@@ -4282,7 +4282,7 @@ input.input[type="date"] {
   left: 0;
   right: 0;
   background: #1a1728;
-  border: 1px solid rgba(255,138,0,0.28);
+  border: 1px solid rgba(0,212,138,0.28);
   border-radius: var(--r-md);
   list-style: none;
   margin: 0;
@@ -4307,7 +4307,7 @@ input.input[type="date"] {
 }
 
 .sb-sugg li button:hover {
-  background: rgba(255,138,0,0.12);
+  background: rgba(0,212,138,0.12);
   color: #fff;
 }
 
@@ -4375,7 +4375,7 @@ input.input[type="date"] {
   font-size: 0.68rem;
   padding: 2px 6px;
   border-radius: 20px;
-  background: rgba(255,138,0,0.15);
+  background: rgba(0,212,138,0.15);
   color: var(--accent);
 }
 
@@ -4750,7 +4750,7 @@ input.input[type="date"] {
 }
 .ed-block .ed-setlist__list li:nth-child(odd) { background: rgba(255,255,255,0.02); }
 .ed-block .ed-setlist__list li:last-child { border-bottom: none; }
-.ed-block .ed-setlist__list li.encore { background: rgba(255,138,0,0.07); }
+.ed-block .ed-setlist__list li.encore { background: rgba(0,212,138,0.07); }
 .ed-block .ed-setlist__num {
   width: 26px;
   text-align: center;
@@ -4764,7 +4764,7 @@ input.input[type="date"] {
   letter-spacing: 0.05em;
   padding: 2px 8px;
   border-radius: var(--r-pill);
-  background: rgba(255,138,0,0.16);
+  background: rgba(0,212,138,0.16);
   color: var(--brand-soft);
 }
 
@@ -4786,7 +4786,7 @@ input.input[type="date"] {
   padding: 22px;
   border-radius: var(--r-lg);
   border: 1px solid var(--border);
-  background: linear-gradient(160deg, rgba(124,92,255,0.14), rgba(255,138,0,0.06));
+  background: linear-gradient(160deg, rgba(124,92,255,0.14), rgba(0,212,138,0.06));
 }
 .ed-wx__icon { font-size: 3.2rem; line-height: 1; }
 .ed-wx__temp {
@@ -4879,7 +4879,7 @@ input.input[type="date"] {
   white-space: nowrap;
 }
 .ed-col__tag--fee {
-  background: rgba(255,165,0,0.12);
+  background: rgba(74,111,255,0.12);
   color: #ffb347;
 }
 .ed-col__tags {
@@ -4919,7 +4919,7 @@ input.input[type="date"] {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: rgba(255,138,0,0.14);
+  background: rgba(0,212,138,0.14);
   color: var(--brand-soft);
   font-weight: 800;
   font-size: 0.85rem;
@@ -5059,21 +5059,21 @@ input.input[type="date"] {
 .ed-block--venue::before { background: linear-gradient(90deg, transparent, rgba(124,92,255,0.7), transparent); }
 .ed-block--venue .ed-mapwrap { border-color: rgba(124,92,255,0.22); }
 .ed-block--venue .ed-mapwrap__cta {
-  background: linear-gradient(135deg, rgba(124,92,255,0.1), rgba(255,138,0,0.05));
+  background: linear-gradient(135deg, rgba(124,92,255,0.1), rgba(0,212,138,0.05));
 }
 .ed-block--venue .ed-mapwrap__cta:hover {
-  background: linear-gradient(135deg, rgba(124,92,255,0.16), rgba(255,138,0,0.09));
+  background: linear-gradient(135deg, rgba(124,92,255,0.16), rgba(0,212,138,0.09));
   color: #fff;
 }
 
 .ed-block--logistica {
-  background: linear-gradient(160deg, rgba(255,138,0,0.10) 0%, var(--surface-2) 55%, var(--surface) 100%);
-  border-color: rgba(255,138,0,0.30);
-  box-shadow: 0 0 0 1px rgba(255,138,0,0.06), inset 0 0 40px rgba(255,138,0,0.04);
+  background: linear-gradient(160deg, rgba(0,212,138,0.10) 0%, var(--surface-2) 55%, var(--surface) 100%);
+  border-color: rgba(0,212,138,0.30);
+  box-shadow: 0 0 0 1px rgba(0,212,138,0.06), inset 0 0 40px rgba(0,212,138,0.04);
 }
-.ed-block--logistica::before { background: linear-gradient(90deg, transparent, rgba(255,138,0,0.8), transparent); }
-.ed-block--logistica .ed-block__title { color: #ffaa40; }
-.ed-block--logistica .ed-eyebrow { color: rgba(255,160,60,0.85); }
+.ed-block--logistica::before { background: linear-gradient(90deg, transparent, rgba(0,212,138,0.8), transparent); }
+.ed-block--logistica .ed-block__title { color: #33DFA2; }
+.ed-block--logistica .ed-eyebrow { color: rgba(0,212,138,0.85); }
 
 .ed-block--dintorni {
   background: linear-gradient(160deg, rgba(80,200,110,0.09) 0%, var(--surface-2) 55%, var(--surface) 100%);
@@ -5093,10 +5093,10 @@ input.input[type="date"] {
 
 /* Prossime date — arancio/ambra accent */
 .ed-block--dates {
-  background: linear-gradient(160deg, rgba(255,165,0,0.07) 0%, var(--surface-2) 60%, var(--surface) 100%);
-  border-color: rgba(255,165,0,0.2);
+  background: linear-gradient(160deg, rgba(74,111,255,0.07) 0%, var(--surface-2) 60%, var(--surface) 100%);
+  border-color: rgba(74,111,255,0.2);
 }
-.ed-block--dates::before { background: linear-gradient(90deg, transparent, rgba(255,165,0,0.65), transparent); }
+.ed-block--dates::before { background: linear-gradient(90deg, transparent, rgba(74,111,255,0.65), transparent); }
 
 /* ── City info dentro blocco ── */
 .ed-block .ed-cityinfo__body { display: flex; gap: 20px; }
@@ -5478,8 +5478,8 @@ input.input[type="date"] {
 }
 .nav-link.is-active {
   color: #fff;
-  background: rgba(255, 138, 0, 0.1);
-  border-color: rgba(255, 138, 0, 0.28);
+  background: rgba(0, 212, 138, 0.1);
+  border-color: rgba(0, 212, 138, 0.28);
 }
 
 /* ===================== FOOTER — DARK PREMIUM ===================== */
