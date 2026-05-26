@@ -489,7 +489,7 @@ img {
     top: 0;
     left: 0;
     bottom: 0;
-    width: 220px;
+    width: 180px;
     height: 100dvh;
     border-bottom: none;
     border-right: 1px solid var(--border);
@@ -497,6 +497,16 @@ img {
     animation: nav-sidebar-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     display: flex;
     flex-direction: column;
+  }
+
+  .nav.nav--sidebar ~ main.app-main {
+    margin-left: 180px;
+    transition: margin-left 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .nav.nav--sidebar.nav--sidebar-out ~ main.app-main {
+    margin-left: 0;
+    transition: margin-left 0.34s cubic-bezier(0.4, 0, 1, 1);
   }
 
   .nav.nav--sidebar.nav--sidebar-out {
@@ -507,7 +517,7 @@ img {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 24px 16px 24px;
+    padding: 24px 12px 24px;
     gap: 0;
   }
 
@@ -527,8 +537,8 @@ img {
   .nav__sidebar-links .nav-link {
     width: 100%;
     justify-content: flex-start;
-    padding: 11px 14px;
-    font-size: 0.94rem;
+    padding: 10px 12px;
+    font-size: 0.9rem;
     border-radius: var(--r-md);
   }
 
