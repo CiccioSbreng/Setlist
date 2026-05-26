@@ -23,7 +23,7 @@ export default function Navbar() {
   const lastY = useRef(0);
 
   const [searchQ, setSearchQ] = useState("");
-  const [nextEvent, setNextEvent] = useState(null);
+  const [upcomingFavs, setUpcomingFavs] = useState([]);
 
   useEffect(() => {
     function handleAuthChange() {
@@ -34,13 +34,13 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (!sidebar || !token) { setNextEvent(null); return; }
+    if (!sidebar || !token) { setUpcomingFavs([]); return; }
     getFavorites()
       .then((list) => {
         const upcoming = list
           .filter((f) => daysUntil(f.date) !== null)
           .sort((a, b) => new Date(a.date) - new Date(b.date));
-        setNextEvent(upcoming[0] ?? null);
+        setUpcomingFavs(upcoming);
       })
       .catch(() => {});
   }, [sidebar, token]);
@@ -99,7 +99,6 @@ export default function Navbar() {
     ? ` nav--sidebar${sidebarOut ? " nav--sidebar-out" : ""}`
     : "";
 
-  const days = nextEvent ? daysUntil(nextEvent.date) : null;
 
   return (
     <nav className={`nav${hidden ? " nav--hidden" : ""}${sidebarClass}`}>
@@ -146,23 +145,39 @@ export default function Navbar() {
             )}
           </nav>
 
-          {/* ── Prossimo evento ── */}
-          {nextEvent && days !== null && (
-            <Link to={`/event/${nextEvent.eventId}`} className="nav__next">
-              {nextEvent.image && (
-                <img src={nextEvent.image} alt={nextEvent.name} className="nav__next-img" />
-              )}
-              <div className="nav__next-body">
-                <div className="nav__next-label">Prossimo show</div>
-                <div className="nav__next-name">{nextEvent.name}</div>
-                <div className="nav__next-meta">
-                  {nextEvent.city && <span>{nextEvent.city}</span>}
-                  <span className="nav__next-days">
-                    {days === 0 ? "oggi!" : `tra ${days} ${days === 1 ? "giorno" : "giorni"}`}
-                  </span>
+          {/* ── Preferiti imminenti ── */}
+          {token && (
+            <div className="nav__favs">
+              <div className="nav__favs-label">I tuoi show</div>
+              {upcomingFavs.length === 0 ? (
+                <p className="nav__favs-empty">Nessun evento salvato</p>
+              ) : (
+                <div className="nav__favs-list">
+                  {upcomingFavs.map((fav, i) => {
+                    const d = daysUntil(fav.date);
+                    return (
+                      <Link key={fav._id} to={`/event/${fav.eventId}`} className={`nav__next${i === 0 ? " nav__next--first" : ""}`}>
+                        {fav.image && (
+                          <img src={fav.image} alt={fav.name} className="nav__next-img" />
+                        )}
+                        <div className="nav__next-body">
+                          {i === 0 && <div className="nav__next-label">Prossimo</div>}
+                          <div className="nav__next-name">{fav.name}</div>
+                          <div className="nav__next-meta">
+                            {fav.city && <span>{fav.city}</span>}
+                            {d !== null && (
+                              <span className="nav__next-days">
+                                {d === 0 ? "oggi!" : `tra ${d}g`}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
-              </div>
-            </Link>
+              )}
+            </div>
           )}
 
           <div className="nav__sidebar-foot">
