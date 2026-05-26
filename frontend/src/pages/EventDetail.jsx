@@ -80,7 +80,6 @@ export default function EventDetail() {
   const heroRef = useTilt({ max: 7 });
   const stageRef = useRef(null);
   const [barFloating, setBarFloating] = useState(false);
-  const [barStuck, setBarStuck] = useState(false);
 
   const [venueVisible, setVenueVisible] = useState(false);
   const venueSentinelRef = useRef(null);
@@ -94,38 +93,13 @@ export default function EventDetail() {
     return () => obs.disconnect();
   }, [ev]);
 
-  const lastScrollY = useRef(0);
   useEffect(() => {
     if (!ev) return;
     const stage = stageRef.current;
     if (!stage) return;
-    const SCROLL_TOLERANCE = 22;
     const check = () => {
-      const isMobile = window.innerWidth <= 820;
-      const rect = stage.getBoundingClientRect();
-      const currentY = window.scrollY;
-      const delta = currentY - lastScrollY.current;
-      const heroOutOfView = rect.bottom < 70;
-
-      if (isMobile) {
-        setBarFloating(false);
-        if (!heroOutOfView) {
-          setBarStuck(false);
-          lastScrollY.current = currentY;
-        } else if (delta < -SCROLL_TOLERANCE) {
-          setBarStuck(true);
-          lastScrollY.current = currentY;
-        } else if (delta > SCROLL_TOLERANCE) {
-          setBarStuck(false);
-          lastScrollY.current = currentY;
-        }
-        // delta < SCROLL_TOLERANCE: non aggiornare lastScrollY, accumula
-        return;
-      }
-
-      setBarStuck(false);
-      setBarFloating(rect.bottom < 72);
-      lastScrollY.current = currentY;
+      if (window.innerWidth <= 820) { setBarFloating(false); return; }
+      setBarFloating(stage.getBoundingClientRect().bottom < 72);
     };
     window.addEventListener("scroll", check, { passive: true });
     window.addEventListener("resize", check, { passive: true });
@@ -232,8 +206,7 @@ export default function EventDetail() {
         </div>
 
         {/* ── BARRA: navigazione + azioni ── */}
-        {barStuck && <div className="ed-bar-spacer" />}
-        <div className={`ed-bar${barFloating ? " is-floating" : ""}${barStuck ? " is-bar-stuck" : ""}`}>
+        <div className={`ed-bar${barFloating ? " is-floating" : ""}`}>
           <nav className="ed-bar__nav" aria-label="Sezioni evento">
             {[["evento","Evento"],["artista","Artista"],["dove","Dove & Come"]].map(([tab, label]) => (
               <button

@@ -2388,49 +2388,25 @@ input.input[type="date"] {
   .ed-hero__media { transform: none; inset: 0; }
   .ed-hero__inner { transform: none; }
   .ed-hero__title { font-size: 1.5rem; }
+  /* Barra sticky sotto la navbar */
   .ed-bar:not(.is-floating) {
-    position: static;
+    position: sticky;
+    top: 70px;
     margin: 0 0 16px;
     padding: 6px;
     border-radius: var(--r-xl);
-    overflow-x: auto;
     z-index: 45;
   }
-  /* Barra incollata in cima (JS toggled) */
-  .ed-bar.is-bar-stuck {
-    position: fixed;
-    top: 80px;
-    left: 12px;
-    right: 12px;
-    margin: 0;
-    padding: 6px 10px;
-    border-radius: var(--r-xl);
-    border: 1px solid var(--border-strong);
-    z-index: 45;
-    animation: ed-bar-slide-down 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .nav.nav--hidden ~ .app-main .ed-bar.is-bar-stuck {
+  /* Quando la navbar si nasconde, la barra sale in cima */
+  .nav.nav--hidden ~ main.app-main .ed-bar:not(.is-floating) {
     top: 10px;
   }
-  @keyframes ed-bar-slide-down {
-    from { transform: translateY(-110%); opacity: 0; }
-    to   { transform: translateY(0);     opacity: 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .ed-bar.is-bar-stuck { animation: none; }
-  }
-  .ed-bar-spacer {
-    height: 56px;
-    margin-bottom: 14px;
-  }
   /* Tab occupano tutta la larghezza equamente */
-  .ed-bar:not(.is-floating) .ed-bar__nav,
-  .ed-bar.is-bar-stuck .ed-bar__nav {
+  .ed-bar:not(.is-floating) .ed-bar__nav {
     width: 100%;
     gap: 4px;
   }
-  .ed-bar:not(.is-floating) .ed-bar__tab,
-  .ed-bar.is-bar-stuck .ed-bar__tab {
+  .ed-bar:not(.is-floating) .ed-bar__tab {
     flex: 1;
     text-align: center;
     padding: 10px 8px;
@@ -2438,16 +2414,15 @@ input.input[type="date"] {
     font-size: 0.88rem;
     transition: color 0.2s ease, background 0.25s ease, box-shadow 0.25s ease;
   }
-  .ed-bar:not(.is-floating) .ed-bar__tab.active,
-  .ed-bar.is-bar-stuck .ed-bar__tab.active {
+  .ed-bar:not(.is-floating) .ed-bar__tab.active {
     background: linear-gradient(180deg, rgba(0, 212, 138, 0.18), rgba(0, 212, 138, 0.08));
     color: var(--brand);
     box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 4px 14px rgba(0, 212, 138, 0.18);
   }
   /* Azioni già nel sticky-cta in basso → nascondi dalla barra */
   .ed-bar__actions { display: none; }
-  /* Offset scroll per i tab nav */
-  .ed-section { scroll-margin-top: 60px; }
+  /* Offset scroll per i tab nav: nav(70) + barra(~50) + margine */
+  .ed-section { scroll-margin-top: 130px; }
 }
 
 /* ── ED-BACK ── */
