@@ -94,20 +94,39 @@ export default function EventDetail() {
     return () => obs.disconnect();
   }, [ev]);
 
+  const lastScrollY = useRef(0);
   useEffect(() => {
     if (!ev) return;
     const stage = stageRef.current;
     if (!stage) return;
+    const SCROLL_TOLERANCE = 6; // ignora micro-scroll/inerzia
     const check = () => {
       const isMobile = window.innerWidth <= 820;
       const rect = stage.getBoundingClientRect();
+      const currentY = window.scrollY;
+      const delta = currentY - lastScrollY.current;
+      const heroOutOfView = rect.bottom < 70;
+
       if (isMobile) {
         setBarFloating(false);
-        setBarStuck(rect.bottom < 70);
+        if (!heroOutOfView) {
+          // Hero ancora visibile: barra nella sua posizione naturale
+          setBarStuck(false);
+        } else if (delta < -SCROLL_TOLERANCE) {
+          // Sto risalendo: barra si stacca e scende dall'alto
+          setBarStuck(true);
+        } else if (delta > SCROLL_TOLERANCE) {
+          // Sto scendendo: barra scorre via con la pagina
+          setBarStuck(false);
+        }
+        // delta piccolo: lascia lo stato precedente (evita flicker)
+        lastScrollY.current = currentY;
         return;
       }
+
       setBarStuck(false);
       setBarFloating(rect.bottom < 72);
+      lastScrollY.current = currentY;
     };
     window.addEventListener("scroll", check, { passive: true });
     window.addEventListener("resize", check, { passive: true });
