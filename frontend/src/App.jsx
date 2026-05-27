@@ -1,6 +1,7 @@
 // frontend/src/App.jsx
 
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigationType } from "react-router-dom";
 import { Toaster } from "sonner";
 import Home from "./pages/Home";
 import Navbar from "./components/navbar";
@@ -17,6 +18,41 @@ import VideoBackground from "./components/VideoBackground";
 import { PageTransition } from "./components/Motion";
 import BottomNav from "./components/BottomNav";
 import BackToTop from "./components/BackToTop";
+
+function ScrollRestorer() {
+  const { key } = useLocation();
+  const navType = useNavigationType();
+
+  // Ripristina posizione su navigazione "back" (POP)
+  useEffect(() => {
+    if (navType !== "POP") {
+      window.scrollTo(0, 0);
+      return;
+    }
+    const saved = sessionStorage.getItem(`scroll:${key}`);
+    if (!saved) return;
+    const target = parseInt(saved, 10);
+    // Riprova finché la pagina è abbastanza alta (contenuto async)
+    let tries = 0;
+    const attempt = () => {
+      if (document.documentElement.scrollHeight >= target + window.innerHeight || tries++ >= 20) {
+        window.scrollTo(0, target);
+      } else {
+        requestAnimationFrame(attempt);
+      }
+    };
+    requestAnimationFrame(attempt);
+  }, [key, navType]);
+
+  // Salva posizione corrente quando si lascia la route
+  useEffect(() => {
+    return () => {
+      sessionStorage.setItem(`scroll:${key}`, String(Math.round(window.scrollY)));
+    };
+  }, [key]);
+
+  return null;
+}
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -42,6 +78,7 @@ function AnimatedRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollRestorer />
       <div className="app-shell">
         <VideoBackground />
         <GradientBackground />
