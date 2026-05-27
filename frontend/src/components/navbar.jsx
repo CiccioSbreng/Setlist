@@ -24,17 +24,21 @@ export default function Navbar() {
 
   const [searchQ, setSearchQ] = useState("");
   const [upcomingFavs, setUpcomingFavs] = useState([]);
+  const tokenRef = useRef(token);
 
   useEffect(() => {
     function handleAuthChange() {
-      setToken(localStorage.getItem("token"));
+      const t = localStorage.getItem("token");
+      tokenRef.current = t;
+      setToken(t);
     }
     window.addEventListener("auth-changed", handleAuthChange);
     return () => window.removeEventListener("auth-changed", handleAuthChange);
   }, []);
 
-  function loadFavs() {
-    if (!token) { setUpcomingFavs([]); return; }
+  const loadFavs = useRef(() => {});
+  loadFavs.current = () => {
+    if (!tokenRef.current) { setUpcomingFavs([]); return; }
     getFavorites()
       .then((list) => {
         const upcoming = list
@@ -44,17 +48,18 @@ export default function Navbar() {
         setUpcomingFavs(upcoming);
       })
       .catch(() => {});
-  }
+  };
 
   useEffect(() => {
     if (!sidebar) return;
-    loadFavs();
+    loadFavs.current();
   }, [sidebar, token]);
 
   useEffect(() => {
-    window.addEventListener("favorites-changed", loadFavs);
-    return () => window.removeEventListener("favorites-changed", loadFavs);
-  }, [token]);
+    const handler = () => loadFavs.current();
+    window.addEventListener("favorites-changed", handler);
+    return () => window.removeEventListener("favorites-changed", handler);
+  }, []);
 
   useEffect(() => {
     function onScroll() {
