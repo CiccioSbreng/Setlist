@@ -15,16 +15,69 @@ const EU_COUNTRIES = new Set([
   'SK','SI','BG','RS','LU','IE','LV','LT','EE','MT','CY'
 ])
 
+// Nomi italiani città → coordinate (fallback latlong per Ticketmaster)
 const CITY_LL = {
-  'roma':     { lat: 41.9028, lon: 12.4964 },
-  'milano':   { lat: 45.4642, lon: 9.1900 },
-  'napoli':   { lat: 40.8518, lon: 14.2681 },
-  'torino':   { lat: 45.0703, lon: 7.6869 },
-  'bologna':  { lat: 44.4949, lon: 11.3426 },
-  'firenze':  { lat: 43.7696, lon: 11.2558 },
-  'venezia':  { lat: 45.4408, lon: 12.3155 },
-  'genova':   { lat: 44.4056, lon: 8.9463 },
-  'palermo':  { lat: 38.1157, lon: 13.3613 }
+  // Italia
+  'roma':        { lat: 41.9028, lon: 12.4964 },
+  'milano':      { lat: 45.4642, lon: 9.1900  },
+  'napoli':      { lat: 40.8518, lon: 14.2681 },
+  'torino':      { lat: 45.0703, lon: 7.6869  },
+  'bologna':     { lat: 44.4949, lon: 11.3426 },
+  'firenze':     { lat: 43.7696, lon: 11.2558 },
+  'venezia':     { lat: 45.4408, lon: 12.3155 },
+  'genova':      { lat: 44.4056, lon: 8.9463  },
+  'palermo':     { lat: 38.1157, lon: 13.3613 },
+  // Europa (nomi italiani)
+  'parigi':      { lat: 48.8566, lon:  2.3522 },
+  'londra':      { lat: 51.5074, lon: -0.1278 },
+  'berlino':     { lat: 52.5200, lon: 13.4050 },
+  'monaco':      { lat: 48.1351, lon: 11.5820 }, // Monaco di Baviera
+  'amburgo':     { lat: 53.5753, lon: 10.0153 },
+  'bruxelles':   { lat: 50.8503, lon:  4.3517 },
+  'amsterdam':   { lat: 52.3676, lon:  4.9041 },
+  'barcellona':  { lat: 41.3851, lon:  2.1734 },
+  'madrid':      { lat: 40.4168, lon: -3.7038 },
+  'lisbona':     { lat: 38.7169, lon: -9.1399 },
+  'vienna':      { lat: 48.2082, lon: 16.3738 },
+  'zurigo':      { lat: 47.3769, lon:  8.5417 },
+  'ginevra':     { lat: 46.2044, lon:  6.1432 },
+  'praga':       { lat: 50.0755, lon: 14.4378 },
+  'varsavia':    { lat: 52.2297, lon: 21.0122 },
+  'atene':       { lat: 37.9838, lon: 23.7275 },
+  'dublino':     { lat: 53.3498, lon: -6.2603 },
+  'stoccolma':   { lat: 59.3293, lon: 18.0686 },
+  'oslo':        { lat: 59.9139, lon: 10.7522 },
+  'copenaghen':  { lat: 55.6761, lon: 12.5683 },
+  'helsinki':    { lat: 60.1699, lon: 24.9384 },
+  'budapest':    { lat: 47.4979, lon: 19.0402 },
+  'bucarest':    { lat: 44.4268, lon: 26.1025 },
+  'belgrado':    { lat: 44.8176, lon: 20.4633 },
+  'zagabria':    { lat: 45.8150, lon: 15.9819 },
+}
+
+// Nomi italiani nazioni → countryCode Ticketmaster
+const COUNTRY_MAP = {
+  'italia': 'IT', 'italy': 'IT',
+  'francia': 'FR', 'france': 'FR',
+  'spagna': 'ES', 'spain': 'ES',
+  'germania': 'DE', 'germany': 'DE',
+  'inghilterra': 'GB', 'uk': 'GB', 'regno unito': 'GB',
+  'portogallo': 'PT', 'portugal': 'PT',
+  'olanda': 'NL', 'paesi bassi': 'NL', 'netherlands': 'NL',
+  'belgio': 'BE', 'belgium': 'BE',
+  'austria': 'AT',
+  'svizzera': 'CH', 'switzerland': 'CH',
+  'grecia': 'GR', 'greece': 'GR',
+  'polonia': 'PL', 'poland': 'PL',
+  'svezia': 'SE', 'sweden': 'SE',
+  'norvegia': 'NO', 'norway': 'NO',
+  'danimarca': 'DK', 'denmark': 'DK',
+  'finlandia': 'FI', 'finland': 'FI',
+  'irlanda': 'IE', 'ireland': 'IE',
+  'ungheria': 'HU', 'hungary': 'HU',
+  'cechia': 'CZ', 'repubblica ceca': 'CZ',
+  'romania': 'RO',
+  'croazia': 'HR', 'croatia': 'HR',
 }
 
 function toIsoUTC(d){ if(!d) return; const dt=new Date(d); return dt.toISOString().slice(0,19)+'Z' }
@@ -156,6 +209,8 @@ router.get('/events', async (req, res) => {
   try {
     const { city = '', keyword = '', size = 12, page = 0, start, end, genre = '' } = req.query
 
+    const cityKey = city.trim().toLowerCase()
+    const mappedCountry = COUNTRY_MAP[cityKey]
     const isSearch = !!(city || keyword || genre)
 
     const baseParams = {
@@ -177,15 +232,26 @@ router.get('/events', async (req, res) => {
       return { ...out, events }
     }
 
+    // Ricerca per nome nazione (es. "Germania" → countryCode: 'DE', niente city)
+    if (mappedCountry) {
+      const p = { ...baseParams, countryCode: mappedCountry, keyword }
+      const k = JSON.stringify(p)
+      if (cache.has(k)) return res.json(cache.get(k))
+      const out = filterEU(await tmRequest(p))
+      cache.set(k, out)
+      return res.json(out)
+    }
+
     const p1 = { ...baseParams, city, keyword }
     const key1 = JSON.stringify(p1)
     if (cache.has(key1)) return res.json(cache.get(key1))
     let out = filterEU(await tmRequest(p1))
 
+    // Fallback latlong: copre nomi italiani di città europee (parigi, londra, berlino…)
     if ((out.events?.length ?? 0) === 0 && city) {
-      const ll = CITY_LL[city.trim().toLowerCase()]
+      const ll = CITY_LL[cityKey]
       if (ll) {
-        const p2 = { ...baseParams, latlong: `${ll.lat},${ll.lon}`, radius: 50, unit: 'km', keyword }
+        const p2 = { ...baseParams, latlong: `${ll.lat},${ll.lon}`, radius: 40, unit: 'km', keyword }
         const key2 = JSON.stringify(p2)
         if (cache.has(key2)) return res.json(cache.get(key2))
         out = filterEU(await tmRequest(p2))
