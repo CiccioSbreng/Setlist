@@ -23,7 +23,7 @@ export default function Navbar() {
   const lastY = useRef(0);
 
   const [searchQ, setSearchQ] = useState("");
-  const [nextEvent, setNextEvent] = useState(null);
+  const [upcomingFavs, setUpcomingFavs] = useState([]);
 
   useEffect(() => {
     function handleAuthChange() {
@@ -33,17 +33,28 @@ export default function Navbar() {
     return () => window.removeEventListener("auth-changed", handleAuthChange);
   }, []);
 
-  useEffect(() => {
-    if (!sidebar || !token) { setNextEvent(null); return; }
+  function loadFavs() {
+    if (!token) { setUpcomingFavs([]); return; }
     getFavorites()
       .then((list) => {
         const upcoming = list
           .filter((f) => daysUntil(f.date) !== null)
-          .sort((a, b) => new Date(a.date) - new Date(b.date));
-        setNextEvent(upcoming[0] ?? null);
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .slice(0, 4);
+        setUpcomingFavs(upcoming);
       })
       .catch(() => {});
+  }
+
+  useEffect(() => {
+    if (!sidebar) return;
+    loadFavs();
   }, [sidebar, token]);
+
+  useEffect(() => {
+    window.addEventListener("favorites-changed", loadFavs);
+    return () => window.removeEventListener("favorites-changed", loadFavs);
+  }, [token]);
 
   useEffect(() => {
     function onScroll() {
@@ -99,8 +110,6 @@ export default function Navbar() {
     ? ` nav--sidebar${sidebarOut ? " nav--sidebar-out" : ""}`
     : "";
 
-  const days = nextEvent ? daysUntil(nextEvent.date) : null;
-
   return (
     <nav className={`nav${hidden ? " nav--hidden" : ""}${sidebarClass}`}>
 
@@ -146,23 +155,28 @@ export default function Navbar() {
             )}
           </nav>
 
-          {/* ── Prossimo evento ── */}
-          {nextEvent && days !== null && (
-            <Link to={`/event/${nextEvent.eventId}`} className="nav__next">
-              {nextEvent.image && (
-                <img src={nextEvent.image} alt={nextEvent.name} className="nav__next-img" />
-              )}
-              <div className="nav__next-body">
-                <div className="nav__next-label">Prossimo show</div>
-                <div className="nav__next-name">{nextEvent.name}</div>
-                <div className="nav__next-meta">
-                  {nextEvent.city && <span>{nextEvent.city}</span>}
-                  <span className="nav__next-days">
-                    {days === 0 ? "oggi!" : `tra ${days} ${days === 1 ? "giorno" : "giorni"}`}
-                  </span>
-                </div>
-              </div>
-            </Link>
+          {/* ── Prossimi eventi salvati ── */}
+          {upcomingFavs.length > 0 && (
+            <div className="nav__favs">
+              <div className="nav__favs-label">In arrivo</div>
+              {upcomingFavs.map((f, i) => {
+                const d = daysUntil(f.date);
+                return (
+                  <Link key={f.eventId} to={`/event/${f.eventId}`} className={`nav__fav${i === 0 ? " nav__fav--next" : ""}`}>
+                    {f.image && <img src={f.image} alt={f.name} className="nav__fav-img" />}
+                    <div className="nav__fav-body">
+                      <div className="nav__fav-name">{f.name}</div>
+                      <div className="nav__fav-meta">
+                        {f.city && <span>{f.city}</span>}
+                        <span className="nav__fav-days">
+                          {d === 0 ? "oggi" : `${d}g`}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           )}
 
           <div className="nav__sidebar-foot">

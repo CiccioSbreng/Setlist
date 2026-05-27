@@ -27,6 +27,7 @@ export function useEventFavorite(id, ev) {
         setIsFav(false);
         setFavId(null);
         toast("Rimosso dai preferiti.");
+        window.dispatchEvent(new Event("favorites-changed"));
       } else if (ev) {
         const created = await addFavorite({
           eventId: ev.id, name: ev.name, image: ev.image,
@@ -35,6 +36,7 @@ export function useEventFavorite(id, ev) {
         setIsFav(true);
         setFavId(created._id);
         toast.success("Aggiunto ai preferiti!");
+        window.dispatchEvent(new Event("favorites-changed"));
       }
     } catch (e) {
       toast.error(e.message || "Errore.");
