@@ -9,6 +9,12 @@ const cache = new NodeCache({ stdTTL: 60 * 15 }) // 15 minuti
 const TM_BASE = 'https://app.ticketmaster.com/discovery/v2'
 const API_KEY = process.env.TICKETMASTER_API_KEY
 
+const EU_COUNTRIES = new Set([
+  'IT','FR','DE','ES','GB','NL','BE','AT','CH','PT',
+  'SE','NO','DK','FI','PL','CZ','HU','RO','GR','HR',
+  'SK','SI','BG','RS','LU','IE','LV','LT','EE','MT','CY'
+])
+
 const CITY_LL = {
   'roma':     { lat: 41.9028, lon: 12.4964 },
   'milano':   { lat: 45.4642, lon: 9.1900 },
@@ -80,7 +86,7 @@ function normalizeStatus(code) {
 
 async function tmRequest(params) {
   const { data } = await axios.get(`${TM_BASE}/events.json`, { params })
-  const events = (data?._embedded?.events || []).map(ev => {
+  const raw = (data?._embedded?.events || []).map(ev => {
     const v = ev._embedded?.venues?.[0]
     return {
       id: ev.id,
@@ -89,6 +95,7 @@ async function tmRequest(params) {
       time: ev.dates?.start?.localTime || null,
       venue: v?.name,
       city: v?.city?.name,
+      country: v?.country?.countryCode || null,
       lat: num(v?.location?.latitude),
       lon: num(v?.location?.longitude),
       address: v?.address?.line1 || null,
@@ -103,10 +110,10 @@ async function tmRequest(params) {
   })
   return {
     page: data?.page?.number ?? 0,
-    size: data?.page?.size ?? events.length,
+    size: data?.page?.size ?? raw.length,
     totalPages: data?.page?.totalPages ?? 1,
-    totalElements: data?.page?.totalElements ?? events.length,
-    events
+    totalElements: data?.page?.totalElements ?? raw.length,
+    events: raw
   }
 }
 
@@ -149,22 +156,31 @@ router.get('/events', async (req, res) => {
   try {
     const { city = '', keyword = '', size = 12, page = 0, start, end, genre = '' } = req.query
 
+    const isSearch = !!(city || keyword || genre)
+
     const baseParams = {
       apikey: API_KEY,
-      countryCode: 'IT',
       classificationName: genre || 'music',
       size: Math.min(Number(size) || 12, 100),
       page: Number(page) || 0,
       sort: 'date,asc',
       startDateTime: toIsoUTC(start),
       endDateTime: toIsoUTC(end),
-      locale: '*'
+      locale: '*',
+      // Senza ricerca: mostra solo Italia. Con ricerca: aperto all'Europa (filtro post-fetch)
+      ...(!isSearch && { countryCode: 'IT' })
+    }
+
+    const filterEU = (out) => {
+      if (!isSearch) return out
+      const events = out.events.filter(ev => !ev.country || EU_COUNTRIES.has(ev.country))
+      return { ...out, events }
     }
 
     const p1 = { ...baseParams, city, keyword }
     const key1 = JSON.stringify(p1)
     if (cache.has(key1)) return res.json(cache.get(key1))
-    let out = await tmRequest(p1)
+    let out = filterEU(await tmRequest(p1))
 
     if ((out.events?.length ?? 0) === 0 && city) {
       const ll = CITY_LL[city.trim().toLowerCase()]
@@ -172,7 +188,7 @@ router.get('/events', async (req, res) => {
         const p2 = { ...baseParams, latlong: `${ll.lat},${ll.lon}`, radius: 50, unit: 'km', keyword }
         const key2 = JSON.stringify(p2)
         if (cache.has(key2)) return res.json(cache.get(key2))
-        out = await tmRequest(p2)
+        out = filterEU(await tmRequest(p2))
         cache.set(key2, out)
         return res.json(out)
       }
