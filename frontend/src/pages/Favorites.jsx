@@ -18,6 +18,8 @@ export default function FavoritesPage() {
 
   const token = localStorage.getItem("token");
 
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   useEffect(() => {
     if (!token) {
       setLoading(false);

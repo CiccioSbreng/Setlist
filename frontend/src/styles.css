@@ -531,7 +531,6 @@ img {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    flex: 1;
   }
 
   .nav__sidebar-links .nav-link {
@@ -573,10 +572,13 @@ img {
   .nav__favs {
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
     margin: 10px 0;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
   }
   .nav__favs-label {
     font-size: 0.67rem;
@@ -587,14 +589,21 @@ img {
     padding: 0 6px;
     margin-bottom: 4px;
   }
+  .nav__favs-empty {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    padding: 4px 6px;
+    margin: 0;
+  }
   .nav__fav {
     display: flex;
     gap: 8px;
     align-items: center;
-    padding: 6px 6px;
+    padding: 6px;
     border-radius: var(--r-sm);
     text-decoration: none;
     transition: background 0.15s;
+    flex-shrink: 0;
   }
   .nav__fav--next {
     border: 1px solid rgba(0,212,138,0.25);
@@ -2483,15 +2492,11 @@ input.input[type="date"] {
   /* Barra sticky sotto la navbar */
   .ed-bar:not(.is-floating) {
     position: sticky;
-    top: 70px;
+    top: 10px;
     margin: 0 0 16px;
     padding: 6px;
     border-radius: var(--r-xl);
     z-index: 45;
-  }
-  /* Quando la navbar si nasconde, la barra sale in cima */
-  .nav.nav--hidden ~ main.app-main .ed-bar:not(.is-floating) {
-    top: 10px;
   }
   /* Tab occupano tutta la larghezza equamente */
   .ed-bar:not(.is-floating) .ed-bar__nav {

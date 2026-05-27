@@ -63,7 +63,7 @@ export default function Navbar() {
 
       if (isMobile) {
         if (y > lastY.current && y > 80) setHidden(true);
-        else setHidden(false);
+        else if (y <= 5) setHidden(false);
       } else {
         setHidden(false);
         if (y > 110 && !sidebar && !sidebarOut) {
@@ -155,27 +155,35 @@ export default function Navbar() {
             )}
           </nav>
 
-          {/* ── Prossimi eventi salvati ── */}
-          {upcomingFavs.length > 0 && (
+          {/* ── Preferiti in arrivo ── */}
+          {token && (
             <div className="nav__favs">
               <div className="nav__favs-label">In arrivo</div>
-              {upcomingFavs.map((f, i) => {
-                const d = daysUntil(f.date);
-                return (
-                  <Link key={f.eventId} to={`/event/${f.eventId}`} className={`nav__fav${i === 0 ? " nav__fav--next" : ""}`}>
-                    {f.image && <img src={f.image} alt={f.name} className="nav__fav-img" />}
-                    <div className="nav__fav-body">
-                      <div className="nav__fav-name">{f.name}</div>
-                      <div className="nav__fav-meta">
-                        {f.city && <span>{f.city}</span>}
-                        <span className="nav__fav-days">
-                          {d === 0 ? "oggi" : `${d}g`}
-                        </span>
+              {upcomingFavs.length === 0 ? (
+                <p className="nav__favs-empty">Nessun evento salvato</p>
+              ) : (
+                upcomingFavs.map((f, i) => {
+                  const d = daysUntil(f.date);
+                  return (
+                    <Link
+                      key={f.eventId}
+                      to={`/event/${f.eventId}`}
+                      className={`nav__fav${i === 0 ? " nav__fav--next" : ""}`}
+                    >
+                      {f.image && <img src={f.image} alt={f.name} className="nav__fav-img" />}
+                      <div className="nav__fav-body">
+                        <div className="nav__fav-name">{f.name}</div>
+                        <div className="nav__fav-meta">
+                          {f.city && <span>{f.city}</span>}
+                          <span className="nav__fav-days">
+                            {d === 0 ? "oggi" : `${d}g`}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                );
-              })}
+                    </Link>
+                  );
+                })
+              )}
             </div>
           )}
 
