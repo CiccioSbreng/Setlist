@@ -1,19 +1,28 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { formatWhen } from "../lib/format";
+import { formatWhen, compactNumber } from "../lib/format";
 import {
   ArrowRightIcon, CalendarIcon, FacebookIcon, GlobeIcon, InstagramIcon,
   ListMusicIcon, MusicIcon, SpotifyIcon, XIcon, YoutubeIcon,
 } from "./Icons";
 
-function compact(n) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".0", "")}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(".0", "")}K`;
-  return String(n);
-}
 
 export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, ytVideos, setlistData, otherDates, spotifyLoading, ytLoading, ytError }) {
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [bioOverflows, setBioOverflows] = useState(false);
+  const bioRef = useRef(null);
+
+  useEffect(() => {
+    setBioExpanded(false);
+    setBioOverflows(false);
+    if (!bioRef.current || !artistBio) return;
+    const el = bioRef.current;
+    const check = () => setBioOverflows(el.scrollHeight > el.clientHeight + 2);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [artistBio]);
 
   return (
     <div id="section-artista" className="ed-section ed-stack">
@@ -35,18 +44,24 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
               </h2>
               {artist.genre && <p className="ed-aphero__genre">{artist.genre}</p>}
 
-              {spotifyArtist && (spotifyArtist.followers > 0 || spotifyArtist.genres?.length > 0) && (
+              {spotifyArtist && (spotifyArtist.followers > 0 || spotifyArtist.genres?.length > 0 || spotifyArtist.popularity > 0) && (
                 <div className="ed-stats">
                   {spotifyArtist.followers > 0 && (
                     <div className="ed-stat">
-                      <b>{compact(spotifyArtist.followers)}</b>
+                      <b>{compactNumber(spotifyArtist.followers)}</b>
                       <span>follower Spotify</span>
                     </div>
                   )}
-                  {spotifyArtist.genres?.[0] && (
+                  {spotifyArtist.popularity > 0 && (
                     <div className="ed-stat">
-                      <b>{spotifyArtist.genres[0]}</b>
-                      <span>genere</span>
+                      <b>{spotifyArtist.popularity}<small style={{ fontWeight: 400, opacity: 0.6 }}>/100</small></b>
+                      <span>popolarità</span>
+                    </div>
+                  )}
+                  {spotifyArtist.genres?.length > 0 && (
+                    <div className="ed-stat ed-stat--wide">
+                      <b>{spotifyArtist.genres.slice(0, 3).join(" · ")}</b>
+                      <span>generi</span>
                     </div>
                   )}
                 </div>
@@ -54,10 +69,12 @@ export default function ArtistSection({ ev, artist, artistBio, spotifyArtist, yt
 
               {artistBio && (
                 <>
-                  <p className={`ed-aphero__bio${bioExpanded ? " is-open" : ""}`}>{artistBio}</p>
-                  <button type="button" className="ed-link-btn" onClick={() => setBioExpanded((v) => !v)}>
-                    {bioExpanded ? "Riduci ▲" : "Leggi di più ▼"}
-                  </button>
+                  <p ref={bioRef} className={`ed-aphero__bio${bioExpanded ? " is-open" : ""}`}>{artistBio}</p>
+                  {bioOverflows && (
+                    <button type="button" className="ed-link-btn" onClick={() => setBioExpanded((v) => !v)}>
+                      {bioExpanded ? "Riduci ▲" : "Leggi di più ▼"}
+                    </button>
+                  )}
                 </>
               )}
 

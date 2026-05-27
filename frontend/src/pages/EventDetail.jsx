@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { toast } from "sonner";
 import { getEvent } from "../lib/api";
 import { formatWhen, formatPrice } from "../lib/format";
 import { openGoogleCalendar } from "../lib/calendar";
@@ -71,7 +72,6 @@ export default function EventDetail() {
   const [loading,  setLoading]  = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error,    setError]    = useState("");
-  const [shareMsg, setShareMsg] = useState("");
   const [activeTab, setActiveTab] = useState("evento");
 
   const media   = useArtistMedia(ev);
@@ -131,9 +131,12 @@ export default function EventDetail() {
     if (navigator.share) {
       try { await navigator.share({ title: ev.name, url: window.location.href }); } catch {}
     } else {
-      await navigator.clipboard.writeText(window.location.href).catch(() => {});
-      setShareMsg("Link copiato!");
-      setTimeout(() => setShareMsg(""), 2500);
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copiato negli appunti!");
+      } catch {
+        toast.error("Impossibile copiare il link.");
+      }
     }
   }
 
@@ -232,7 +235,7 @@ export default function EventDetail() {
               <HeartIcon size={18} filled={isFav} />{isFav ? "Nei preferiti" : "Salva"}
             </button>
             <button type="button" className="btn btn--ghost" onClick={share}>
-              <ShareIcon size={18} />{shareMsg || "Condividi"}
+              <ShareIcon size={18} />Condividi
             </button>
             <button type="button" className="btn btn--ghost" onClick={() => openGoogleCalendar(ev)}>
               <DownloadIcon size={18} />Calendario

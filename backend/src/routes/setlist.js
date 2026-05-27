@@ -13,16 +13,22 @@ router.get('/', async (req, res) => {
       headers: { 'x-api-key': key, Accept: 'application/json' },
     });
 
-    const setlist = (r.data.setlist || []).find((s) =>
-      s.sets?.set?.some((set) => set.song?.length > 0)
-    );
+    const countSongs = (s) =>
+      (s.sets?.set || []).reduce(
+        (acc, set) => acc + (set.song || []).filter((so) => so.name).length, 0
+      );
+
+    const allWithSongs = (r.data.setlist || []).filter((s) => countSongs(s) > 0);
+    // Preferisce il più recente con almeno 4 canzoni; fallback al più recente con qualcosa
+    const setlist = allWithSongs.find((s) => countSongs(s) >= 4) ?? allWithSongs[0] ?? null;
     if (!setlist) return res.json({ songs: [], event: null });
 
+    // encore è proprietà del set (blocco), non della singola canzone
     const songs = setlist.sets.set
-      .flatMap((s) => s.song || [])
+      .flatMap((set) => (set.song || []).map((song) => ({ ...song, _encore: !!set.encore })))
       .filter((s) => s.name)
-      .slice(0, 8)
-      .map((s) => ({ name: s.name, encore: !!s.encore }));
+      .slice(0, 15)
+      .map((s) => ({ name: s.name, encore: s._encore }));
 
     res.json({
       songs,
@@ -32,8 +38,9 @@ router.get('/', async (req, res) => {
         city: setlist.venue?.city?.name,
       },
     });
-  } catch {
-    res.status(500).json({ error: 'fetch failed' });
+  } catch (err) {
+    const status = err.response?.status === 404 ? 404 : 502;
+    res.status(status).json({ error: 'fetch failed' });
   }
 });
 

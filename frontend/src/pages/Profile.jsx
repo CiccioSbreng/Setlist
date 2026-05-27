@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { getProfile, updateProfile, updatePassword, getFavorites } from "../lib/api";
 import { UserIcon, HeartIcon, MusicIcon, LockIcon } from "../components/Icons";
 
@@ -66,8 +67,10 @@ export default function ProfilePage() {
       const updated = await updateProfile(form);
       setProfile(updated);
       setMsg({ text: "Profilo aggiornato!", ok: true });
+      toast.success("Profilo aggiornato!");
     } catch (err) {
       setMsg({ text: err.message, ok: false });
+      toast.error(err.message || "Errore aggiornamento profilo.");
     } finally {
       setSaving(false);
     }
@@ -83,8 +86,10 @@ export default function ProfilePage() {
       await updatePassword(pwForm.current, pwForm.next);
       setPwMsg({ text: "Password aggiornata!", ok: true });
       setPwForm({ current: "", next: "", confirm: "" });
+      toast.success("Password aggiornata!");
     } catch (err) {
       setPwMsg({ text: err.message, ok: false });
+      toast.error(err.message || "Errore aggiornamento password.");
     } finally {
       setSavingPw(false);
     }

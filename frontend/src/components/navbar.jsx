@@ -44,7 +44,7 @@ export default function Navbar() {
         const upcoming = list
           .filter((f) => daysUntil(f.date) !== null)
           .sort((a, b) => new Date(a.date) - new Date(b.date))
-          .slice(0, 4);
+          .slice(0, 12);
         setUpcomingFavs(upcoming);
       })
       .catch(() => {});
@@ -65,7 +65,7 @@ export default function Navbar() {
           [...prev, fav]
             .filter((f) => daysUntil(f.date) !== null)
             .sort((a, b) => new Date(a.date) - new Date(b.date))
-            .slice(0, 4)
+            .slice(0, 12)
         );
       } else if (type === "remove" && eventId) {
         setUpcomingFavs((prev) => prev.filter((f) => f.eventId !== eventId));
@@ -77,24 +77,35 @@ export default function Navbar() {
     return () => window.removeEventListener("favorites-changed", handler);
   }, []);
 
+  // Refs per leggere lo stato aggiornato dentro il listener senza ricrearlo
+  const sidebarRef    = useRef(false);
+  const sidebarOutRef = useRef(false);
+  useEffect(() => { sidebarRef.current    = sidebar;    }, [sidebar]);
+  useEffect(() => { sidebarOutRef.current = sidebarOut; }, [sidebarOut]);
+
   useEffect(() => {
     function onScroll() {
-      const y = window.scrollY;
-      const isMobile = window.innerWidth <= 820;
+      const y          = window.scrollY;
+      const isMobile   = window.innerWidth <= 820;
+      const isShortPage = document.documentElement.scrollHeight <= window.innerHeight + 80;
 
       if (isMobile) {
         if (y > lastY.current && y > 80) setHidden(true);
         else if (y <= 5) setHidden(false);
       } else {
         setHidden(false);
-        if (y > 110 && !sidebar && !sidebarOut) {
+        if ((y > 110 || isShortPage) && !sidebarRef.current && !sidebarOutRef.current) {
+          sidebarRef.current = true;
           setSidebar(true);
           setSidebarOut(false);
           clearTimeout(sidebarTimer.current);
-        } else if (y <= 50 && sidebar) {
+        } else if (y <= 50 && !isShortPage && sidebarRef.current && !sidebarOutRef.current) {
+          sidebarOutRef.current = true;
           setSidebarOut(true);
           clearTimeout(sidebarTimer.current);
           sidebarTimer.current = setTimeout(() => {
+            sidebarRef.current    = false;
+            sidebarOutRef.current = false;
             setSidebar(false);
             setSidebarOut(false);
           }, 360);
@@ -102,13 +113,18 @@ export default function Navbar() {
       }
       lastY.current = y;
     }
+
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
+    // Controlla subito: gestisce pagine corte e navigate-back già scrollate
+    onScroll();
+
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      clearTimeout(sidebarTimer.current);
     };
-  }, [sidebar, sidebarOut]);
+  }, []); // registrato una volta sola — usa refs per lo stato
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -122,6 +138,7 @@ export default function Navbar() {
     const q = searchQ.trim();
     if (!q) return;
     navigate(`/home?q=${encodeURIComponent(q)}`);
+    window.dispatchEvent(new CustomEvent("sidebar-search", { detail: { q } }));
     setSearchQ("");
   }
 

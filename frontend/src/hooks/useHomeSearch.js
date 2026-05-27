@@ -162,6 +162,18 @@ export function useHomeSearch() {
   }, []);
 
   useEffect(() => {
+    function onSidebarSearch(e) {
+      const q = e.detail?.q || "";
+      const next = { city: "", keyword: q, genre: "", start: "", end: "", size: 12, page: 0 };
+      setForm(next);
+      runSearch(0, next);
+    }
+    window.addEventListener("sidebar-search", onSidebarSearch);
+    return () => window.removeEventListener("sidebar-search", onSidebarSearch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     const city = form.city.trim();
     if (city.length < 2) { setCitySugg([]); return; }
     const tid = setTimeout(() => {

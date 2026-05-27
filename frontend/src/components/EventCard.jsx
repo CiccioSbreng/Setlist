@@ -1,8 +1,8 @@
 // frontend/src/components/EventCard.jsx
 
-import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatPrice } from "../lib/format";
+import { useCountdown } from "../hooks/useCountdown";
 import {
   CalendarIcon,
   ClockIcon,
@@ -16,49 +16,6 @@ const MONTHS = [
   "GEN", "FEB", "MAR", "APR", "MAG", "GIU",
   "LUG", "AGO", "SET", "OTT", "NOV", "DIC",
 ];
-
-const pad = (n) => String(n).padStart(2, "0");
-
-function isToday(date) {
-  const d = new Date(date.includes("T") ? date : `${date}T12:00:00`);
-  const n = new Date();
-  return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
-}
-
-function useCardCountdown(date, time) {
-  const [label, setLabel] = useState(null);
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!date) return;
-    const target = new Date(date.includes("T") ? date : `${date}T${time || "20:00:00"}`);
-    if (isNaN(target)) return;
-
-    if (target <= Date.now() && isToday(date)) {
-      setLabel("started");
-      return;
-    }
-
-    function tick() {
-      const diff = target - Date.now();
-      if (diff <= 0) {
-        clearInterval(ref.current);
-        setLabel(isToday(date) ? "started" : null);
-        return;
-      }
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      if (d > 0)      setLabel(`${d}g ${pad(h)}h ${pad(m)}m`);
-      else if (h > 0) setLabel(`${pad(h)}h ${pad(m)}m ${pad(s)}s`);
-      else            setLabel(`${pad(m)}m ${pad(s)}s`);
-    }
-    tick();
-    ref.current = setInterval(tick, 1000);
-    return () => clearInterval(ref.current);
-  }, [date, time]);
-  return label;
-}
 
 function parseWhen(date, time) {
   if (!date) return null;
@@ -107,7 +64,8 @@ export default function EventCard({
   const when = parseWhen(ev.date, ev.time);
   const price = formatPrice(ev.priceMin, ev.priceMax, ev.currency);
   const detailId = ev.eventId || ev.id;
-  const cdLabel = useCardCountdown(ev.date, ev.time);
+  const cdLabel = useCountdown(ev.date, ev.time);
+  const isStarted = cdLabel === "🔴 Iniziato";
 
 
   const favAction = onRemove || onToggleFavorite || onAddFavorite;
@@ -162,7 +120,7 @@ export default function EventCard({
 
         {ev.status === "cancelled" ? (
           <div className="ev-card__cancelled-badge">Annullato</div>
-        ) : cdLabel === "started" ? (
+        ) : isStarted ? (
           <div className="ev-card__incorso-badge"><span className="ev-card__incorso-dot" />In Corso</div>
         ) : cdLabel ? (
           <div className="ev-card__countdown-badge">⏱ {cdLabel}</div>
@@ -216,7 +174,7 @@ export default function EventCard({
               </Link>
             )}
           </div>
-          {cdLabel !== "started" && (
+          {!isStarted && (
             <div className="ev-card__foot-right">
               {price && ev.status !== "cancelled" && (
                 <span className="ev-card__foot-price">{price}</span>

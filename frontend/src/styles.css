@@ -100,6 +100,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -489,7 +490,7 @@ img {
     top: 0;
     left: 0;
     bottom: 0;
-    width: 180px;
+    width: 230px;
     height: 100dvh;
     border-bottom: none;
     border-right: 1px solid var(--border);
@@ -499,12 +500,14 @@ img {
     flex-direction: column;
   }
 
-  .nav.nav--sidebar ~ main.app-main {
-    margin-left: 180px;
+  .nav.nav--sidebar ~ main.app-main,
+  .nav.nav--sidebar ~ .footer {
+    margin-left: 230px;
     transition: margin-left 0.42s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .nav.nav--sidebar.nav--sidebar-out ~ main.app-main {
+  .nav.nav--sidebar.nav--sidebar-out ~ main.app-main,
+  .nav.nav--sidebar.nav--sidebar-out ~ .footer {
     margin-left: 0;
     transition: margin-left 0.34s cubic-bezier(0.4, 0, 1, 1);
   }
@@ -4758,11 +4761,13 @@ input.input[type="date"] {
   line-height: 1.65;
   color: rgba(255,255,255,0.72);
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .ed-aphero__bio.is-open { -webkit-line-clamp: unset; overflow: visible; }
+
+.ed-stat--wide { flex: 0 0 100%; }
 .ed-aphero__links {
   display: flex;
   flex-wrap: wrap;
@@ -5598,42 +5603,57 @@ input.input[type="date"] {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0;
-    margin: 14px 0 0;
+    position: fixed;
+    bottom: calc(72px + 10px + env(safe-area-inset-bottom, 0px));
+    left: 12px;
+    right: 12px;
+    z-index: 55;
+    padding: 10px 12px;
+    background: rgba(10, 11, 17, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: var(--r-xl);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,212,138,0.08);
+    animation: cta-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes cta-slide-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   .ed-sticky-cta__tickets {
     flex: 1;
     justify-content: center;
+    font-size: 0.9rem;
+    padding: 13px 16px;
+    border-radius: var(--r-lg);
   }
 
   .ed-sticky-cta__fav {
     flex-shrink: 0;
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     padding: 0;
     border-radius: var(--r-lg);
-  }
-
-  /* In EventDetail riduci lo spazio vuoto in fondo sopra al footer */
-  .ed-stage ~ * + .ed-sticky-cta,
-  .ed-sticky-cta:last-child {
-    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   [data-sonner-toaster] {
-    bottom: 90px !important;
+    bottom: 160px !important;
   }
 }
 
-/* Riduce il padding-block della sezione EventDetail su mobile per evitare
-   un vuoto eccessivo tra il CTA "Controlla disponibilità" e il footer. */
 .section:has(.ed-stage) {
   padding-top: 16px;
 }
 @media (max-width: 820px) {
+  /* bottom-nav 72px + gap 10px + cta ~70px + respiro 16px = ~168px */
   .section:has(.ed-stage) {
-    padding-block: 12px 16px;
+    padding-block: 12px calc(168px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -5815,4 +5835,40 @@ input.input[type="date"] {
 }
 @media (max-width: 480px) {
   .ed-countdown__num { font-size: 1.6rem; }
+}
+
+/* =========================================================
+   Back-to-top button
+   ========================================================= */
+.back-to-top {
+  position: fixed;
+  bottom: 88px;
+  right: 24px;
+  z-index: 120;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 212, 138, 0.35);
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  opacity: 0.9;
+}
+.back-to-top:hover {
+  transform: translateY(-3px);
+  opacity: 1;
+  box-shadow: 0 6px 28px rgba(0, 212, 138, 0.5);
+}
+.back-to-top:active {
+  transform: translateY(0);
+}
+@media (min-width: 821px) {
+  .back-to-top { bottom: 32px; }
 }

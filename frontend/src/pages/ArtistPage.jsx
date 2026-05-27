@@ -2,18 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useArtistMedia } from "../hooks/useArtistMedia";
 import { getArtistEvents } from "../lib/api";
-import { formatWhen, formatPrice } from "../lib/format";
+import { formatWhen, formatPrice, compactNumber } from "../lib/format";
 import {
   ArrowRightIcon, CalendarIcon, FacebookIcon, GlobeIcon, InstagramIcon,
   ListMusicIcon, MusicIcon, PinIcon, SearchIcon, SpotifyIcon,
   TicketIcon, XIcon, YoutubeIcon,
 } from "../components/Icons";
 
-function compact(n) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".0", "")}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(".0", "")}K`;
-  return String(n);
-}
 
 function ArtistSkeleton() {
   return (
@@ -107,7 +102,7 @@ export default function ArtistPage() {
                 <div className="ed-stats">
                   {spotifyArtist.followers > 0 && (
                     <div className="ed-stat">
-                      <b>{compact(spotifyArtist.followers)}</b>
+                      <b>{compactNumber(spotifyArtist.followers)}</b>
                       <span>follower Spotify</span>
                     </div>
                   )}
