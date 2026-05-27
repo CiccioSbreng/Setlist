@@ -69,6 +69,7 @@ export function useHomeSearch() {
         await removeFavorite(favId);
         setFavMap((m) => { const next = { ...m }; delete next[ev.id]; return next; });
         toast(`"${ev.name}" rimosso dai preferiti`);
+        window.dispatchEvent(new CustomEvent("favorites-changed", { detail: { type: "remove", eventId: ev.id } }));
       } catch (e) { toast.error(e.message || "Non è stato possibile rimuovere il preferito."); }
       return;
     }
@@ -79,6 +80,9 @@ export function useHomeSearch() {
       });
       setFavMap((m) => ({ ...m, [ev.id]: created._id }));
       toast.success(`"${ev.name}" aggiunto ai preferiti`);
+      window.dispatchEvent(new CustomEvent("favorites-changed", {
+        detail: { type: "add", fav: { eventId: ev.id, name: ev.name, image: ev.image, date: ev.date, city: ev.city } },
+      }));
     } catch (e) { toast.error(e.message || "Non è stato possibile salvare il preferito."); }
   }
 

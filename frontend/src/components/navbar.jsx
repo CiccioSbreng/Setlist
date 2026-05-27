@@ -56,7 +56,23 @@ export default function Navbar() {
   }, [sidebar, token]);
 
   useEffect(() => {
-    const handler = () => loadFavs.current();
+    const handler = (e) => {
+      const { type, fav, eventId } = e.detail || {};
+      if (type === "add" && fav) {
+        const d = daysUntil(fav.date);
+        if (d === null) return;
+        setUpcomingFavs((prev) =>
+          [...prev, fav]
+            .filter((f) => daysUntil(f.date) !== null)
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .slice(0, 4)
+        );
+      } else if (type === "remove" && eventId) {
+        setUpcomingFavs((prev) => prev.filter((f) => f.eventId !== eventId));
+      } else {
+        loadFavs.current();
+      }
+    };
     window.addEventListener("favorites-changed", handler);
     return () => window.removeEventListener("favorites-changed", handler);
   }, []);
