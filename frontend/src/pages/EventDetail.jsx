@@ -162,8 +162,6 @@ export default function EventDetail() {
   return (
     <section className="section">
       <div className="wrap">
-        <Link to="/home" className="ed-back">← Tutti gli eventi</Link>
-
         {/* ── HERO 3D ── */}
         <div ref={stageRef} className="ed-stage">
           <div ref={heroRef} className={`ed-hero${!ev.image ? " ed-hero--noimg" : ""}`}>
@@ -179,6 +177,7 @@ export default function EventDetail() {
             )}
             <div className="ed-hero__glow" aria-hidden="true" />
             <div className="ed-hero__overlay">
+              <Link to="/home" className="ed-back">← Tutti gli eventi</Link>
               <div className="ed-hero__inner">
                 <div className="ed__tags">
                   {ev.segment && <span className="tag">{ev.segment}</span>}
