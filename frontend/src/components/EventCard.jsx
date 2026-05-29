@@ -119,9 +119,17 @@ export default function EventCard({
         )}
 
         {ev.status === "cancelled" ? (
-          <div className="ev-card__cancelled-badge">Annullato</div>
+          <div className="ev-card__status-badge ev-card__status-badge--cancelled">Annullato</div>
+        ) : ev.status === "postponed" ? (
+          <div className="ev-card__status-badge ev-card__status-badge--postponed">Posticipato</div>
+        ) : ev.status === "rescheduled" ? (
+          <div className="ev-card__status-badge ev-card__status-badge--rescheduled">Riprogrammato</div>
         ) : isStarted ? (
           <div className="ev-card__incorso-badge"><span className="ev-card__incorso-dot" />In Corso</div>
+        ) : ev.status === "offsale" ? (
+          <div className="ev-card__status-badge ev-card__status-badge--offsale">Esaurito</div>
+        ) : ev.limited ? (
+          <div className="ev-card__status-badge ev-card__status-badge--limited">Ultimi posti</div>
         ) : cdLabel ? (
           <div className="ev-card__countdown-badge">⏱ {cdLabel}</div>
         ) : price ? (
@@ -176,13 +184,17 @@ export default function EventCard({
           </div>
           {!isStarted && (
             <div className="ev-card__foot-right">
-              {price && ev.status !== "cancelled" && (
+              {price && ev.status !== "cancelled" && ev.status !== "offsale" && (
                 <span className="ev-card__foot-price">{price}</span>
               )}
               {ev.status === "cancelled" ? (
-                <button type="button" className="btn btn--sm ev-card__cancelled-btn" disabled>
-                  Annullato
-                </button>
+                <button type="button" className="btn btn--sm ev-card__status-btn" disabled>Annullato</button>
+              ) : ev.status === "offsale" ? (
+                <button type="button" className="btn btn--sm ev-card__status-btn ev-card__status-btn--offsale" disabled>Esaurito</button>
+              ) : ev.status === "postponed" ? (
+                <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Aggiornamenti →</a>
+              ) : ev.status === "rescheduled" ? (
+                <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">Nuova data →</a>
               ) : ev.url ? (
                 <a
                   href={ev.url}

@@ -6,6 +6,7 @@ import { Stagger, StaggerItem } from "../components/Motion";
 import {
   SearchIcon, PinIcon, MusicIcon, HeartIcon, SparkIcon,
   TicketIcon, ArrowRightIcon, RefreshIcon, CloseIcon, SpotifyIcon, YoutubeIcon,
+  CalendarIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -25,10 +26,11 @@ export default function Home() {
   const {
     form, update, data, visibleEvents, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
-    quickRange, applyQuickRange, applyGenre, clearDates, clearSearch,
+    artistSugg, showArtistSugg, setShowArtistSugg,
+    applyGenre, clearDates, clearSearch,
     runSearch, goToPage, scrollToSearch,
     favMap, toggleFavorite,
-    hasResults, hasActiveFilters, hasSearch, isShowcase,
+    hasResults, hasSearch, isShowcase,
   } = useHomeSearch();
 
 
@@ -134,42 +136,78 @@ export default function Home() {
 
               <span className="sb-div" aria-hidden="true" />
 
-              <label className="sb-seg" htmlFor="keyword">
+              <label className="sb-seg sb-seg--autocomplete" htmlFor="keyword">
                 <MusicIcon size={20} className="sb-seg__ic" />
                 <input
                   id="keyword"
                   className="sb-seg__input"
                   placeholder="Artista, band o genere"
                   value={form.keyword}
-                  onChange={(e) => update({ keyword: e.target.value })}
+                  autoComplete="off"
+                  onChange={(e) => { update({ keyword: e.target.value }); setShowArtistSugg(true); }}
+                  onFocus={() => setShowArtistSugg(true)}
+                  onBlur={() => setTimeout(() => setShowArtistSugg(false), 150)}
                 />
+                {showArtistSugg && artistSugg.length > 0 && (
+                  <ul className="sb-sugg">
+                    {artistSugg.map((a) => (
+                      <li key={a.id}>
+                        <button type="button" onMouseDown={() => {
+                          update({ keyword: a.name });
+                          setShowArtistSugg(false);
+                          runSearch(0, { ...form, keyword: a.name, page: 0 });
+                        }}>
+                          {a.image && <img src={a.image} alt="" className="sb-sugg__img" />}
+                          {a.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </label>
 
+
+              <span className="sb-div" aria-hidden="true" />
+
+              <label className="sb-seg sb-seg--date" htmlFor="start">
+                <CalendarIcon size={16} className="sb-seg__ic" />
+                <div className="sb-seg__dateblock">
+                  <span className="sb-seg__datelabel">Dal</span>
+                  <input
+                    type="date"
+                    id="start"
+                    className="sb-seg__dateinput"
+                    value={form.start}
+                    onChange={(e) => update({ start: e.target.value })}
+                  />
+                </div>
+              </label>
+
+              <span className="sb-div" aria-hidden="true" />
+
+              <label className="sb-seg sb-seg--date" htmlFor="end">
+                <CalendarIcon size={16} className="sb-seg__ic" />
+                <div className="sb-seg__dateblock">
+                  <span className="sb-seg__datelabel">Al</span>
+                  <input
+                    type="date"
+                    id="end"
+                    className="sb-seg__dateinput"
+                    value={form.end}
+                    onChange={(e) => update({ end: e.target.value })}
+                  />
+                </div>
+              </label>
+
+              {hasSearch && (
+                <button type="button" className="sb-clear" onClick={clearSearch} title="Azzera ricerca" aria-label="Azzera ricerca">
+                  <CloseIcon size={15} />
+                </button>
+              )}
 
               <button type="submit" className="sb-go">
                 <SearchIcon size={18} /><span>Cerca</span>
               </button>
-            </div>
-
-            <div className="sb-tools">
-              <div className="chips" role="group" aria-label="Quando">
-                {[{ id: "today", label: "Oggi" }, { id: "week", label: "Questa settimana" }, { id: "month", label: "Questo mese" }].map((q) => (
-                  <button key={q.id} type="button" className={"chip" + (quickRange === q.id ? " is-active" : "")} onClick={() => applyQuickRange(q.id)}>
-                    {q.label}
-                  </button>
-                ))}
-                <DateRangePopover
-                  start={form.start}
-                  end={form.end}
-                  onChange={({ start, end }) => { update({ start, end }); }}
-                  onClear={() => update({ start: "", end: "" })}
-                />
-              </div>
-              {hasSearch && (
-                <button type="button" className="sb-reset" onClick={clearSearch}>
-                  <CloseIcon size={15} />Azzera tutto
-                </button>
-              )}
             </div>
           </form>
 

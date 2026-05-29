@@ -84,6 +84,15 @@ export async function searchEvents({ city, keyword, size = 12, page = 0, start, 
   return res.json();
 }
 
+// ---- TICKETMASTER: suggerimenti artisti ----
+export async function searchAttractions(keyword) {
+  const url = `${BASE}/api/ticketmaster/attractions?${qs({ keyword })}`;
+  const res = await fetch(url);
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.attractions || [];
+}
+
 // ---- TICKETMASTER: dettaglio singolo evento ----
 export async function getEvent(id) {
   const res = await fetch(

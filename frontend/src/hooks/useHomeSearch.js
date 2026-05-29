@@ -1,8 +1,28 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+
+const CITY_LIST = [
+  // Italia
+  "Roma","Milano","Napoli","Torino","Palermo","Genova","Bologna","Firenze",
+  "Bari","Catania","Venezia","Verona","Messina","Padova","Trieste","Brescia",
+  "Parma","Modena","Perugia","Livorno","Cagliari","Foggia","Rimini","Salerno",
+  "Ferrara","Bergamo","Pescara","Trento","Vicenza","Ancona","Lecce","Bolzano",
+  "Novara","Piacenza","Arezzo","Udine","Cesena","Pisa","Monza","Varese",
+  "Como","Reggio Calabria","Reggio Emilia","Cosenza","Brindisi","Caserta",
+  "Sassari","Siracusa","Latina","Taranto","La Spezia","Mantova","Lucca",
+  "Terni","Ravenna","Forlì","Sesto San Giovanni","Catanzaro","Ragusa",
+  // Europa (nomi italiani → gestiti da CITY_LL nel backend)
+  "Parigi","Londra","Berlino","Monaco","Amburgo","Madrid","Barcellona",
+  "Lisbona","Bruxelles","Amsterdam","Vienna","Zurigo","Ginevra","Praga",
+  "Varsavia","Budapest","Bucarest","Atene","Stoccolma","Oslo","Copenaghen",
+  "Helsinki","Dublino","Siviglia","Valencia","Bilbao","Porto","Cracovia",
+  "Francoforte","Colonia","Stoccarda","Amburgo","Salisburgo","Basilea",
+  "Rotterdam","Anversa","Göteborg","Belgrado","Zagabria","Lubiana","Sofia",
+  "Salonicco","Lione","Marsiglia","Bordeaux","Tolosa",
+];
 import { toast } from "sonner";
 import {
-  searchEvents, toUtcStart, toUtcEnd,
+  searchEvents, searchAttractions, toUtcStart, toUtcEnd,
   addFavorite, getFavorites, removeFavorite,
 } from "../lib/api";
 
@@ -29,8 +49,10 @@ export function useHomeSearch() {
   const [data, setData] = useState({ events: [], totalPages: 1, page: 0, totalElements: 0 });
   const [loading,      setLoading]      = useState(false);
   const [error,        setError]        = useState("");
-  const [citySugg,     setCitySugg]     = useState([]);
-  const [showCitySugg, setShowCitySugg] = useState(false);
+  const [citySugg,      setCitySugg]      = useState([]);
+  const [showCitySugg,  setShowCitySugg]  = useState(false);
+  const [artistSugg,    setArtistSugg]    = useState([]);
+  const [showArtistSugg, setShowArtistSugg] = useState(false);
   const [quickRange,   setQuickRange]   = useState(null);
   const [favMap,       setFavMap]       = useState({});
   const searchSeq = useRef(0);
@@ -163,8 +185,12 @@ export function useHomeSearch() {
 
   useEffect(() => {
     function onSidebarSearch(e) {
-      const q = e.detail?.q || "";
-      const next = { city: "", keyword: q, genre: "", start: "", end: "", size: 12, page: 0 };
+      const q = e.detail?.q?.trim() || "";
+      if (!q) return;
+      const isCity = CITY_LIST.some((c) => c.toLowerCase() === q.toLowerCase());
+      const next = isCity
+        ? { city: q, keyword: "", genre: "", start: "", end: "", size: 12, page: 0 }
+        : { city: "", keyword: q, genre: "", start: "", end: "", size: 12, page: 0 };
       setForm(next);
       runSearch(0, next);
     }
@@ -175,18 +201,20 @@ export function useHomeSearch() {
 
   useEffect(() => {
     const city = form.city.trim();
-    if (city.length < 2) { setCitySugg([]); return; }
-    const tid = setTimeout(() => {
-      searchEvents({ city, size: 6 })
-        .then((res) => {
-          const cities = [...new Set((res.events || []).map((e) => e.city).filter(Boolean))].slice(0, 5);
-          setCitySugg(cities);
-        })
-        .catch(() => {});
-    }, 300);
-    return () => clearTimeout(tid);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!city) { setCitySugg([]); return; }
+    const q = city.toLowerCase();
+    const matches = CITY_LIST.filter((c) => c.toLowerCase().startsWith(q)).slice(0, 6);
+    setCitySugg(matches);
   }, [form.city]);
+
+  useEffect(() => {
+    const kw = form.keyword.trim();
+    if (kw.length < 2) { setArtistSugg([]); return; }
+    const tid = setTimeout(() => {
+      searchAttractions(kw).then(setArtistSugg).catch(() => {});
+    }, 280);
+    return () => clearTimeout(tid);
+  }, [form.keyword]);
 
   async function goToPage(p) {
     await runSearch(p);
@@ -199,7 +227,7 @@ export function useHomeSearch() {
 
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 60000);
+    const id = setInterval(() => setNow(Date.now()), 10000);
     return () => clearInterval(id);
   }, []);
 
@@ -219,7 +247,8 @@ export function useHomeSearch() {
   return {
     form, update, data, visibleEvents, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
-    quickRange, applyQuickRange, applyGenre, clearDates, clearSearch,
+    artistSugg, showArtistSugg, setShowArtistSugg,
+    applyGenre, clearDates, clearSearch,
     runSearch, goToPage, scrollToSearch,
     favMap, toggleFavorite,
     hasResults, hasActiveFilters, hasSearch, isShowcase,

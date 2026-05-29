@@ -56,7 +56,13 @@ function buildGrid(view) {
   return days;
 }
 
-export default function DateRangePopover({ start, end, onChange, onClear }) {
+const QUICK = [
+  { id: "today", label: "Oggi" },
+  { id: "week",  label: "Questa settimana" },
+  { id: "month", label: "Questo mese" },
+];
+
+export default function DateRangePopover({ start, end, onChange, onClear, quickRange, applyQuickRange }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
 
@@ -121,6 +127,20 @@ export default function DateRangePopover({ start, end, onChange, onClear }) {
 
       {open && (
         <div className="drp__pop" role="dialog" aria-label="Seleziona le date">
+          {applyQuickRange && (
+            <div className="drp__quick">
+              {QUICK.map((q) => (
+                <button
+                  key={q.id}
+                  type="button"
+                  className={"drp__qchip" + (quickRange === q.id ? " is-active" : "")}
+                  onClick={() => { applyQuickRange(q.id); setOpen(false); }}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="drp__head">
             <button
               type="button"

@@ -186,9 +186,11 @@ export default function EventDetail() {
                   {ev.segment && <span className="tag">{ev.segment}</span>}
                   {ev.genre   && <span className="tag">{ev.genre}</span>}
                   {ev.subGenre && ev.subGenre !== ev.genre && <span className="tag">{ev.subGenre}</span>}
-                  {ev.status === "cancelled"  && <span className="tag tag--warn">Annullato</span>}
+                  {ev.status === "cancelled"   && <span className="tag tag--warn">Annullato</span>}
+                  {ev.status === "offsale"    && <span className="tag tag--offsale">Esaurito</span>}
                   {ev.status === "postponed"  && <span className="tag tag--warn">Rinviato</span>}
-                  {ev.status === "rescheduled" && <span className="tag tag--warn">Riprogrammato</span>}
+                  {ev.status === "rescheduled"&& <span className="tag tag--warn">Riprogrammato</span>}
+                  {ev.limited                 && ev.status !== "offsale" && <span className="tag tag--limited">Ultimi posti</span>}
                 </div>
                 <h1 className="ed-hero__title">{ev.name}</h1>
                 {ev.lineup?.length > 1 && (
@@ -222,11 +224,15 @@ export default function EventDetail() {
             ))}
           </nav>
           <div className="ed-bar__actions">
-            {ev.status !== "cancelled" && ev.url && (
+            {ev.status === "cancelled" ? null : ev.status === "offsale" ? (
+              <button type="button" className="btn btn--disabled" disabled>
+                <TicketIcon size={18} />Non disponibile
+              </button>
+            ) : ev.url ? (
               <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary">
                 <TicketIcon size={18} />Controlla disponibilità<ArrowRightIcon size={18} />
               </a>
-            )}
+            ) : null}
             <button
               type="button"
               className={`btn ${isFav ? "btn--fav-active" : "btn--ghost"}`}
@@ -251,6 +257,11 @@ export default function EventDetail() {
                 Evento annullato — i biglietti acquistati verranno rimborsati
               </div>
             )}
+            {ev.status === "offsale" && (
+              <div className="ed__status-banner ed__status-banner--offsale">
+                Biglietti non disponibili — l'evento potrebbe essere esaurito o la vendita è chiusa
+              </div>
+            )}
             {ev.status === "postponed" && (
               <div className="ed__status-banner ed__status-banner--warn">
                 Evento rinviato — verifica la nuova data sul sito ufficiale
@@ -259,6 +270,11 @@ export default function EventDetail() {
             {ev.status === "rescheduled" && (
               <div className="ed__status-banner ed__status-banner--warn">
                 Evento riprogrammato — controlla la data aggiornata
+              </div>
+            )}
+            {ev.limited && ev.status !== "offsale" && (
+              <div className="ed__status-banner ed__status-banner--limited">
+                Ultimi posti disponibili — acquista prima che sia troppo tardi
               </div>
             )}
             <div className="ed__meta">
@@ -313,11 +329,15 @@ export default function EventDetail() {
 
         {/* ── CTA biglietti (solo mobile, in fondo al contenuto) ── */}
         <div className="ed-sticky-cta">
-        {ev.status !== "cancelled" && ev.url && (
+        {ev.status === "cancelled" ? null : ev.status === "offsale" ? (
+          <button type="button" className="btn btn--disabled ed-sticky-cta__tickets" disabled>
+            <TicketIcon size={18} />Non disponibile
+          </button>
+        ) : ev.url ? (
           <a href={ev.url} target="_blank" rel="noreferrer" className="btn btn--primary ed-sticky-cta__tickets">
             <TicketIcon size={18} />Controlla disponibilità<ArrowRightIcon size={16} />
           </a>
-        )}
+        ) : null}
         <button
           type="button"
           className={`btn ${isFav ? "btn--fav-active" : "btn--ghost"} ed-sticky-cta__fav`}

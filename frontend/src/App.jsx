@@ -23,8 +23,9 @@ function ScrollRestorer() {
   const { key } = useLocation();
   const navType = useNavigationType();
 
-  // Ripristina posizione su navigazione "back" (POP)
+  // Ripristina posizione su navigazione "back" (POP), scroll top solo su nuova pagina (PUSH)
   useEffect(() => {
+    if (navType === "REPLACE") return; // cambio parametri URL nella stessa pagina → non scrollare
     if (navType !== "POP") {
       window.scrollTo(0, 0);
       return;

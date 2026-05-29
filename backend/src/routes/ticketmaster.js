@@ -137,6 +137,21 @@ function normalizeStatus(code) {
   return c
 }
 
+function resolveStatus(ev) {
+  // 1. nome evento contiene "annullato" o "[cancelled]"
+  if (/\[cancelled\]|\bannullat/i.test(ev.name || '')) return 'cancelled'
+  // 2. status esplicito dall'API
+  const base = normalizeStatus(ev.dates?.status?.code)
+  if (base === 'cancelled' || base === 'postponed' || base === 'rescheduled') return base
+  // 3. ticketAvailability.unavailableReason → sold out / non disponibile
+  const reason = (ev.ticketAvailability?.unavailableReason || '').toLowerCase()
+  if (reason) return 'offsale'
+  // 4. sale pubblica terminata
+  const saleEnd = ev.sales?.public?.endDateTime
+  if (saleEnd && new Date(saleEnd) < new Date()) return 'offsale'
+  return base  // 'onsale' o null
+}
+
 async function tmRequest(params) {
   const { data } = await axios.get(`${TM_BASE}/events.json`, { params })
   const raw = (data?._embedded?.events || []).map(ev => {
@@ -153,7 +168,8 @@ async function tmRequest(params) {
       lon: num(v?.location?.longitude),
       address: v?.address?.line1 || null,
       genre: ev.classifications?.[0]?.genre?.name || null,
-      status: normalizeStatus(ev.dates?.status?.code),
+      status: resolveStatus(ev),
+      limited: ev.ticketAvailability?.limitedAvailability || false,
       priceMin: ev.priceRanges?.[0]?.min ?? null,
       priceMax: ev.priceRanges?.[0]?.max ?? null,
       currency: ev.priceRanges?.[0]?.currency || null,
@@ -177,7 +193,10 @@ function mapDetail(ev){
     name: ev.name,
     date: ev.dates?.start?.dateTime || ev.dates?.start?.localDate || null,
     time: ev.dates?.start?.localTime || null,
-    status: normalizeStatus(ev.dates?.status?.code),
+    status: resolveStatus(ev),
+    limited: ev.ticketAvailability?.limitedAvailability || false,
+    unavailableReason: ev.ticketAvailability?.unavailableReason || null,
+    saleEnd: ev.sales?.public?.endDateTime || null,
     venue: mapVenue(ev._embedded?.venues?.[0]),
     segment: c?.segment?.name || null,
     genre: c?.genre?.name || null,
@@ -195,14 +214,11 @@ function mapDetail(ev){
 }
 
 async function fetchEventDetail(id) {
-  const cacheKey = `event:${id}`
-  if (cache.has(cacheKey)) return cache.get(cacheKey)
+  // Nessuna cache: vogliamo sempre dati freschi per status e disponibilità
   const { data } = await axios.get(`${TM_BASE}/events/${encodeURIComponent(id)}.json`, {
     params: { apikey: API_KEY, locale: '*' }
   })
-  const detail = mapDetail(data)
-  cache.set(cacheKey, detail)
-  return detail
+  return mapDetail(data)
 }
 
 router.get('/events', async (req, res) => {
@@ -296,6 +312,28 @@ router.get('/artists/:id/events', async (req, res) => {
   } catch (err) {
     const status = err.response?.status || 500
     res.status(status).json({ error: 'Ticketmaster API error', details: err.response?.data || err.message })
+  }
+})
+
+router.get('/attractions', async (req, res) => {
+  try {
+    const { keyword = '' } = req.query
+    if (!keyword || keyword.length < 2) return res.json({ attractions: [] })
+    const cacheKey = `attr:${keyword.toLowerCase()}`
+    if (cache.has(cacheKey)) return res.json(cache.get(cacheKey))
+    const { data } = await axios.get(`${TM_BASE}/attractions.json`, {
+      params: { apikey: API_KEY, keyword, classificationName: 'music', size: 6, locale: '*' }
+    })
+    const attractions = (data?._embedded?.attractions || []).map(a => ({
+      id: a.id,
+      name: a.name,
+      image: bestImage(a.images),
+    }))
+    const result = { attractions }
+    cache.set(cacheKey, result, 300)
+    res.json(result)
+  } catch {
+    res.json({ attractions: [] })
   }
 })
 

@@ -718,6 +718,16 @@ img {
   transform: translateY(-2px);
 }
 
+.btn--disabled, .btn--disabled:hover {
+  background: rgba(140,142,168,0.1);
+  border-color: rgba(140,142,168,0.25);
+  color: #9a9cb8;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+  opacity: 0.8;
+}
+
 .btn--outline {
   background: transparent;
   color: var(--text);
@@ -1284,14 +1294,40 @@ input.input[type="date"] {
 .sb-tools {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px 16px;
-  padding: 0 2px;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 4px 2px 0;
 }
 
 .chip--cal {
   gap: 6px;
+}
+
+/* Dentro la searchbar il bottone date diventa un segmento, non un chip */
+.sb-bar .chip--cal {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0 14px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-2);
+  height: 100%;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.sb-bar .chip--cal:hover {
+  color: var(--text-1);
+  transform: none;
+  opacity: 1;
+}
+.sb-bar .chip--cal.is-active {
+  color: var(--accent);
+  box-shadow: none;
+}
+.sb-bar .drp__pop {
+  left: auto;
+  right: 0;
 }
 
 .chip--genre {
@@ -1373,6 +1409,43 @@ input.input[type="date"] {
     0 0 0 1px rgba(255, 255, 255, 0.04), var(--sh-glow);
   transform-origin: top left;
   animation: sbFade 0.16s ease;
+}
+
+.drp__quick {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.drp__qchip {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--r-md);
+  background: var(--bg-600);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.drp__qchip:hover {
+  background: rgba(0, 212, 138, 0.12);
+  color: var(--accent);
+  border-color: rgba(0, 212, 138, 0.3);
+}
+
+.drp__qchip.is-active {
+  background: rgba(0, 212, 138, 0.18);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .drp__head {
@@ -1520,7 +1593,88 @@ input.input[type="date"] {
   filter: brightness(1.07);
 }
 
+/* ---- Riga date sotto la searchbar ---- */
+.sb-dates {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  min-height: 44px;
+}
+
+.sb-date-seg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  flex: 1;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.sb-date-seg:hover { background: rgba(255,255,255,0.04); }
+
+.sb-date-ic { color: var(--text-mute); flex: none; }
+
+.sb-date-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  font-weight: 700;
+  flex: none;
+}
+
+.sb-date-input {
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  outline: none;
+  cursor: pointer;
+  min-width: 0;
+  flex: 1;
+  color-scheme: dark;
+}
+.sb-date-input::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+
+.sb-date-div {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex: none;
+}
+
+.sb-date-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  font: inherit;
+  font-size: 0.79rem;
+  cursor: pointer;
+  flex: none;
+  margin-left: 6px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.sb-date-clear:hover { color: var(--text); border-color: var(--border-strong); }
+
 @media (max-width: 860px) {
+  .sb-dates {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .sb-date-seg { min-width: 120px; }
+  .sb-date-clear { margin-left: 0; }
   .sb-bar {
     flex-direction: column;
     gap: 0;
@@ -1637,20 +1791,63 @@ input.input[type="date"] {
 
 .results-bar {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 22px;
+  flex-wrap: wrap;
 }
 
 .results-bar h2 {
   font-size: 1.5rem;
   font-weight: 800;
+  margin-right: auto;
 }
 
 .results-bar .count {
   color: var(--text-mute);
   font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.results-bar__filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rb-chip {
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.rb-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.rb-chip.is-active {
+  background: rgba(0, 212, 138, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.rb-chip--clear {
+  padding: 4px 8px;
+  opacity: 0.6;
+}
+
+.rb-chip--clear:hover {
+  opacity: 1;
+  color: var(--text-1);
+  border-color: var(--border);
 }
 
 .events-grid {
@@ -2626,6 +2823,16 @@ input.input[type="date"] {
   background: rgba(255, 85, 64, 0.14);
   border-color: rgba(255, 85, 64, 0.4);
   color: #FF8580;
+}
+.tag--offsale {
+  background: rgba(255, 120, 60, 0.14);
+  border-color: rgba(255, 120, 60, 0.4);
+  color: #ff9a6c;
+}
+.tag--limited {
+  background: rgba(180, 120, 255, 0.14);
+  border-color: rgba(180, 120, 255, 0.4);
+  color: #c8a0ff;
 }
 
 .ed__title {
@@ -3814,15 +4021,52 @@ input.input[type="date"] {
   flex-shrink: 0;
 }
 
-.ev-card__soldout-btn {
-  background: rgba(255, 68, 68, 0.12);
-  border-color: rgba(255, 68, 68, 0.28);
-  color: #ff8888;
+/* Badge status generici (sostituiscono i singoli) */
+.ev-card__status-badge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.77rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(10, 8, 12, 0.78);
+  backdrop-filter: blur(6px);
+  border-radius: var(--r-pill);
+  padding: 4px 10px 4px 8px;
 }
-.ev-card__cancelled-btn {
-  background: rgba(140, 142, 168, 0.12);
-  border-color: rgba(140, 142, 168, 0.28);
+.ev-card__status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ev-card__status-badge--cancelled  { color: #b0b2c8; border: 1px solid rgba(160,162,184,0.4); }
+.ev-card__status-badge--cancelled::before  { background: #8e90a8; }
+.ev-card__status-badge--offsale    { color: #ff9a6c; border: 1px solid rgba(255,120,60,0.4); }
+.ev-card__status-badge--offsale::before    { background: #ff7a40; }
+.ev-card__status-badge--postponed  { color: #ffd06c; border: 1px solid rgba(255,190,60,0.4); }
+.ev-card__status-badge--postponed::before  { background: #ffb830; }
+.ev-card__status-badge--rescheduled{ color: #7ab8ff; border: 1px solid rgba(90,160,255,0.4); }
+.ev-card__status-badge--rescheduled::before{ background: #5a9ff0; }
+.ev-card__status-badge--limited    { color: #c8a0ff; border: 1px solid rgba(180,120,255,0.4); }
+.ev-card__status-badge--limited::before    { background: #b070f0; }
+
+/* Pulsanti footer status */
+.ev-card__status-btn {
+  background: rgba(140,142,168,0.12);
+  border-color: rgba(140,142,168,0.28);
   color: #9a9cb8;
+}
+.ev-card__status-btn--offsale {
+  background: rgba(255,120,60,0.1);
+  border-color: rgba(255,120,60,0.3);
+  color: #ff9a6c;
 }
 .ev-card__foot-right {
   display: flex;
@@ -3853,10 +4097,15 @@ input.input[type="date"] {
   border: 1px solid rgba(255, 68, 68, 0.35);
   color: #ff6060;
 }
-.ed__status-banner--soldout {
-  background: rgba(255, 68, 68, 0.1);
-  border: 1px solid rgba(255, 68, 68, 0.25);
-  color: #ff8888;
+.ed__status-banner--offsale {
+  background: rgba(255, 120, 60, 0.1);
+  border: 1px solid rgba(255, 120, 60, 0.3);
+  color: #ff9a6c;
+}
+.ed__status-banner--limited {
+  background: rgba(180, 120, 255, 0.08);
+  border: 1px solid rgba(180, 120, 255, 0.3);
+  color: #c8a0ff;
 }
 .ed__status-banner--warn {
   background: rgba(255, 85, 64, 0.1);
@@ -4396,6 +4645,52 @@ input.input[type="date"] {
 /* ── Autocomplete città ─────────────────────────────────── */
 .sb-seg--autocomplete { position: relative; }
 
+/* Segmenti data dentro la searchbar */
+.sb-seg--date {
+  flex: 0 0 auto;
+  min-width: 130px;
+  cursor: pointer;
+  gap: 10px;
+}
+.sb-seg__dateblock {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.sb-seg__datelabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dim);
+  line-height: 1;
+}
+.sb-seg__dateinput {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  outline: none;
+  cursor: pointer;
+  color-scheme: dark;
+  min-width: 0;
+  width: 100%;
+}
+.sb-seg__dateinput::-webkit-calendar-picker-indicator {
+  filter: invert(0.55);
+  cursor: pointer;
+  margin-left: 2px;
+}
+.sb-seg__dateinput:not([value=""]) { color: var(--text); }
+
+@media (max-width: 860px) {
+  .sb-seg--date { min-width: unset; width: 100%; }
+  .sb-seg__dateinput { font-size: 1rem; }
+}
+
 /* ── GenreSelect custom dropdown ───────────────────────── */
 .gsel {
   position: relative;
@@ -4513,6 +4808,14 @@ input.input[type="date"] {
 .sb-sugg li button:hover {
   background: rgba(0,212,138,0.12);
   color: #fff;
+}
+
+.sb-sugg__img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 /* ── Setlist ────────────────────────────────────────────── */
