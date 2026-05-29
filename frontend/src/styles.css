@@ -501,12 +501,15 @@ img {
   }
 
   .nav.nav--sidebar ~ main.app-main,
+  .nav.nav--sidebar ~ #search-portal,
   .nav.nav--sidebar ~ .footer {
     margin-left: 230px;
     transition: margin-left 0.42s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+
   .nav.nav--sidebar.nav--sidebar-out ~ main.app-main,
+  .nav.nav--sidebar.nav--sidebar-out ~ #search-portal,
   .nav.nav--sidebar.nav--sidebar-out ~ .footer {
     margin-left: 0;
     transition: margin-left 0.34s cubic-bezier(0.4, 0, 1, 1);

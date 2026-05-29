@@ -86,20 +86,19 @@ export default function Navbar() {
   useEffect(() => {
     function onScroll() {
       const y          = window.scrollY;
-      const isMobile   = window.innerWidth <= 820;
-      const isShortPage = document.documentElement.scrollHeight <= window.innerHeight + 80;
+      const isMobile = window.innerWidth <= 820;
 
       if (isMobile) {
         if (y > lastY.current && y > 80) setHidden(true);
         else if (y <= 5) setHidden(false);
       } else {
         setHidden(false);
-        if ((y > 110 || isShortPage) && !sidebarRef.current && !sidebarOutRef.current) {
+        if (y > 160 && !sidebarRef.current && !sidebarOutRef.current) {
           sidebarRef.current = true;
           setSidebar(true);
           setSidebarOut(false);
           clearTimeout(sidebarTimer.current);
-        } else if (y <= 50 && !isShortPage && sidebarRef.current && !sidebarOutRef.current) {
+        } else if (y <= 10 && sidebarRef.current && !sidebarOutRef.current) {
           sidebarOutRef.current = true;
           setSidebarOut(true);
           clearTimeout(sidebarTimer.current);

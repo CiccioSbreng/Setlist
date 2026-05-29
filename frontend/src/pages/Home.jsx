@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { useHomeSearch } from "../hooks/useHomeSearch";
 import EventCard from "../components/EventCard";
@@ -30,6 +31,8 @@ export default function Home() {
     hasResults, hasSearch, isShowcase,
   } = useHomeSearch();
 
+
+  const searchPortal = document.getElementById("search-portal");
 
   return (
     <>
@@ -90,8 +93,8 @@ export default function Home() {
 
       </section>
 
-      {/* ===== SEARCHBAR ===== */}
-      <section className="search-section">
+      {/* ===== SEARCHBAR (portal — fuori da main.app-main, non risente del margin-left sidebar) ===== */}
+      {searchPortal && createPortal(<section className="search-section">
         <div className="wrap">
           <form className="searchbar" onSubmit={(e) => { e.preventDefault(); runSearch(0); }}>
             <div className="sb-wrap">
@@ -166,7 +169,7 @@ export default function Home() {
             </div>
           </form>
         </div>
-      </section>
+      </section>, searchPortal)}
 
       {/* ===== RISULTATI ===== */}
       <section className="section" id="ricerca">
