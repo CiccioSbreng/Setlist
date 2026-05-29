@@ -78,8 +78,9 @@ export default function Navbar() {
   }, []);
 
   // Refs per leggere lo stato aggiornato dentro il listener senza ricrearlo
-  const sidebarRef    = useRef(false);
-  const sidebarOutRef = useRef(false);
+  const sidebarRef       = useRef(false);
+  const sidebarOutRef    = useRef(false);
+  const sidebarActivated = useRef(0);
   useEffect(() => { sidebarRef.current    = sidebar;    }, [sidebar]);
   useEffect(() => { sidebarOutRef.current = sidebarOut; }, [sidebarOut]);
 
@@ -93,12 +94,13 @@ export default function Navbar() {
         else if (y <= 5) setHidden(false);
       } else {
         setHidden(false);
-        if (y > 160 && !sidebarRef.current && !sidebarOutRef.current) {
+        if (y > 50 && !sidebarRef.current && !sidebarOutRef.current) {
           sidebarRef.current = true;
+          sidebarActivated.current = Date.now();
           setSidebar(true);
           setSidebarOut(false);
           clearTimeout(sidebarTimer.current);
-        } else if (y <= 10 && sidebarRef.current && !sidebarOutRef.current) {
+        } else if (y <= 10 && sidebarRef.current && !sidebarOutRef.current && Date.now() - sidebarActivated.current > 800) {
           sidebarOutRef.current = true;
           setSidebarOut(true);
           clearTimeout(sidebarTimer.current);
