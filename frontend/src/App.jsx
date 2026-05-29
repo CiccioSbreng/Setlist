@@ -84,7 +84,6 @@ export default function App() {
         <VideoBackground />
         <GradientBackground />
         <Navbar />
-        <div id="search-portal" />
 
         <main className="app-main">
           <AnimatedRoutes />
