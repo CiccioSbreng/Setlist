@@ -2,7 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { getFavorites } from "../lib/api";
 import {
-  MusicIcon, HeartIcon, UserIcon, MenuIcon, CloseIcon, SearchIcon,
+  MusicIcon, HeartIcon, UserIcon, MenuIcon, CloseIcon, SearchIcon, PinIcon,
 } from "./Icons";
 
 function daysUntil(dateStr) {
@@ -23,6 +23,7 @@ export default function Navbar() {
   const lastY = useRef(0);
 
   const [searchQ, setSearchQ] = useState("");
+  const [cityQ,   setCityQ]   = useState("");
   const [upcomingFavs, setUpcomingFavs] = useState([]);
   const tokenRef = useRef(token);
 
@@ -136,10 +137,15 @@ export default function Navbar() {
 
   function handleSearch(e) {
     e.preventDefault();
-    const q = searchQ.trim();
-    if (!q) return;
-    navigate(`/home?q=${encodeURIComponent(q)}`);
-    window.dispatchEvent(new CustomEvent("sidebar-search", { detail: { q } }));
+    const city    = cityQ.trim();
+    const keyword = searchQ.trim();
+    if (!city && !keyword) return;
+    const params = new URLSearchParams();
+    if (city)    params.set("city", city);
+    if (keyword) params.set("q",    keyword);
+    navigate(`/home?${params.toString()}`);
+    window.dispatchEvent(new CustomEvent("sidebar-search", { detail: { city, keyword } }));
+    setCityQ("");
     setSearchQ("");
   }
 
@@ -166,17 +172,35 @@ export default function Navbar() {
           </Link>
 
           {/* ── Mini search ── */}
+          <p className="nav__section-lbl">Cerca eventi</p>
           <form className="nav__sb-form" onSubmit={handleSearch}>
-            <SearchIcon size={14} />
-            <input
-              className="nav__sb-input"
-              type="text"
-              placeholder="Cerca artista o evento…"
-              value={searchQ}
-              onChange={(e) => setSearchQ(e.target.value)}
-            />
+            <div className="nav__sb-row">
+              <PinIcon size={13} />
+              <input
+                className="nav__sb-input"
+                type="text"
+                placeholder="Città…"
+                value={cityQ}
+                onChange={(e) => setCityQ(e.target.value)}
+              />
+            </div>
+            <span className="nav__sb-sep" />
+            <div className="nav__sb-row">
+              <MusicIcon size={13} />
+              <input
+                className="nav__sb-input"
+                type="text"
+                placeholder="Artista o evento…"
+                value={searchQ}
+                onChange={(e) => setSearchQ(e.target.value)}
+              />
+            </div>
+            <button type="submit" className="nav__sb-go">
+              <SearchIcon size={13} />Cerca
+            </button>
           </form>
 
+          <p className="nav__section-lbl">Naviga</p>
           <nav className="nav__sidebar-links" aria-label="Navigazione principale">
             <NavLink to="/home" className={linkClass}>
               <MusicIcon size={18} />

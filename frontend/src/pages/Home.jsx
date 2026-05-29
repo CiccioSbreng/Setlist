@@ -35,8 +35,10 @@ export default function Home() {
     <>
       {/* ===== HERO ===== */}
       <section className="hero">
-        <div className="hero__overlay" />
-        <div className="hero__glow" />
+        <div className="hero__bg">
+          <div className="hero__overlay" />
+          <div className="hero__glow" />
+        </div>
         <div className="wrap hero__inner">
           <div>
             <span className="eyebrow">
@@ -88,84 +90,84 @@ export default function Home() {
           </div>
         </div>
 
-      </section>
+        {/* ===== SEARCHBAR ===== */}
+        <div className="hero__search">
+          <div className="wrap">
+            <form className="searchbar" onSubmit={(e) => { e.preventDefault(); runSearch(0); }}>
+              <div className="sb-wrap">
+                <div className="sb-bar">
+                  <label className="sb-seg sb-seg--autocomplete" htmlFor="city">
+                    <PinIcon size={20} className="sb-seg__ic" />
+                    <input
+                      id="city"
+                      className="sb-seg__input"
+                      placeholder="In quale città?"
+                      value={form.city}
+                      autoComplete="off"
+                      onChange={(e) => { update({ city: e.target.value }); setShowCitySugg(true); }}
+                      onFocus={() => setShowCitySugg(true)}
+                      onBlur={() => setTimeout(() => setShowCitySugg(false), 150)}
+                    />
+                    {showCitySugg && citySugg.length > 0 && (
+                      <ul className="sb-sugg">
+                        {citySugg.map((c) => (
+                          <li key={c}>
+                            <button type="button" onMouseDown={() => { update({ city: c }); setShowCitySugg(false); runSearch(0, { ...form, city: c, page: 0 }); }}>
+                              <PinIcon size={14} />{c}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </label>
 
-      {/* ===== SEARCHBAR ===== */}
-      <section className="search-section">
-        <div className="wrap">
-          <form className="searchbar" onSubmit={(e) => { e.preventDefault(); runSearch(0); }}>
-            <div className="sb-wrap">
-              <div className="sb-bar">
-                <label className="sb-seg sb-seg--autocomplete" htmlFor="city">
-                  <PinIcon size={20} className="sb-seg__ic" />
-                  <input
-                    id="city"
-                    className="sb-seg__input"
-                    placeholder="In quale città?"
-                    value={form.city}
-                    autoComplete="off"
-                    onChange={(e) => { update({ city: e.target.value }); setShowCitySugg(true); }}
-                    onFocus={() => setShowCitySugg(true)}
-                    onBlur={() => setTimeout(() => setShowCitySugg(false), 150)}
-                  />
-                  {showCitySugg && citySugg.length > 0 && (
-                    <ul className="sb-sugg">
-                      {citySugg.map((c) => (
-                        <li key={c}>
-                          <button type="button" onMouseDown={() => { update({ city: c }); setShowCitySugg(false); runSearch(0, { ...form, city: c, page: 0 }); }}>
-                            <PinIcon size={14} />{c}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                  <span className="sb-div" aria-hidden="true" />
+
+                  <label className="sb-seg sb-seg--autocomplete" htmlFor="keyword">
+                    <MusicIcon size={20} className="sb-seg__ic" />
+                    <input
+                      id="keyword"
+                      className="sb-seg__input"
+                      placeholder="Artista, band o genere"
+                      value={form.keyword}
+                      autoComplete="off"
+                      onChange={(e) => { update({ keyword: e.target.value }); setShowArtistSugg(true); }}
+                      onFocus={() => setShowArtistSugg(true)}
+                      onBlur={() => setTimeout(() => setShowArtistSugg(false), 150)}
+                    />
+                    {showArtistSugg && artistSugg.length > 0 && (
+                      <ul className="sb-sugg">
+                        {artistSugg.map((a) => (
+                          <li key={a.id}>
+                            <button type="button" onMouseDown={() => {
+                              update({ keyword: a.name });
+                              setShowArtistSugg(false);
+                              runSearch(0, { ...form, keyword: a.name, page: 0 });
+                            }}>
+                              {a.image && <img src={a.image} alt="" className="sb-sugg__img" />}
+                              {a.name}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </label>
+
+                  {hasSearch && (
+                    <button type="button" className="sb-clear" onClick={clearSearch} title="Azzera ricerca" aria-label="Azzera ricerca">
+                      <CloseIcon size={15} />
+                    </button>
                   )}
-                </label>
 
-                <span className="sb-div" aria-hidden="true" />
-
-                <label className="sb-seg sb-seg--autocomplete" htmlFor="keyword">
-                  <MusicIcon size={20} className="sb-seg__ic" />
-                  <input
-                    id="keyword"
-                    className="sb-seg__input"
-                    placeholder="Artista, band o genere"
-                    value={form.keyword}
-                    autoComplete="off"
-                    onChange={(e) => { update({ keyword: e.target.value }); setShowArtistSugg(true); }}
-                    onFocus={() => setShowArtistSugg(true)}
-                    onBlur={() => setTimeout(() => setShowArtistSugg(false), 150)}
-                  />
-                  {showArtistSugg && artistSugg.length > 0 && (
-                    <ul className="sb-sugg">
-                      {artistSugg.map((a) => (
-                        <li key={a.id}>
-                          <button type="button" onMouseDown={() => {
-                            update({ keyword: a.name });
-                            setShowArtistSugg(false);
-                            runSearch(0, { ...form, keyword: a.name, page: 0 });
-                          }}>
-                            {a.image && <img src={a.image} alt="" className="sb-sugg__img" />}
-                            {a.name}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </label>
-
-                {hasSearch && (
-                  <button type="button" className="sb-clear" onClick={clearSearch} title="Azzera ricerca" aria-label="Azzera ricerca">
-                    <CloseIcon size={15} />
+                  <button type="submit" className="sb-go">
+                    <SearchIcon size={18} /><span>Cerca</span>
                   </button>
-                )}
-
-                <button type="submit" className="sb-go">
-                  <SearchIcon size={18} /><span>Cerca</span>
-                </button>
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
+
       </section>
 
       {/* ===== RISULTATI ===== */}

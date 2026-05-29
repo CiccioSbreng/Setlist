@@ -185,12 +185,10 @@ export function useHomeSearch() {
 
   useEffect(() => {
     function onSidebarSearch(e) {
-      const q = e.detail?.q?.trim() || "";
-      if (!q) return;
-      const isCity = CITY_LIST.some((c) => c.toLowerCase() === q.toLowerCase());
-      const next = isCity
-        ? { city: q, keyword: "", genre: "", start: "", end: "", size: 12, page: 0 }
-        : { city: "", keyword: q, genre: "", start: "", end: "", size: 12, page: 0 };
+      const city    = e.detail?.city?.trim()    || "";
+      const keyword = e.detail?.keyword?.trim() || "";
+      if (!city && !keyword) return;
+      const next = { city, keyword, genre: "", start: "", end: "", size: 12, page: 0 };
       setForm(next);
       runSearch(0, next);
     }
