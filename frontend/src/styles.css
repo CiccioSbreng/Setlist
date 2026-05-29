@@ -848,6 +848,13 @@ img {
   align-items: center;
 }
 
+/* Sezione dedicata searchbar */
+.search-section {
+  position: relative;
+  z-index: 10;
+  padding: 24px 0;
+}
+
 .hero__title {
   font-size: clamp(2.3rem, 1.5rem + 3.4vw, 4rem);
   font-weight: 900;
@@ -1093,58 +1100,40 @@ img {
   gap: 14px;
 }
 
-.sb-bar {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  padding: 7px;
-  background: radial-gradient(
-      130% 200% at 100% 0%,
-      rgba(0, 212, 138, 0.1),
-      transparent 55%
-    ),
-    linear-gradient(180deg, var(--surface-2), var(--surface));
+.sb-wrap {
+  position: relative;
   border: 1px solid var(--border-strong);
   border-radius: 16px;
-  box-shadow: var(--sh-md);
-  backdrop-filter: blur(10px);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  background: var(--bg-800);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  overflow: visible;
 }
 
-.sb-bar:focus-within {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--ring), var(--sh-md);
+.sb-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 6px;
+  position: relative;
+  z-index: 1;
+  min-height: 62px;
 }
 
 .sb-seg {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
-  height: 52px;
-  padding: 0 18px;
-  border-radius: 11px;
+  padding: 0 16px;
+  height: 50px;
+  border-radius: 10px;
   cursor: text;
-  transition: background 0.16s ease;
-}
-
-.sb-seg:hover {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.sb-seg:focus-within {
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .sb-seg__ic {
   flex: none;
   color: var(--text-mute);
-  transition: color 0.16s ease;
-}
-
-.sb-seg:focus-within .sb-seg__ic {
-  color: var(--brand);
 }
 
 .sb-seg__input {
@@ -1154,7 +1143,7 @@ img {
   padding: 0;
   color: var(--text);
   font: inherit;
-  font-size: 0.98rem;
+  font-size: 0.97rem;
   outline: none;
   text-overflow: ellipsis;
 }
@@ -1165,10 +1154,10 @@ img {
 
 .sb-div {
   width: 1px;
-  align-self: center;
-  height: 26px;
-  background: var(--border);
+  height: 24px;
+  background: var(--border-strong);
   flex: none;
+  align-self: center;
 }
 
 .sb-go {
@@ -1176,22 +1165,25 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  padding: 0 30px;
+  gap: 8px;
+  padding: 0 24px;
+  margin: 6px 6px 6px 4px;
+  height: 46px;
   border: 0;
-  border-radius: 11px;
+  border-radius: 10px;
   background: var(--grad-brand);
-  color: #1c0900;
+  color: #071a0e;
   font: inherit;
-  font-size: 0.97rem;
+  font-size: 0.95rem;
   font-weight: 800;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.03em;
   cursor: pointer;
-  transition: filter 0.16s ease, transform 0.12s ease;
+  box-shadow: 0 4px 16px rgba(0, 212, 138, 0.3);
+  transition: filter 0.15s ease, transform 0.1s ease;
 }
 
 .sb-go:hover {
-  filter: brightness(1.07);
+  filter: brightness(1.08);
 }
 
 .sb-go:active {
@@ -1361,20 +1353,20 @@ input.input[type="date"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: var(--text-mute);
   cursor: pointer;
   flex-shrink: 0;
-  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  margin: 0 6px;
+  transition: background 0.15s, color 0.15s;
 }
 .sb-clear:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.08);
-  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text);
 }
 
 /* ---- Date range picker ---- */
@@ -1593,23 +1585,22 @@ input.input[type="date"] {
   filter: brightness(1.07);
 }
 
-/* ---- Riga date sotto la searchbar ---- */
+/* ---- Riga date (seconda riga dentro sb-wrap) ---- */
 .sb-dates {
   display: flex;
   align-items: center;
-  padding: 4px 8px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  min-height: 44px;
+  padding: 4px 14px;
+  border-top: 1px solid var(--border);
+  min-height: 40px;
+  position: relative;
+  z-index: 1;
 }
 
 .sb-date-seg {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 5px 8px;
   flex: 1;
   cursor: pointer;
   border-radius: 8px;
@@ -1669,11 +1660,8 @@ input.input[type="date"] {
 .sb-date-clear:hover { color: var(--text); border-color: var(--border-strong); }
 
 @media (max-width: 860px) {
-  .sb-dates {
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .sb-date-seg { min-width: 120px; }
+  .sb-dates { padding: 4px 8px; }
+  .sb-date-seg { min-width: 100px; }
   .sb-date-clear { margin-left: 0; }
   .sb-bar {
     flex-direction: column;

@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import { useHomeSearch } from "../hooks/useHomeSearch";
 import EventCard from "../components/EventCard";
-import DateRangePopover from "../components/DateRangePopover";
 import { Stagger, StaggerItem } from "../components/Motion";
 import {
   SearchIcon, PinIcon, MusicIcon, HeartIcon, SparkIcon,
   TicketIcon, ArrowRightIcon, RefreshIcon, CloseIcon, SpotifyIcon, YoutubeIcon,
-  CalendarIcon,
 } from "../components/Icons";
 
 const HERO_IMAGES = [
@@ -27,8 +25,7 @@ export default function Home() {
     form, update, data, visibleEvents, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
     artistSugg, showArtistSugg, setShowArtistSugg,
-    applyGenre, clearDates, clearSearch,
-    runSearch, goToPage, scrollToSearch,
+    clearSearch, runSearch, goToPage,
     favMap, toggleFavorite,
     hasResults, hasSearch, isShowcase,
   } = useHomeSearch();
@@ -45,28 +42,21 @@ export default function Home() {
             <span className="eyebrow">
               <SparkIcon size={14} /> Eventi live · powered by Ticketmaster
             </span>
-
             <h1 className="hero__title">
               Your next show
               <br />
               <span className="grad">starts here.</span>
             </h1>
-
             <p className="hero__sub">
               Concerti, festival, esperienze live — tutto nella tua setlist.
               Cerca per città, artista o data, scopri venue e prezzi, e salva
               gli show che non vuoi perdere.
             </p>
-
             <div className="hero__actions">
-              <button type="button" className="btn btn--primary" onClick={scrollToSearch}>
-                <SearchIcon size={18} />Cerca eventi
-              </button>
               <Link to="/favorites" className="btn btn--ghost">
                 <HeartIcon size={18} />My List
               </Link>
             </div>
-
             <div className="hero__stats">
               <div className="hero__stat">
                 <div className="n">Live</div>
@@ -97,123 +87,93 @@ export default function Home() {
             <div className="hero__card c3"><img src={HERO_IMAGES[2]} alt="" /></div>
           </div>
         </div>
+
       </section>
 
-      {/* ===== RICERCA + RISULTATI ===== */}
-      <section className="section" id="ricerca">
+      {/* ===== SEARCHBAR ===== */}
+      <section className="search-section">
         <div className="wrap">
-          <div className="section-head">
-            <h2>Scopri concerti nella tua città</h2>
-            <p>Affina la ricerca per città, artista o periodo. I risultati si aggiornano in tempo reale.</p>
-          </div>
-
           <form className="searchbar" onSubmit={(e) => { e.preventDefault(); runSearch(0); }}>
-            <div className="sb-bar">
-              <label className="sb-seg sb-seg--autocomplete" htmlFor="city">
-                <PinIcon size={20} className="sb-seg__ic" />
-                <input
-                  id="city"
-                  className="sb-seg__input"
-                  placeholder="In quale città?"
-                  value={form.city}
-                  autoComplete="off"
-                  onChange={(e) => { update({ city: e.target.value }); setShowCitySugg(true); }}
-                  onFocus={() => setShowCitySugg(true)}
-                  onBlur={() => setTimeout(() => setShowCitySugg(false), 150)}
-                />
-                {showCitySugg && citySugg.length > 0 && (
-                  <ul className="sb-sugg">
-                    {citySugg.map((c) => (
-                      <li key={c}>
-                        <button type="button" onMouseDown={() => { update({ city: c }); setShowCitySugg(false); runSearch(0, { ...form, city: c, page: 0 }); }}>
-                          <PinIcon size={14} />{c}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </label>
-
-              <span className="sb-div" aria-hidden="true" />
-
-              <label className="sb-seg sb-seg--autocomplete" htmlFor="keyword">
-                <MusicIcon size={20} className="sb-seg__ic" />
-                <input
-                  id="keyword"
-                  className="sb-seg__input"
-                  placeholder="Artista, band o genere"
-                  value={form.keyword}
-                  autoComplete="off"
-                  onChange={(e) => { update({ keyword: e.target.value }); setShowArtistSugg(true); }}
-                  onFocus={() => setShowArtistSugg(true)}
-                  onBlur={() => setTimeout(() => setShowArtistSugg(false), 150)}
-                />
-                {showArtistSugg && artistSugg.length > 0 && (
-                  <ul className="sb-sugg">
-                    {artistSugg.map((a) => (
-                      <li key={a.id}>
-                        <button type="button" onMouseDown={() => {
-                          update({ keyword: a.name });
-                          setShowArtistSugg(false);
-                          runSearch(0, { ...form, keyword: a.name, page: 0 });
-                        }}>
-                          {a.image && <img src={a.image} alt="" className="sb-sugg__img" />}
-                          {a.name}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </label>
-
-
-              <span className="sb-div" aria-hidden="true" />
-
-              <label className="sb-seg sb-seg--date" htmlFor="start">
-                <CalendarIcon size={16} className="sb-seg__ic" />
-                <div className="sb-seg__dateblock">
-                  <span className="sb-seg__datelabel">Dal</span>
+            <div className="sb-wrap">
+              <div className="sb-bar">
+                <label className="sb-seg sb-seg--autocomplete" htmlFor="city">
+                  <PinIcon size={20} className="sb-seg__ic" />
                   <input
-                    type="date"
-                    id="start"
-                    className="sb-seg__dateinput"
-                    value={form.start}
-                    onChange={(e) => update({ start: e.target.value })}
+                    id="city"
+                    className="sb-seg__input"
+                    placeholder="In quale città?"
+                    value={form.city}
+                    autoComplete="off"
+                    onChange={(e) => { update({ city: e.target.value }); setShowCitySugg(true); }}
+                    onFocus={() => setShowCitySugg(true)}
+                    onBlur={() => setTimeout(() => setShowCitySugg(false), 150)}
                   />
-                </div>
-              </label>
+                  {showCitySugg && citySugg.length > 0 && (
+                    <ul className="sb-sugg">
+                      {citySugg.map((c) => (
+                        <li key={c}>
+                          <button type="button" onMouseDown={() => { update({ city: c }); setShowCitySugg(false); runSearch(0, { ...form, city: c, page: 0 }); }}>
+                            <PinIcon size={14} />{c}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </label>
 
-              <span className="sb-div" aria-hidden="true" />
+                <span className="sb-div" aria-hidden="true" />
 
-              <label className="sb-seg sb-seg--date" htmlFor="end">
-                <CalendarIcon size={16} className="sb-seg__ic" />
-                <div className="sb-seg__dateblock">
-                  <span className="sb-seg__datelabel">Al</span>
+                <label className="sb-seg sb-seg--autocomplete" htmlFor="keyword">
+                  <MusicIcon size={20} className="sb-seg__ic" />
                   <input
-                    type="date"
-                    id="end"
-                    className="sb-seg__dateinput"
-                    value={form.end}
-                    onChange={(e) => update({ end: e.target.value })}
+                    id="keyword"
+                    className="sb-seg__input"
+                    placeholder="Artista, band o genere"
+                    value={form.keyword}
+                    autoComplete="off"
+                    onChange={(e) => { update({ keyword: e.target.value }); setShowArtistSugg(true); }}
+                    onFocus={() => setShowArtistSugg(true)}
+                    onBlur={() => setTimeout(() => setShowArtistSugg(false), 150)}
                   />
-                </div>
-              </label>
+                  {showArtistSugg && artistSugg.length > 0 && (
+                    <ul className="sb-sugg">
+                      {artistSugg.map((a) => (
+                        <li key={a.id}>
+                          <button type="button" onMouseDown={() => {
+                            update({ keyword: a.name });
+                            setShowArtistSugg(false);
+                            runSearch(0, { ...form, keyword: a.name, page: 0 });
+                          }}>
+                            {a.image && <img src={a.image} alt="" className="sb-sugg__img" />}
+                            {a.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </label>
 
-              {hasSearch && (
-                <button type="button" className="sb-clear" onClick={clearSearch} title="Azzera ricerca" aria-label="Azzera ricerca">
-                  <CloseIcon size={15} />
+                {hasSearch && (
+                  <button type="button" className="sb-clear" onClick={clearSearch} title="Azzera ricerca" aria-label="Azzera ricerca">
+                    <CloseIcon size={15} />
+                  </button>
+                )}
+
+                <button type="submit" className="sb-go">
+                  <SearchIcon size={18} /><span>Cerca</span>
                 </button>
-              )}
-
-              <button type="submit" className="sb-go">
-                <SearchIcon size={18} /><span>Cerca</span>
-              </button>
+              </div>
             </div>
           </form>
+        </div>
+      </section>
 
-          {error && <div className="banner banner--error" style={{ marginTop: 24 }}>{error}</div>}
+      {/* ===== RISULTATI ===== */}
+      <section className="section" id="ricerca">
+        <div className="wrap">
+          {error && <div className="banner banner--error" style={{ marginBottom: 24 }}>{error}</div>}
 
-          <div id="risultati" style={{ marginTop: 36 }}>
+          <div id="risultati">
             {!loading && hasResults && (
               <div className="results-bar">
                 <h2>{isShowcase ? "Prossimi concerti in Italia" : "Eventi trovati"}</h2>
@@ -241,7 +201,7 @@ export default function Home() {
                   <>
                     <h3>Nessun evento trovato</h3>
                     <p>Prova a cambiare città, periodo o parola chiave.</p>
-                    <button type="button" className="btn btn--ghost" onClick={clearDates}>
+                    <button type="button" className="btn btn--ghost" onClick={clearSearch}>
                       <RefreshIcon size={18} />Azzera filtri
                     </button>
                   </>
