@@ -137,6 +137,8 @@ export default function EventCard({
             <TicketIcon size={15} />
             {price}
           </div>
+        ) : ev.status === "onsale" ? (
+          <div className="ev-card__status-badge ev-card__status-badge--onsale">Disponibile</div>
         ) : null}
 
       </div>
