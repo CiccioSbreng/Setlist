@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useHomeSearch } from "../hooks/useHomeSearch";
 import EventCard from "../components/EventCard";
@@ -35,6 +36,16 @@ export default function Home() {
     hasResults, hasSearch, isShowcase,
   } = useHomeSearch();
 
+  const [pageInput, setPageInput] = useState("");
+
+  function submitPageJump(e) {
+    e.preventDefault();
+    const p = parseInt(pageInput, 10);
+    if (!isNaN(p) && p >= 1 && p <= (data.totalPages || 1)) {
+      goToPage(p - 1);
+    }
+    setPageInput("");
+  }
 
   return (
     <>
@@ -252,7 +263,19 @@ export default function Home() {
                 <button type="button" className="btn btn--outline btn--sm" disabled={form.page <= 0} onClick={() => goToPage(form.page - 1)}>
                   ← Precedente
                 </button>
-                <span className="pager__info">Pagina {form.page + 1} di {data.totalPages || 1}</span>
+                <form className="pager__jump" onSubmit={submitPageJump}>
+                  <span className="pager__of">Pagina</span>
+                  <input
+                    className="pager__input"
+                    type="number"
+                    min={1}
+                    max={data.totalPages || 1}
+                    placeholder={String(form.page + 1)}
+                    value={pageInput}
+                    onChange={(e) => setPageInput(e.target.value)}
+                  />
+                  <span className="pager__of">di {data.totalPages || 1}</span>
+                </form>
                 <button type="button" className="btn btn--outline btn--sm" disabled={form.page + 1 >= (data.totalPages || 1)} onClick={() => goToPage(form.page + 1)}>
                   Successiva →
                 </button>
