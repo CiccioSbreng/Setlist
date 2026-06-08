@@ -128,6 +128,18 @@ function mapVenue(v){
   }
 }
 
+function resolveGenre(ev) {
+  const ok = (v) => v && v !== 'Undefined'
+  // Preferisce subGenre (più specifico) poi genre, poi fallback sulle attractions
+  const sub = ev.classifications?.[0]?.subGenre?.name
+  if (ok(sub)) return sub
+  const genre = ev.classifications?.[0]?.genre?.name
+  if (ok(genre)) return genre
+  // Fallback: primo artista con genre valido
+  const attr = ev._embedded?.attractions?.find(a => ok(a.classifications?.[0]?.genre?.name))
+  return attr?.classifications?.[0]?.genre?.name || null
+}
+
 function normalizeStatus(code) {
   if (!code) return null
   const c = code.toLowerCase()
@@ -167,7 +179,7 @@ async function tmRequest(params) {
       lat: num(v?.location?.latitude),
       lon: num(v?.location?.longitude),
       address: v?.address?.line1 || null,
-      genre: ev.classifications?.[0]?.genre?.name || null,
+      genre: resolveGenre(ev),
       status: resolveStatus(ev),
       limited: ev.ticketAvailability?.limitedAvailability || false,
       priceMin: ev.priceRanges?.[0]?.min ?? null,
@@ -199,8 +211,8 @@ function mapDetail(ev){
     saleEnd: ev.sales?.public?.endDateTime || null,
     venue: mapVenue(ev._embedded?.venues?.[0]),
     segment: c?.segment?.name || null,
-    genre: c?.genre?.name || null,
-    subGenre: c?.subGenre?.name || null,
+    genre: resolveGenre(ev),
+    subGenre: (() => { const s = c?.subGenre?.name; return s && s !== 'Undefined' ? s : null })(),
     priceMin: ev.priceRanges?.[0]?.min ?? null,
     priceMax: ev.priceRanges?.[0]?.max ?? null,
     currency: ev.priceRanges?.[0]?.currency || null,

@@ -223,19 +223,7 @@ export function useHomeSearch() {
     document.getElementById("ricerca")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 10000);
-    return () => clearInterval(id);
-  }, []);
-
-  const SHOW_AFTER_START_MS = 90 * 60 * 1000; // 90 minuti
-  const visibleEvents = (data.events || []).filter(ev => {
-    if (!ev.date) return true;
-    const start = new Date(ev.date.includes('T') ? ev.date : `${ev.date}T${ev.time || '20:00:00'}`).getTime();
-    if (start > now) return true;
-    return now - start < SHOW_AFTER_START_MS;
-  });
+  const visibleEvents = data.events || [];
 
   const hasResults       = visibleEvents.length > 0;
   const hasActiveFilters = Boolean(form.start || form.end || quickRange);

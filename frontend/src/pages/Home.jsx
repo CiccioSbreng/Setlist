@@ -13,6 +13,11 @@ const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=800&q=80",
 ];
 
+const GENRES = [
+  "Rock", "Pop", "Electronic", "Hip-Hop", "Metal",
+  "R&B", "Jazz", "Alternative",
+];
+
 const FEATURES = [
   { icon: <PinIcon size={22} />, title: "Concerti nella tua città", text: "Filtra per città e scopri in pochi secondi tutti gli show vicino a te." },
   { icon: <MusicIcon size={22} />, title: "Artisti, date e venue", text: "Cerca per artista o genere e trova date, orari e location aggiornati." },
@@ -25,7 +30,7 @@ export default function Home() {
     form, update, data, visibleEvents, loading, error,
     citySugg, showCitySugg, setShowCitySugg,
     artistSugg, showArtistSugg, setShowArtistSugg,
-    clearSearch, runSearch, goToPage,
+    applyGenre, clearSearch, runSearch, goToPage,
     favMap, toggleFavorite,
     hasResults, hasSearch, isShowcase,
   } = useHomeSearch();
@@ -165,6 +170,18 @@ export default function Home() {
                 </div>
               </div>
             </form>
+            <div className="genre-chips">
+              {GENRES.map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  className={`genre-chip${form.genre === g ? " is-active" : ""}`}
+                  onClick={() => applyGenre(g)}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -187,10 +204,14 @@ export default function Home() {
               <div className="events-grid">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div className="sk-card" key={i}>
-                    <div className="sk sk--media" />
-                    <div className="sk sk--line w70" />
-                    <div className="sk sk--line w45" />
-                    <div className="sk sk--line" style={{ marginBottom: 18 }} />
+                    <div className="sk sk--img" />
+                    <div className="sk-card__body">
+                      <div className="sk sk--line w70" />
+                      <div className="sk sk--line" style={{ width: "55%" }} />
+                      <div className="sk sk--line w45" />
+                      <div className="sk--spacer" />
+                      <div className="sk sk--line" style={{ width: "30%" }} />
+                    </div>
                   </div>
                 ))}
               </div>

@@ -797,10 +797,18 @@ img {
   border-color: var(--border-strong);
 }
 
+@keyframes heart-pop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.44); }
+  65%  { transform: scale(0.86); }
+  100% { transform: scale(1); }
+}
+
 .icon-btn--fav.is-on {
   color: var(--fuchsia);
   border-color: rgba(255, 61, 139, 0.6);
   background: rgba(255, 61, 139, 0.14);
+  animation: heart-pop 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 .icon-btn--fav:not(.is-on):hover {
@@ -2173,10 +2181,30 @@ input.input[type="date"] {
 
 /* skeleton di caricamento */
 .sk-card {
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
+  border: 1px solid rgba(0, 212, 138, 0.1);
+  border-radius: var(--r-xl);
   overflow: hidden;
-  background: var(--surface);
+  background: linear-gradient(160deg, rgba(0,212,138,0.04) 0%, rgba(255,255,255,0.02) 100%);
+  height: 470px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sk-card__body {
+  flex: 1;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sk--spacer {
+  flex: 1;
+}
+
+.sk--img {
+  height: 200px;
+  flex-shrink: 0;
 }
 
 .sk {
@@ -5909,6 +5937,38 @@ input.input[type="date"] {
   .bottom-nav__item:active svg {
     transform: scale(0.88);
   }
+
+  .bottom-nav__icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @keyframes badge-pop {
+    from { transform: scale(0.3); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .bottom-nav__badge {
+    position: absolute;
+    top: -5px;
+    right: -9px;
+    min-width: 17px;
+    height: 17px;
+    border-radius: 999px;
+    background: var(--brand);
+    color: #071a0e;
+    font-size: 0.58rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    pointer-events: none;
+    border: 1.5px solid var(--bg-900);
+    animation: badge-pop 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
 }
 
 /* ===================== CTA BIGLIETTI (EventDetail mobile — in-flow) ===================== */
@@ -5984,16 +6044,60 @@ input.input[type="date"] {
 .page-enter { animation: page-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
 
 @keyframes stagger-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(26px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 .stagger-item {
-  animation: stagger-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) both;
-  animation-delay: calc(var(--i, 0) * 45ms);
+  animation: stagger-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 65ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .page-enter, .stagger-item { animation: none !important; }
+}
+
+/* ===================== GENRE CHIPS BAR ===================== */
+
+.genre-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 14px 0 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.genre-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.genre-chip {
+  flex-shrink: 0;
+  padding: 7px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-strong);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.genre-chip:hover {
+  background: rgba(0, 212, 138, 0.1);
+  border-color: rgba(0, 212, 138, 0.35);
+  color: var(--brand-soft);
+  transform: translateY(-1px);
+}
+
+.genre-chip.is-active {
+  background: rgba(0, 212, 138, 0.16);
+  border-color: var(--brand);
+  color: var(--brand);
+  box-shadow: 0 2px 14px rgba(0, 212, 138, 0.22);
 }
 
 /* ===================== BLUR-UP (progressive image loading) ===================== */
