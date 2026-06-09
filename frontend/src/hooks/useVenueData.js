@@ -41,35 +41,50 @@ export function useVenueData(ev) {
   useEffect(() => {
     if (lat == null || lon == null) return;
     const ctrl = new AbortController();
-    const tid  = setTimeout(() => ctrl.abort(), 10000);
-    const q    = (query) => overpass(query, ctrl.signal);
+    const tid  = setTimeout(() => ctrl.abort(), 20000);
 
-    q(`[out:json][timeout:8];(node(around:2000,${lat},${lon})[leisure~"park|garden"][name];way(around:2000,${lat},${lon})[leisure~"park|garden"][name];);out center 5;`)
-      .then((d) => setParks((d.elements || []).filter((e) => e.tags?.name).slice(0, 5).map((e) => ({ id: e.id, type: e.type, name: e.tags.name }))))
-      .catch(() => {});
-
-    // Ristoranti: niente brand tag E niente catene note per nome
+    // Catene da escludere dai ristoranti; supermercati/negozi da escludere dai parcheggi
     const CHAIN_RE = /autogrill|mcdonald|burger\s*king|kfc|subway|starbucks|old wild west|roadhouse|spizzico|pizza hut|domino|chef express/i;
     const PARKING_NOISE_RE = /lidl|esselunga|carrefour|conad|coop|ikea|leroy|decathlon|mediaworld|auchan|penny|eurospin|tigr[oò]/i;
 
-    q(`[out:json][timeout:10];(node(around:2000,${lat},${lon})[amenity~"restaurant|pizzeria|pub"][name];way(around:2000,${lat},${lon})[amenity~"restaurant|pizzeria|pub"][name];);out center 8;`)
-      .then((d) => {
-        const all = (d.elements || []).filter((e) => e.tags?.name && !CHAIN_RE.test(e.tags.name));
-        // se dopo il filtro catene è vuoto, mostra i risultati grezzi senza brand=yes
-        const fallback = all.length === 0
-          ? (d.elements || []).filter((e) => e.tags?.name).slice(0, 6)
-          : all.slice(0, 6);
-        setRestaurants(fallback.map((e) => ({ id: e.id, name: e.tags.name, type: e.tags.amenity, lat: e.lat ?? e.center?.lat, lon: e.lon ?? e.center?.lon })));
-      })
-      .catch(() => {});
+    // UNA sola query Overpass per parchi + ristoranti + parcheggi: una richiesta
+    // sola evita il limite di concorrenza del browser (3 query in parallelo
+    // facevano abortire quella dei parcheggi -> colonna che spariva).
+    const query =
+      `[out:json][timeout:25];(` +
+      `node(around:2000,${lat},${lon})[leisure~"park|garden"][name];` +
+      `way(around:2000,${lat},${lon})[leisure~"park|garden"][name];` +
+      `node(around:2000,${lat},${lon})[amenity~"restaurant|pizzeria|pub"][name];` +
+      `way(around:2000,${lat},${lon})[amenity~"restaurant|pizzeria|pub"][name];` +
+      `node(around:1500,${lat},${lon})[amenity=parking];` +
+      `way(around:1500,${lat},${lon})[amenity=parking];` +
+      `);out center;`;
 
-    q(`[out:json][timeout:8];(node(around:1500,${lat},${lon})[amenity=parking];way(around:1500,${lat},${lon})[amenity=parking];);out center 8;`)
+    overpass(query, ctrl.signal)
       .then((d) => {
-        const all = (d.elements || [])
+        const els = d.elements || [];
+        const parkEls = [], restEls = [], parkingEls = [];
+        for (const e of els) {
+          const t = e.tags || {};
+          if (t.leisure && /park|garden/.test(t.leisure) && t.name) parkEls.push(e);
+          else if (t.amenity && /restaurant|pizzeria|pub/.test(t.amenity) && t.name) restEls.push(e);
+          else if (t.amenity === "parking") parkingEls.push(e);
+        }
+
+        // Parchi e verde
+        setParks(parkEls.slice(0, 5).map((e) => ({ id: e.id, type: e.type, name: e.tags.name })));
+
+        // Ristoranti / pizzerie / pub (niente catene note)
+        const restAll = restEls.filter((e) => !CHAIN_RE.test(e.tags.name));
+        const restList = (restAll.length === 0 ? restEls : restAll).slice(0, 6);
+        setRestaurants(restList.map((e) => ({ id: e.id, name: e.tags.name, type: e.tags.amenity, lat: e.lat ?? e.center?.lat, lon: e.lon ?? e.center?.lon })));
+
+        // Parcheggi (con indicazione a pagamento)
+        const pAll = parkingEls
           .filter((e) => e.tags?.access !== "private" && e.tags?.access !== "no")
           .filter((e) => !PARKING_NOISE_RE.test(e.tags?.name ?? ""));
-        const named = all.filter((e) => e.tags?.name);
-        const list = named.length > 0 ? named : all;
+        const named = pAll.filter((e) => e.tags?.name);
+        const list = named.length > 0 ? named : pAll;
         setParkings(
           list
             .map((e) => {
