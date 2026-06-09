@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useHomeSearch } from "../hooks/useHomeSearch";
 import EventCard from "../components/EventCard";
@@ -37,6 +37,60 @@ export default function Home() {
   } = useHomeSearch();
 
   const [pageInput, setPageInput] = useState("");
+  const heroRef = useRef(null);
+  const artRef = useRef(null);
+
+  // Parallax: la collage hero scorre più lenta dello scroll
+  useEffect(() => {
+    const art = artRef.current;
+    if (!art) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const y = Math.min(window.scrollY, 700);
+        art.style.transform = `translate3d(0, ${(y * 0.12).toFixed(1)}px, 0)`;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+  }, []);
+
+  // Spotlight: luce verde che segue il cursore nella hero
+  function heroMove(e) {
+    const el = heroRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    el.style.setProperty("--my", `${e.clientY - r.top}px`);
+  }
+
+  // Magnetic: i pulsanti si attraggono verso il cursore
+  function magneticMove(e) {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width / 2;
+    const y = e.clientY - r.top - r.height / 2;
+    el.style.transform = `translate(${(x * 0.25).toFixed(1)}px, ${(y * 0.4).toFixed(1)}px)`;
+  }
+  function magneticLeave(e) {
+    e.currentTarget.style.transform = "";
+  }
+
+  const marqueeEvents = [...visibleEvents].sort((a, b) => {
+    const ta = a.date ? new Date(a.date).getTime() : Infinity;
+    const tb = b.date ? new Date(b.date).getTime() : Infinity;
+    return ta - tb;
+  });
+
+  function chipDate(d) {
+    if (!d) return "";
+    const date = new Date(d);
+    if (isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+  }
 
   function submitPageJump(e) {
     e.preventDefault();
@@ -50,7 +104,13 @@ export default function Home() {
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="hero">
+      <section
+        className="hero"
+        ref={heroRef}
+        onMouseMove={heroMove}
+        onMouseEnter={(e) => e.currentTarget.classList.add("is-pointer")}
+        onMouseLeave={(e) => e.currentTarget.classList.remove("is-pointer")}
+      >
         <div className="hero__bg">
           <div className="hero__overlay" />
           <div className="hero__glow" />
@@ -71,7 +131,12 @@ export default function Home() {
               gli show che non vuoi perdere.
             </p>
             <div className="hero__actions">
-              <Link to="/favorites" className="btn btn--ghost">
+              <Link
+                to="/favorites"
+                className="btn btn--ghost magnetic"
+                onMouseMove={magneticMove}
+                onMouseLeave={magneticLeave}
+              >
                 <HeartIcon size={18} />My List
               </Link>
             </div>
@@ -99,7 +164,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="hero__art" aria-hidden="true">
+          <div className="hero__art" aria-hidden="true" ref={artRef}>
             <div className="hero__card c1"><img src={HERO_IMAGES[0]} alt="" /></div>
             <div className="hero__card c2"><img src={HERO_IMAGES[1]} alt="" /></div>
             <div className="hero__card c3"><img src={HERO_IMAGES[2]} alt="" /></div>
@@ -197,6 +262,34 @@ export default function Home() {
         </div>
 
       </section>
+
+      {/* ===== MARQUEE ARTISTI ===== */}
+      {isShowcase && hasResults && (
+        <div className="marquee">
+          <div className="marquee__track">
+            {[...marqueeEvents, ...marqueeEvents].map((ev, idx) => (
+              <Link
+                to={`/event/${ev.eventId || ev.id}`}
+                className="marquee__chip"
+                key={`${ev.id}-${idx}`}
+                tabIndex={idx < marqueeEvents.length ? 0 : -1}
+              >
+                {ev.image ? (
+                  <img src={ev.image} alt="" className="marquee__thumb" loading="lazy" />
+                ) : (
+                  <span className="marquee__thumb marquee__thumb--ph"><MusicIcon size={16} /></span>
+                )}
+                <span className="marquee__info">
+                  <span className="marquee__name">{ev.name}</span>
+                  {chipDate(ev.date) && (
+                    <span className="marquee__date">{chipDate(ev.date)}</span>
+                  )}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ===== RISULTATI ===== */}
       <section className="section" id="ricerca">
@@ -312,7 +405,12 @@ export default function Home() {
               <h2>Crea il tuo account e salva i tuoi eventi</h2>
               <p>Registrati gratuitamente per costruire la tua lista di concerti preferiti e ritrovarli su qualsiasi dispositivo.</p>
             </div>
-            <Link to="/login" className="btn btn--primary">
+            <Link
+              to="/login"
+              className="btn btn--primary magnetic"
+              onMouseMove={magneticMove}
+              onMouseLeave={magneticLeave}
+            >
               <TicketIcon size={18} />Inizia ora<ArrowRightIcon size={18} />
             </Link>
           </div>

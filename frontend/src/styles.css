@@ -23,6 +23,9 @@
   --grad-brand: linear-gradient(135deg, #00D48A 0%, #00B87A 100%);
   --grad-aurora: linear-gradient(135deg, #00D48A 0%, #4A6FFF 100%);
 
+  /* Font display titoli */
+  --font-display: "Clash Display", "Sora", system-ui, sans-serif;
+
   /* Testo */
   --text: #EEF1FF;
   --text-dim: #B0B8D8;
@@ -219,8 +222,8 @@ h2,
 h3,
 h4,
 .font-display {
-  font-family: "Sora", "Inter", system-ui, sans-serif;
-  letter-spacing: -0.03em;
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
   line-height: 1.12;
   margin: 0;
 }
@@ -331,7 +334,7 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.35rem;
   color: #fff;
@@ -928,7 +931,7 @@ img {
 }
 
 .hero__stat .n {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 800;
   color: #fff;
@@ -1975,7 +1978,7 @@ input.input[type="date"] {
 }
 
 .ev-card__date .d {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 800;
   color: #fff;
@@ -2024,10 +2027,11 @@ input.input[type="date"] {
 }
 
 .ev-card__title {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-display);
   font-size: 1.04rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  color: var(--text);
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -2921,7 +2925,7 @@ input.input[type="date"] {
 }
 
 .ed__title {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 800;
   line-height: 1.15;
@@ -3648,7 +3652,7 @@ input.input[type="date"] {
 }
 
 .ed-wx__temp {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 800;
   color: #fff;
@@ -3803,7 +3807,7 @@ input.input[type="date"] {
 }
 
 .ch-budget__total strong {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-display);
   font-size: 1.35rem;
   background: var(--grad-brand);
   -webkit-background-clip: text;
@@ -5333,8 +5337,6 @@ input.input[type="date"] {
 }
 .ed-yt-fallback svg { opacity: 0.4; }
 .ed-yt-fallback p { font-size: 0.9rem; margin: 0; }
-  border: 0;
-}
 
 /* ── Setlist pulita ── */
 .ed-block .ed-setlist__list { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
@@ -5386,7 +5388,7 @@ input.input[type="date"] {
 }
 .ed-wx__icon { font-size: 3.2rem; line-height: 1; }
 .ed-wx__temp {
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 800;
   color: #fff;
@@ -6338,3 +6340,184 @@ input.input[type="date"] {
 @media (min-width: 821px) {
   .back-to-top { bottom: 32px; }
 }
+
+/* =========================================================
+   Premium FX — grain · spotlight · gradient border · parallax
+   ========================================================= */
+
+/* ── 1. Grain / noise texture globale ─────────────────────── */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ── 2. Spotlight cursor nella hero ───────────────────────── */
+.hero__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    560px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(0, 212, 138, 0.12),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.hero.is-pointer .hero__bg::after {
+  opacity: 1;
+}
+
+/* ── 3. Gradient border animato sulle card (hover) ────────── */
+@property --card-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.ev-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--card-angle),
+    transparent 0%,
+    var(--brand) 18%,
+    transparent 38%,
+    transparent 60%,
+    var(--brand-soft) 82%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.ev-card:hover::after {
+  opacity: 1;
+  animation: card-border-rotate 4s linear infinite;
+}
+
+@keyframes card-border-rotate {
+  to { --card-angle: 360deg; }
+}
+
+/* ── 4. Parallax hero (transform impostato via JS) ────────── */
+.hero__art {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero.is-pointer .hero__bg::after { opacity: 0; }
+  .ev-card:hover::after { animation: none; }
+  .hero__art { transform: none !important; }
+}
+
+/* ── 5. Magnetic buttons ──────────────────────────────────── */
+.magnetic {
+  transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1),
+    background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .magnetic { transform: none !important; }
+}
+
+/* ── 6. Marquee artisti ───────────────────────────────────── */
+.marquee {
+  position: relative;
+  overflow: hidden;
+  padding: 13px 0;
+  border-block: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  -webkit-mask: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+          mask: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.marquee__track {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: max-content;
+  animation: marquee-scroll 55s linear infinite;
+}
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+.marquee__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 7px 18px 7px 7px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.03);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.2s ease, border-color 0.2s ease,
+    background 0.2s ease, box-shadow 0.2s ease;
+}
+.marquee__chip:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 212, 138, 0.45);
+  background: rgba(0, 212, 138, 0.07);
+  box-shadow: 0 8px 24px rgba(0, 212, 138, 0.16);
+}
+.marquee__thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.marquee__thumb--ph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-700);
+  color: var(--brand);
+}
+.marquee__info {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.marquee__name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s ease;
+}
+.marquee__chip:hover .marquee__name { color: var(--text); }
+.marquee__date {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+}
+@keyframes marquee-scroll {
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track { animation: none; }
+}
+

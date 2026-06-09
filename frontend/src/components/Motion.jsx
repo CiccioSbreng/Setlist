@@ -37,11 +37,11 @@ export function Stagger({ children, as: Tag = "div", delay, ...rest }) {
   );
 }
 
-export function StaggerItem({ children, as: Tag = "div", style, ...rest }) {
+export function StaggerItem({ children, as: Tag = "div", style, className, ...rest }) {
   const i = useContext(StaggerCtx);
   return (
     <Tag
-      className="stagger-item"
+      className={"stagger-item" + (className ? ` ${className}` : "")}
       style={{ "--i": Math.min(i, 8), ...style }}
       {...rest}
     >

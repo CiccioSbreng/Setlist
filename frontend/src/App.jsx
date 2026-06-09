@@ -83,6 +83,7 @@ export default function App() {
       <div className="app-shell">
         <VideoBackground />
         <GradientBackground />
+        <div className="grain-overlay" aria-hidden="true" />
         <Navbar />
 
         <main className="app-main">
