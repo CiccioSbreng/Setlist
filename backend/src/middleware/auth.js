@@ -1,5 +1,6 @@
 // backend/src/middleware/auth.js
-const jwt = require('jsonwebtoken');
+const logger = require('../lib/logger');
+const { verifyAccessToken } = require('../lib/tokens');
 
 module.exports = function auth(req, res, next) {
   const header = req.headers.authorization;
@@ -11,11 +12,10 @@ module.exports = function auth(req, res, next) {
   const token = header.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { id, email }
+    req.user = verifyAccessToken(token); // { id, email, type: 'access' }
     next();
   } catch (err) {
-    console.error('JWT error:', err.message);
+    logger.warn(`JWT non valido: ${err.message}`);
     return res.status(401).json({ message: 'Token non valido' });
   }
 };

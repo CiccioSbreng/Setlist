@@ -1,31 +1,11 @@
 // backend/src/routes/auth.js
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
+const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../lib/tokens');
 
 const router = express.Router();
-
-function requireAuth(req, res, next) {
-  const auth = req.headers.authorization;
-  if (!auth?.startsWith('Bearer ')) return res.status(401).json({ message: 'Non autorizzato.' });
-  try {
-    req.user = jwt.verify(auth.slice(7), process.env.JWT_SECRET);
-    next();
-  } catch {
-    res.status(401).json({ message: 'Token non valido.' });
-  }
-}
-
-function createToken(user) {
-  const payload = { id: user._id.toString(), email: user.email };
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-}
-
-function createRefreshToken(user) {
-  const payload = { id: user._id.toString(), type: 'refresh' };
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '30d' });
-}
 
 // POST /api/auth/register
 router.post('/register', async (req, res, next) => {
@@ -49,8 +29,8 @@ router.post('/register', async (req, res, next) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = await User.create({ email, passwordHash });
-    const token        = createToken(user);
-    const refreshToken = createRefreshToken(user);
+    const token        = signAccessToken(user);
+    const refreshToken = signRefreshToken(user);
 
     return res.status(201).json({
       token,
@@ -83,8 +63,8 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ message: 'Credenziali non valide.' });
     }
 
-    const token        = createToken(user);
-    const refreshToken = createRefreshToken(user);
+    const token        = signAccessToken(user);
+    const refreshToken = signRefreshToken(user);
 
     return res.json({
       token,
@@ -97,7 +77,7 @@ router.post('/login', async (req, res, next) => {
 });
 
 // GET /api/auth/profile
-router.get('/profile', requireAuth, async (req, res, next) => {
+router.get('/profile', auth, async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'Utente non trovato.' });
@@ -108,14 +88,15 @@ router.get('/profile', requireAuth, async (req, res, next) => {
 });
 
 // PUT /api/auth/profile
-router.put('/profile', requireAuth, async (req, res, next) => {
+router.put('/profile', auth, async (req, res, next) => {
   try {
     const { displayName, bio, avatar } = req.body;
     const update = {};
     if (displayName !== undefined) update.displayName = String(displayName).slice(0, 60);
     if (bio !== undefined) update.bio = String(bio).slice(0, 200);
-    if (avatar !== undefined) update.avatar = avatar;
+    if (avatar !== undefined) update.avatar = String(avatar).slice(0, 500);
     const user = await User.findByIdAndUpdate(req.user.id, update, { new: true });
+    if (!user) return res.status(404).json({ message: 'Utente non trovato.' });
     res.json(user.toSafeObject());
   } catch (err) {
     next(err);
@@ -123,15 +104,18 @@ router.put('/profile', requireAuth, async (req, res, next) => {
 });
 
 // PUT /api/auth/password
-router.put('/password', requireAuth, async (req, res, next) => {
+router.put('/password', auth, async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
     if (!currentPassword || !newPassword || newPassword.length < 6)
       return res.status(400).json({ message: 'Password non valida (min 6 caratteri).' });
     const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'Utente non trovato.' });
     const ok = await bcrypt.compare(currentPassword, user.passwordHash);
     if (!ok) return res.status(401).json({ message: 'Password attuale errata.' });
     user.passwordHash = await bcrypt.hash(newPassword, 10);
+    // Cambio password: invalida tutti i refresh token esistenti (altri device).
+    user.tokenVersion = (user.tokenVersion || 0) + 1;
     await user.save();
     res.json({ ok: true });
   } catch (err) {
@@ -145,17 +129,21 @@ router.post('/refresh', async (req, res, next) => {
   if (!refreshToken) return res.status(400).json({ message: 'refreshToken mancante.' });
 
   try {
-    const payload = jwt.verify(refreshToken, process.env.JWT_SECRET);
-    if (payload.type !== 'refresh') return res.status(401).json({ message: 'Token non valido.' });
+    const payload = verifyRefreshToken(refreshToken);
 
     const user = await User.findById(payload.id);
     if (!user) return res.status(401).json({ message: 'Utente non trovato.' });
 
-    const token      = createToken(user);
-    const newRefresh = createRefreshToken(user);
+    // Revoca: se il tokenVersion non combacia, il refresh è stato invalidato.
+    if ((payload.tv ?? 0) !== (user.tokenVersion || 0)) {
+      return res.status(401).json({ message: 'Sessione scaduta. Effettua di nuovo l\'accesso.' });
+    }
+
+    const token      = signAccessToken(user);
+    const newRefresh = signRefreshToken(user);
     return res.json({ token, refreshToken: newRefresh });
   } catch (err) {
-    next(err);
+    return res.status(401).json({ message: 'Token non valido.' });
   }
 });
 

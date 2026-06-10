@@ -18,6 +18,13 @@ if (missing.length) {
   process.exit(1);
 }
 
+// In produzione MONGO_URI è obbligatoria: meglio fallire subito che connettersi
+// silenziosamente a un localhost inesistente. In sviluppo resta il default locale.
+if (process.env.NODE_ENV === 'production' && !process.env.MONGO_URI) {
+  console.error("❌ MONGO_URI è obbligatoria in produzione.");
+  process.exit(1);
+}
+
 const ticketmasterRouter = require('./routes/ticketmaster');
 const authRouter         = require('./routes/auth');
 const favoritesRouter    = require('./routes/favorites');
@@ -48,6 +55,17 @@ app.use(cors({
 }));
 
 app.use('/api/', rateLimit({ windowMs: 60_000, max: 60 }));
+
+// Limite più stretto sugli endpoint sensibili di autenticazione (anti brute-force):
+// max 15 tentativi ogni 15 minuti per IP su login e registrazione.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Troppi tentativi. Riprova tra qualche minuto.' },
+});
+app.use(['/api/auth/login', '/api/auth/register'], authLimiter);
 
 // Blocca le route che richiedono DB se Mongoose non è connesso
 const DB_ROUTES = ['/api/auth', '/api/favorites'];

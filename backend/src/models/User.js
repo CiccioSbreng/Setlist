@@ -17,6 +17,8 @@ const userSchema = new mongoose.Schema(
     displayName: { type: String, default: '' },
     bio: { type: String, default: '', maxlength: 200 },
     avatar: { type: String, default: '' },
+    // Incrementato per revocare i refresh token esistenti (es. cambio password).
+    tokenVersion: { type: Number, default: 0 },
   },
   {
     timestamps: true,
